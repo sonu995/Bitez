@@ -54,10 +54,10 @@ const Cart: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
           <p className="text-gray-600 mb-8">Add some delicious items to get started</p>
           <Link 
-            to="/" 
-            className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600"
+            to="/menu" 
+            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:from-orange-600 hover:to-amber-600 transition-all inline-block"
           >
-            Browse Restaurants
+            Explore Instant Order Menu
           </Link>
         </div>
       </div>
@@ -83,51 +83,51 @@ const Cart: React.FC = () => {
 
               <div className="space-y-4">
                 {items.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
+                  <div key={item.id} className="flex items-center justify-between gap-2.5 sm:gap-4 p-3 sm:p-4 border border-gray-200 rounded-xl">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-16 h-16 object-cover rounded-lg"
+                      className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-xl shrink-0"
                     />
                     
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                      <p className="text-sm text-gray-600">{item.restaurant}</p>
-                      <p className="text-lg font-bold text-gray-900">₹{item.price}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <div className={`w-3.5 h-3.5 rounded-xs border shrink-0 flex items-center justify-center ${
+                          item.isVeg ? 'border-emerald-600 bg-white' : 'border-rose-600 bg-white'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${item.isVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
+                        </div>
+                        <h3 className="font-bold text-gray-900 text-xs sm:text-base truncate">{item.name}</h3>
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-gray-500 truncate">{item.restaurant}</p>
+                      <p className="text-sm sm:text-base font-black text-gray-900 mt-0.5">₹{item.price}</p>
                     </div>
 
-                    <div className={`w-6 h-6 rounded border-2 ${
-                      item.isVeg 
-                        ? 'border-green-500 bg-white' 
-                        : 'border-red-500 bg-white'
-                    }`}>
-                      <div className={`w-2 h-2 rounded-full mx-auto mt-1 ${
-                        item.isVeg ? 'bg-green-500' : 'bg-red-500'
-                      }`}></div>
-                    </div>
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                      <div className="flex items-center bg-orange-50 border border-orange-200/80 rounded-xl p-0.5 sm:p-1">
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="w-6 h-6 sm:w-7 sm:h-7 bg-white text-orange-600 rounded-lg flex items-center justify-center hover:bg-orange-100 shadow-2xs cursor-pointer"
+                        >
+                          <Minus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                        </button>
+                        <span className="font-bold text-xs sm:text-sm px-2 text-slate-800">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="w-6 h-6 sm:w-7 sm:h-7 bg-orange-500 text-white rounded-lg flex items-center justify-center hover:bg-orange-600 shadow-2xs cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                        </button>
+                      </div>
 
-                    <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200"
+                        onClick={() => removeFromCart(item.id)}
+                        className="p-1 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
+                        title="Remove item"
                       >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span className="font-semibold px-3">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200"
-                      >
-                        <Plus className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     </div>
-
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
                   </div>
                 ))}
               </div>

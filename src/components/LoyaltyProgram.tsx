@@ -60,7 +60,7 @@ const LoyaltyProgram: React.FC = () => {
       description: 'Get one meal completely free (up to ₹150)',
       points: 1000,
       type: 'freebie',
-      icon: <Crown className="w-6 h-6 text-purple-500" />,
+      icon: <Crown className="w-6 h-6 text-amber-500" />,
       claimed: false
     }
   ];
@@ -78,7 +78,7 @@ const LoyaltyProgram: React.FC = () => {
       case 'Bronze': return 'text-orange-600 bg-orange-100';
       case 'Silver': return 'text-gray-600 bg-gray-100';
       case 'Gold': return 'text-yellow-600 bg-yellow-100';
-      case 'Platinum': return 'text-purple-600 bg-purple-100';
+      case 'Platinum': return 'text-rose-600 bg-rose-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };

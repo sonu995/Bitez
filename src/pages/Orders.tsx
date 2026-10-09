@@ -69,7 +69,7 @@ const Orders: React.FC = () => {
     switch (status) {
       case 'confirmed': return 'bg-blue-100 text-blue-800';
       case 'preparing': return 'bg-yellow-100 text-yellow-800';
-      case 'on-the-way': return 'bg-purple-100 text-purple-800';
+      case 'on-the-way': return 'bg-orange-100 text-orange-800';
       case 'delivered': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -156,12 +156,12 @@ const Orders: React.FC = () => {
             <div className="text-center py-12">
               <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders found</h3>
-              <p className="text-gray-600 mb-6">Start exploring restaurants and place your first order</p>
+              <p className="text-gray-600 mb-6">Explore our fresh menu and place your first instant order</p>
               <Link 
-                to="/" 
-                className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600"
+                to="/menu" 
+                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:from-orange-600 hover:to-amber-600 transition-all inline-block"
               >
-                Browse Restaurants
+                Explore Instant Order Menu
               </Link>
             </div>
           ) : (
@@ -285,7 +285,7 @@ const Orders: React.FC = () => {
               <span className="font-medium text-orange-700">Browse Restaurants</span>
             </Link>
             <Link 
-              to="/subscriptions" 
+              to="/mess" 
               className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-200"
             >
               <Calendar className="w-6 h-6 text-green-500" />

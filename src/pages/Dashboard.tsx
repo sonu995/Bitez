@@ -1,343 +1,255 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, Package, Wallet, Star, Clock, MapPin, Plus, Pause, Play, Settings } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Bell, Edit, Wallet, Utensils, Package, TrendingUp, Crown, Plus, Truck, Users, Settings, Star, Clock } from 'lucide-react';
 
-const Dashboard: React.FC = () => {
-  const { user, updateWallet } = useAuth();
+export default function Dashboard() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const recentOrders = [
-    {
-      id: 'ORD001',
-      restaurant: 'Healthy Mess Co.',
-      items: ['Dal Rice', 'Paneer Curry', 'Roti'],
-      amount: 150,
-      status: 'delivered',
-      date: '2024-01-15',
-      rating: 4.5
-    },
-    {
-      id: 'ORD002',
-      restaurant: 'Student Tiffin Service',
-      items: ['Rajma Chawal', 'Mixed Vegetables'],
-      amount: 120,
-      status: 'delivered',
-      date: '2024-01-14',
-      rating: 4.2
-    }
-  ];
+  const tabs = ['Overview', 'Subscription', 'Orders', 'Wallet', 'Profile'];
 
-  const upcomingMeals = [
-    { date: '2024-01-16', meal: 'Lunch', menu: 'Chole Bhature, Lassi' },
-    { date: '2024-01-16', meal: 'Dinner', menu: 'Aloo Gobi, Dal, Roti' },
-    { date: '2024-01-17', meal: 'Lunch', menu: 'Biryani, Raita, Pickle' }
-  ];
-
-  const handleAddMoney = () => {
-    updateWallet(500);
-  };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please login to continue</h2>
-          <Link to="/login" className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600">
-            Login
-          </Link>
+  const renderOverview = () => (
+    <div className="space-y-6">
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Wallet */}
+        <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 rounded-xl p-5 text-white flex justify-between items-center shadow-sm">
+          <div>
+            <p className="text-orange-100 text-sm font-medium mb-1">Wallet Balance</p>
+            <h3 className="text-3xl font-bold">₹1250</h3>
+          </div>
+          <Wallet size={36} strokeWidth={1.5} className="opacity-90" />
+        </div>
+        {/* Meals Remaining */}
+        <div className="bg-white border border-orange-100 rounded-xl p-5 flex justify-between items-center shadow-sm">
+          <div>
+            <p className="text-slate-500 text-sm font-medium mb-1">Meals Remaining</p>
+            <h3 className="text-3xl font-bold text-emerald-600">45</h3>
+          </div>
+          <Utensils size={36} strokeWidth={1.5} className="text-emerald-500" />
+        </div>
+        {/* Orders This Month */}
+        <div className="bg-white border border-orange-100 rounded-xl p-5 flex justify-between items-center shadow-sm">
+          <div>
+            <p className="text-slate-500 text-sm font-medium mb-1">Orders This Month</p>
+            <h3 className="text-3xl font-bold text-blue-500">24</h3>
+          </div>
+          <Package size={36} strokeWidth={1.5} className="text-blue-500" />
+        </div>
+        {/* Money Saved */}
+        <div className="bg-white border border-orange-100 rounded-xl p-5 flex justify-between items-center shadow-sm">
+          <div>
+            <p className="text-slate-500 text-sm font-medium mb-1">Money Saved</p>
+            <h3 className="text-3xl font-bold text-orange-600">₹480</h3>
+          </div>
+          <TrendingUp size={36} strokeWidth={1.5} className="text-orange-500" />
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}!</h1>
-          <p className="text-gray-600 mt-2">Manage your orders, subscriptions, and account settings</p>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Wallet className="w-6 h-6 text-green-600" />
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Upcoming Meal & Extras */}
+          <div className="bg-white border border-orange-100 rounded-xl p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span className="text-2xl">🍲</span> Upcoming Lunch
+              </h3>
+              <span className="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                <Clock size={12} /> Today, 1:00 PM
+              </span>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-orange-50/30 p-4 rounded-xl mb-6 border border-orange-100/70">
+              <div className="w-16 h-16 rounded-xl overflow-hidden shadow-sm shrink-0 hidden sm:block">
+                <img src="https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=200" alt="Lunch" className="w-full h-full object-cover" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Wallet Balance</p>
-                <p className="text-2xl font-bold text-gray-900">₹{user.walletBalance.toFixed(2)}</p>
+              <div className="flex-1">
+                <h4 className="font-bold text-slate-900 text-base mb-1">Paneer Butter Masala + Dal + 3 Roti</h4>
+                <p className="text-slate-500 text-sm">Included in your Premium Plan</p>
+              </div>
+              <button className="w-full sm:w-auto px-4 py-2 bg-white text-rose-500 text-sm font-bold border border-slate-200 hover:bg-rose-50 hover:border-rose-200 rounded-lg transition-all shadow-sm">
+                Skip Meal
+              </button>
+            </div>
+
+            {/* Add Extra Dish Section */}
+            <div className="border-t border-slate-100 pt-5">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="font-bold text-slate-800 flex items-center gap-2"><Plus className="w-4 h-4 text-orange-600" /> Add Extra Dish</h4>
+                <p className="text-xs text-slate-400 hidden sm:block">Auto-deducted from wallet</p>
+              </div>
+              
+              <div className="flex space-x-3 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
+                {[
+                  { name: "Extra Roti (2)", price: 15, img: "https://images.pexels.com/photos/10860591/pexels-photo-10860591.jpeg?auto=compress&cs=tinysrgb&w=150" },
+                  { name: "Gulab Jamun", price: 30, img: "https://images.pexels.com/photos/13435133/pexels-photo-13435133.jpeg?auto=compress&cs=tinysrgb&w=150" },
+                  { name: "Lassi", price: 25, img: "https://images.pexels.com/photos/10153303/pexels-photo-10153303.jpeg?auto=compress&cs=tinysrgb&w=150" },
+                  { name: "Extra Paneer", price: 50, img: "https://images.pexels.com/photos/9738981/pexels-photo-9738981.jpeg?auto=compress&cs=tinysrgb&w=150" },
+                  { name: "Boiled Eggs", price: 25, img: "https://images.pexels.com/photos/824635/pexels-photo-824635.jpeg?auto=compress&cs=tinysrgb&w=150" },
+                ].map((item, i) => (
+                  <div key={i} className="min-w-[120px] snap-center bg-white border border-orange-100/80 rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all group flex-shrink-0">
+                    <img src={item.img} alt={item.name} className="w-12 h-12 mx-auto rounded-full object-cover mb-2 border border-slate-100 group-hover:scale-105 transition-transform" />
+                    <h5 className="text-xs font-bold text-slate-900 mb-1 truncate">{item.name}</h5>
+                    <p className="text-orange-600 font-extrabold text-sm mb-2">₹{item.price}</p>
+                    <button className="w-full bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white text-xs font-bold py-1.5 rounded-lg transition-colors">
+                      + Add
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {user.subscription && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Package className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-gray-600">Remaining Meals</p>
-                  <p className="text-2xl font-bold text-gray-900">{user.subscription.remainingMeals}</p>
-                </div>
+          {/* Current Subscription */}
+          <div className="bg-white border border-orange-100 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <Crown className="text-amber-500" size={20} /> Current Subscription
+            </h3>
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h4 className="text-xl font-bold text-slate-900 mb-1">Premium Thali Mess</h4>
+                <p className="text-slate-500 text-sm">₹2299/month</p>
               </div>
+              <span className="bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                active
+              </span>
             </div>
-          )}
-
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-orange-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Total Orders</p>
-                <p className="text-2xl font-bold text-gray-900">24</p>
-              </div>
+            
+            <div className="mb-2 flex justify-between text-sm">
+              <span className="text-slate-600">Meals Used</span>
+              <span className="font-bold text-slate-900">45/90</span>
             </div>
-          </div>
+            <div className="w-full bg-orange-50 rounded-full h-2 mb-6">
+              <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-2 rounded-full" style={{ width: '50%' }}></div>
+            </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Star className="w-6 h-6 text-purple-600" />
+            <div className="flex justify-between text-sm">
+              <div>
+                <p className="text-slate-500 mb-1">Next Billing</p>
+                <p className="font-bold text-slate-900">Feb 15, 2025</p>
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Loyalty Points</p>
-                <p className="text-2xl font-bold text-gray-900">1,250</p>
+              <div className="text-right">
+                <p className="text-slate-500 mb-1">Days Left</p>
+                <p className="font-bold text-slate-900">12 days</p>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-sm mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+          {/* Recent Orders */}
+          <div className="bg-white border border-orange-100 rounded-xl p-6 shadow-sm overflow-hidden">
+            <h3 className="text-lg font-bold text-slate-800 mb-4">Recent Orders</h3>
+            <div className="divide-y divide-slate-100">
               {[
-                { key: 'overview', label: 'Overview' },
-                { key: 'orders', label: 'Orders' },
-                { key: 'subscription', label: 'Subscription' },
-                { key: 'wallet', label: 'Wallet' }
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.key
-                      ? 'border-orange-500 text-orange-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  {tab.label}
-                </button>
+                { id: '#ORD-8821', rest: 'Healthy Mess Co.', items: 'Paneer Butter Masala Combo', price: '₹140', time: 'Yesterday, 8:30 PM', status: 'Delivered', rating: 5 },
+                { id: '#ORD-8819', rest: 'Quick Bites Express', items: 'Crispy Veg Burger + Coke', price: '₹110', time: 'Jan 12, 2:15 PM', status: 'Delivered', rating: 4 },
+                { id: '#ORD-8810', rest: 'Student Tiffin Service', items: 'Dal Tadka + Jeera Rice Thali', price: '₹99', time: 'Jan 10, 1:00 PM', status: 'Delivered', rating: 5 },
+              ].map((order, i) => (
+                <div key={i} className="py-4 flex items-center justify-between hover:bg-orange-50/20 px-2 rounded-lg transition">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-xl shrink-0">
+                      🍱
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm mb-1">{order.id}</p>
+                      <p className="text-orange-600 text-xs font-semibold">{order.rest}</p>
+                    </div>
+                    <div className="hidden sm:block">
+                      <p className="text-slate-700 text-sm mb-1">{order.items}</p>
+                      <p className="text-slate-400 text-xs">{order.time}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <span className="font-bold text-slate-900">{order.price}</span>
+                    <span className="bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">{order.status}</span>
+                    <div className="flex items-center gap-1 text-amber-400 font-bold text-sm w-8">
+                      <Star size={14} fill="currentColor" /> {order.rating}
+                    </div>
+                  </div>
+                </div>
               ))}
-            </nav>
+            </div>
+            <div className="mt-6 text-center">
+              <button onClick={() => navigate('/orders')} className="px-5 py-2 bg-white border border-orange-200 text-orange-700 text-sm font-bold rounded-lg hover:bg-orange-50 transition shadow-xs cursor-pointer">
+                View All Orders
+              </button>
+            </div>
           </div>
+        </div>
 
-          <div className="p-6">
-            {activeTab === 'overview' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Current Subscription */}
-                {user.subscription && (
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-semibold">Current Subscription</h3>
-                    <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h4 className="text-xl font-bold">{user.subscription.plan}</h4>
-                          <p className="opacity-90">Active until {user.subscription.expiryDate}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold">{user.subscription.remainingMeals}</p>
-                          <p className="text-sm opacity-90">meals left</p>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <button className="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-opacity-30">
-                          <Pause className="w-4 h-4 inline mr-2" />
-                          Pause Plan
-                        </button>
-                        <button className="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-opacity-30">
-                          <Settings className="w-4 h-4 inline mr-2" />
-                          Manage
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Upcoming Meals */}
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">Upcoming Meals</h3>
-                    <Link to="/menu" className="text-orange-500 text-sm font-medium hover:text-orange-600">
-                      View Full Menu
-                    </Link>
-                  </div>
-                  <div className="space-y-3">
-                    {upcomingMeals.map((meal, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{meal.meal} - {meal.date}</p>
-                          <p className="text-gray-600 text-sm">{meal.menu}</p>
-                        </div>
-                        <button className="text-orange-500 text-sm font-medium hover:text-orange-600">
-                          Skip
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'orders' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Recent Orders</h3>
-                  <Link to="/menu" className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600">
-                    Order Now
-                  </Link>
-                </div>
-                <div className="space-y-4">
-                  {recentOrders.map((order) => (
-                    <div key={order.id} className="border border-gray-200 rounded-lg p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h4 className="font-semibold">{order.restaurant}</h4>
-                          <p className="text-gray-600 text-sm">{order.items.join(', ')}</p>
-                          <p className="text-sm text-gray-500 mt-1">{order.date}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold">₹{order.amount}</p>
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            {order.status}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                          <span className="text-sm">{order.rating}</span>
-                        </div>
-                        <div className="space-x-2">
-                          <button className="text-orange-500 text-sm hover:text-orange-600">
-                            Rate Order
-                          </button>
-                          <button className="text-orange-500 text-sm hover:text-orange-600">
-                            Reorder
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'subscription' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Subscription Management</h3>
-                  <Link to="/plans" className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600">
-                    Browse Plans
-                  </Link>
-                </div>
-                
-                {user.subscription ? (
-                  <div className="border border-gray-200 rounded-lg p-6">
-                    <h4 className="font-semibold mb-4">{user.subscription.plan}</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Remaining Meals</p>
-                        <p className="text-2xl font-bold">{user.subscription.remainingMeals}</p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Expiry Date</p>
-                        <p className="font-semibold">{user.subscription.expiryDate}</p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Status</p>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          Active
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">
-                        <Pause className="w-4 h-4 inline mr-2" />
-                        Pause Subscription
-                      </button>
-                      <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">
-                        Upgrade Plan
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold mb-2">No Active Subscription</h4>
-                    <p className="text-gray-600 mb-6">Subscribe to a meal plan and save money on your daily meals</p>
-                    <Link to="/plans" className="bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600">
-                      Choose a Plan
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'wallet' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Wallet & Payments</h3>
-                  <button 
-                    onClick={handleAddMoney}
-                    className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600"
-                  >
-                    <Plus className="w-4 h-4 inline mr-2" />
-                    Add Money
-                  </button>
-                </div>
-                
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl p-6">
-                  <h4 className="text-lg font-semibold mb-2">Current Balance</h4>
-                  <p className="text-3xl font-bold">₹{user.walletBalance.toFixed(2)}</p>
-                  <p className="text-sm opacity-90 mt-2">Available for orders and subscriptions</p>
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="font-semibold">Recent Transactions</h4>
-                  <div className="space-y-3">
-                    {[
-                      { type: 'debit', description: 'Order payment - Healthy Mess Co.', amount: 150, date: '2024-01-15' },
-                      { type: 'credit', description: 'Wallet top-up', amount: 500, date: '2024-01-14' },
-                      { type: 'debit', description: 'Order payment - Student Tiffin Service', amount: 120, date: '2024-01-14' }
-                    ].map((transaction, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{transaction.description}</p>
-                          <p className="text-sm text-gray-600">{transaction.date}</p>
-                        </div>
-                        <p className={`font-semibold ${
-                          transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+        {/* Right Column - Quick Actions */}
+        <div className="space-y-6">
+          <div className="bg-white border border-orange-100 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Actions</h3>
+            <div className="space-y-3">
+              <button onClick={() => navigate('/menu')} className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white font-bold py-2.5 px-4 rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition cursor-pointer">
+                <Plus size={18} /> Instant Order
+              </button>
+              <button onClick={() => navigate('/orders')} className="w-full flex items-center justify-center gap-2 bg-white border border-orange-100 text-slate-700 font-bold py-2.5 px-4 rounded-lg hover:bg-orange-50 transition shadow-2xs hover:text-orange-700 cursor-pointer">
+                <Truck size={18} /> Track Order
+              </button>
+              <button className="w-full flex items-center justify-center gap-2 bg-white border border-orange-100 text-slate-700 font-bold py-2.5 px-4 rounded-lg hover:bg-orange-50 transition shadow-2xs hover:text-orange-700">
+                <Users size={18} /> Refer Friends
+              </button>
+              <button className="w-full flex items-center justify-center gap-2 bg-white border border-orange-100 text-slate-700 font-bold py-2.5 px-4 rounded-lg hover:bg-orange-50 transition shadow-2xs hover:text-orange-700">
+                <Settings size={18} /> Settings
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-};
 
-export default Dashboard;
+  return (
+    <div className="min-h-screen bg-orange-50/20 font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1 flex items-center gap-2">
+              Welcome back, Sonu! <span className="text-2xl">👋</span>
+            </h1>
+            <p className="text-slate-500 text-sm">Here is what is happening with your daily meals and orders today</p>
+          </div>
+          <div className="flex gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-orange-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-orange-50 hover:text-orange-700 transition shadow-2xs">
+              <Bell size={16} /> Notifications
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition">
+              <Edit size={16} /> Edit Profile
+            </button>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex overflow-x-auto bg-white p-1.5 rounded-xl mb-8 border border-orange-100 shadow-2xs">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab.toLowerCase())}
+              className={`flex-1 min-w-[120px] py-2 px-4 text-sm font-bold rounded-lg transition-all text-center ${
+                activeTab === tab.toLowerCase()
+                  ? 'bg-orange-50 text-orange-700 shadow-xs border border-orange-200'
+                  : 'text-slate-600 hover:text-orange-600 hover:bg-orange-50/50'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        {activeTab === 'overview' ? (
+          renderOverview()
+        ) : (
+          <div className="bg-white border border-orange-100 rounded-xl p-12 text-center text-slate-500 shadow-sm">
+            <p className="text-lg font-medium">{tabs.find(t => t.toLowerCase() === activeTab)} content coming soon...</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
