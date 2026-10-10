@@ -85,7 +85,7 @@ const Home: React.FC = () => {
 
   const foodItems = [
     { id: '1', name: 'Crispy Chicken Burger', price: 120, originalPrice: 150, rating: 4.5, reviewsCount: '340+', image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'burgers', isVeg: false, restaurant: 'Quick Bites', prepTime: '20-25 mins', tag: 'Bestseller 🔥' },
-    { id: '2', name: 'Aloo Tikki Veg Burger', price: 90, originalPrice: 110, rating: 4.3, reviewsCount: '210+', image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'burgers', isVeg: true, restaurant: 'Quick Bites', prepTime: '15-20 mins', tag: 'Must Try ⭐' },
+    { id: '2', name: 'Aloo Tikki Veg Burger', price: 90, originalPrice: 110, rating: 4.3, reviewsCount: '210+', image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'burgers', isVeg: true, restaurant: 'Quick Bites', prepTime: '15-20 mins', tag: 'Must Try ⭐' },
     { id: '3', name: 'Paneer Tikka Roll', price: 80, originalPrice: 100, rating: 4.4, reviewsCount: '180+', image: 'https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'rolls', isVeg: true, restaurant: 'Roll Corner', prepTime: '15-20 mins', tag: 'Popular 🌯' },
     { id: '4', name: 'Double Egg Chicken Roll', price: 100, originalPrice: 130, rating: 4.6, reviewsCount: '420+', image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'rolls', isVeg: false, restaurant: 'Roll Corner', prepTime: '20-25 mins', tag: 'Chef Special 👨‍🍳' },
     { id: '5', name: 'Street Style Veg Chowmein', price: 70, originalPrice: 90, rating: 4.2, reviewsCount: '150+', image: 'https://images.pexels.com/photos/4518843/pexels-photo-4518843.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'chowmein', isVeg: true, restaurant: 'Chinese Corner', prepTime: '15-20 mins', tag: 'Budget Pick 💰' },
@@ -215,29 +215,96 @@ const Home: React.FC = () => {
             {/* LEFT CONTENT COLUMN */}
             <div className="md:col-span-6 text-center md:text-left order-2 md:order-1">
               {/* Handwritten script badge */}
-              <div className="inline-flex flex-col items-center md:items-start mb-3">
-                <span className="font-handwritten text-2xl sm:text-3xl text-slate-900 font-bold tracking-wide">
+              <div className="inline-flex flex-col items-center md:items-start mb-2 sm:mb-3">
+                <span className="font-handwritten text-xl sm:text-3xl text-slate-900 font-bold tracking-wide">
                   Healthy Food • Fresh Meals • Always On Time
                 </span>
                 {/* Brand hand-drawn accent brush underline */}
-                <svg className="w-28 sm:w-32 h-2.5 text-orange-500 fill-none -mt-1" viewBox="0 0 120 10">
+                <svg className="w-24 sm:w-32 h-2 sm:h-2.5 text-orange-500 fill-none -mt-1" viewBox="0 0 120 10">
                   <path d="M 4 7 Q 60 2 116 6" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
                 </svg>
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-5xl lg:text-[54px] font-black text-slate-900 tracking-tight leading-[1.14] mb-4 sm:mb-5">
+              <h1 className="text-2xl sm:text-5xl lg:text-[54px] font-black text-slate-900 tracking-tight leading-[1.14] mb-3 sm:mb-5">
                 Mess &amp; Instant Order <br />
                 All in <span className="text-orange-600">One Place</span>
               </h1>
 
               {/* Subtitle */}
-              <p className="text-sm sm:text-lg text-slate-600 font-normal leading-relaxed max-w-xl mx-auto md:mx-0 mb-6 sm:mb-8">
+              <p className="text-xs sm:text-lg text-slate-600 font-normal leading-relaxed max-w-xl mx-auto md:mx-0 mb-4 sm:mb-8">
                 Get fresh, home-style mess plans for your daily meals and fast instant orders for your cravings — quick, easy and reliable.
               </p>
 
-              {/* THE TWO MAIN ACTION CARDS */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-lg mx-auto md:mx-0 mb-6">
+              {/* ── MOBILE-EXCLUSIVE APP EXPERIENCE (swiggy / zomato style) ── */}
+              <div className="sm:hidden mb-5">
+                {/* 1. App-Style Interactive Search Bar */}
+                <div
+                  onClick={() => navigate('/menu')}
+                  className="flex items-center gap-2.5 bg-white px-3.5 py-3 rounded-2xl border border-orange-200/90 shadow-sm text-slate-400 cursor-pointer active:scale-98 transition-all hover:border-orange-400 mb-3"
+                >
+                  <Search className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                  <span className="text-xs font-semibold text-slate-600 flex-1 text-left truncate">
+                    Search "Shahi Thali", "Biryani", "Rolls"...
+                  </span>
+                  <span className="text-[10px] font-black text-orange-600 bg-orange-100/90 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    25m ⚡
+                  </span>
+                </div>
+
+                {/* 2. Compact Modern Dual Switcher (Replaces the two tall clunky stacked cards) */}
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  <button
+                    onClick={() => navigate('/mess')}
+                    className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20 active:scale-95 transition-all text-left cursor-pointer"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg flex-shrink-0">
+                      🍱
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-black leading-tight flex items-center justify-between">
+                        <span>Daily Mess</span>
+                        <ArrowRight className="w-3 h-3 text-white/80" />
+                      </div>
+                      <div className="text-[10px] text-orange-100 font-medium truncate">From ₹40/meal</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => navigate('/menu')}
+                    className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-white border border-orange-300 text-slate-900 shadow-xs active:scale-95 transition-all text-left cursor-pointer hover:bg-orange-50/50"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-lg flex-shrink-0">
+                      ⚡
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-black leading-tight flex items-center justify-between">
+                        <span>Instant Order</span>
+                        <ArrowRight className="w-3 h-3 text-orange-500" />
+                      </div>
+                      <div className="text-[10px] text-orange-600 font-black truncate">25 Min Express</div>
+                    </div>
+                  </button>
+                </div>
+
+                {/* 3. Promo Strip Pill */}
+                <div 
+                  onClick={() => navigate('/menu')}
+                  className="flex items-center justify-between bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border border-orange-200/80 rounded-xl px-3 py-2 text-xs shadow-2xs cursor-pointer active:scale-98 transition-all"
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-[11px] truncate">
+                    <Sparkles className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
+                    <span>Flat <strong className="text-orange-600 font-black">20% OFF</strong> First Meal • Use <strong>SAVE20</strong></span>
+                  </div>
+                  <span className="text-[10px] font-black text-orange-600 bg-white px-2 py-0.5 rounded-full border border-orange-200 shadow-2xs flex-shrink-0 ml-1">
+                    Order ➔
+                  </span>
+                </div>
+              </div>
+
+              {/* ── DESKTOP/TABLET TWO MAIN ACTION CARDS (hidden on small mobile screens) ── */}
+              <div className="hidden sm:grid sm:grid-cols-2 gap-3.5 max-w-lg mx-auto md:mx-0 mb-6">
                 {/* 1. Explore Mess */}
                 <button
                   id="hero-explore-mess"
@@ -276,23 +343,23 @@ const Home: React.FC = () => {
               </div>
 
               {/* SLEEK TRUST BADGES ROW */}
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-2 text-[11px] font-semibold text-slate-700">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-800 border border-slate-200 shadow-2xs">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-600 flex-shrink-0" />
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1 sm:pt-2 text-[10px] sm:text-[11px] font-semibold text-slate-700">
+                <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white text-slate-800 border border-slate-200 shadow-2xs">
+                  <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-600 flex-shrink-0" />
                   <span>100% Homestyle Taste</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-orange-800 border border-orange-200/70 shadow-2xs">
-                  <Clock className="w-3.5 h-3.5 text-orange-600 flex-shrink-0" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-orange-50 text-orange-800 border border-orange-200/70 shadow-2xs">
+                  <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-600 flex-shrink-0" />
                   <span>On-Time Delivery</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-800 border border-slate-200 shadow-2xs">
-                  <ShieldCheck className="w-3.5 h-3.5 text-slate-700 flex-shrink-0" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white text-slate-800 border border-slate-200 shadow-2xs">
+                  <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-700 flex-shrink-0" />
                   <span>FSSAI Certified</span>
                 </span>
               </div>
             </div>
 
-            {/* RIGHT COMPOSITE VISUAL COLUMN */}
+            {/* RIGHT COMPOSITE VISUAL COLUMN (Header Image - visible on mobile and desktop) */}
             <div className="md:col-span-6 relative flex items-center justify-center pt-2 md:pt-0 order-1 md:order-2 mb-4 sm:mb-6 md:mb-0">
               
               <div className="relative w-full max-w-[620px] group">

@@ -244,7 +244,7 @@ const Subscriptions = () => {
 
             </div>
 
-            {/* Right Column: Visual Composite (First on mobile < 768px; right on tablet & desktop >= 768px) */}
+            {/* Right Column: Visual Composite (Visible on mobile and desktop) */}
             <div className="md:col-span-5 relative flex items-center justify-center md:justify-end mt-2 md:mt-0 order-1 md:order-2 mb-4 md:mb-0">
               {/* Ambient Back Glow */}
               <div className="absolute -inset-4 bg-orange-500/10 rounded-[3rem] blur-2xl -z-10" />

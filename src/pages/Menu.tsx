@@ -499,7 +499,7 @@ const Menu: React.FC = () => {
       description: 'Melt-in-mouth traditional khoya dumplings fried golden brown and soaked in aromatic cardamom and saffron sugar syrup.',
       price: 50,
       originalPrice: 70,
-      image: 'https://images.pexels.com/photos/13435133/pexels-photo-13435133.jpeg?auto=compress&cs=tinysrgb&w=600',
+      image: 'https://images.pexels.com/photos/14463038/pexels-photo-14463038.jpeg?auto=compress&cs=tinysrgb&w=600',
       isVeg: true,
       rating: 4.9,
       reviews: 670,
@@ -1569,9 +1569,9 @@ const Menu: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Bottom Quick Cart Bar - Sunset Orange Brand Theme */}
+      {/* Floating Bottom Quick Cart Bar - Sunset Orange Brand Theme (Lifted to bottom-20 on mobile so it stays above MobileBottomNav) */}
       {totalItems > 0 && (
-        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-xl animate-slide-up">
+        <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-xl animate-slide-up">
           <div className="bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 backdrop-blur-xl border border-orange-400/50 text-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xl shadow-orange-500/35 flex items-center justify-between gap-2 sm:gap-4">
             
             {/* Left cart stats */}

@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
       <div className="h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 shadow-xs" />
 
       {/* Main Container */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-28 sm:pb-8">
         
         {/* Upper Newsletter Promo Card - Radiant Sunset Orange */}
         <div className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl shadow-orange-500/20 mb-10 sm:mb-14 overflow-hidden text-white border border-orange-400/30">
