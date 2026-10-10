@@ -67,12 +67,12 @@ const Orders: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-blue-100 text-blue-800';
-      case 'preparing': return 'bg-yellow-100 text-yellow-800';
-      case 'on-the-way': return 'bg-orange-100 text-orange-800';
-      case 'delivered': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'confirmed': return 'bg-blue-50 text-blue-700 border border-blue-200';
+      case 'preparing': return 'bg-amber-50 text-amber-700 border border-amber-200';
+      case 'on-the-way': return 'bg-orange-500 text-white shadow-xs';
+      case 'delivered': return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      case 'cancelled': return 'bg-rose-50 text-rose-700 border border-rose-200 line-through';
+      default: return 'bg-slate-100 text-slate-700 border border-slate-200';
     }
   };
 
@@ -159,7 +159,7 @@ const Orders: React.FC = () => {
               <p className="text-gray-600 mb-6">Explore our fresh menu and place your first instant order</p>
               <Link 
                 to="/menu" 
-                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:from-orange-600 hover:to-amber-600 transition-all inline-block"
+                className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:bg-orange-600 transition-all inline-block"
               >
                 Explore Instant Order Menu
               </Link>
@@ -231,7 +231,7 @@ const Orders: React.FC = () => {
                             </button>
                             {order.rating ? (
                               <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
                                 <span className="text-sm font-medium">{order.rating}</span>
                               </div>
                             ) : (
@@ -274,29 +274,29 @@ const Orders: React.FC = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-12 bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+        <div className="mt-12 bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link 
-              to="/" 
-              className="flex items-center space-x-3 p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition duration-200"
+              to="/menu" 
+              className="flex items-center space-x-3 p-4 bg-orange-50 border border-orange-100 rounded-xl hover:bg-orange-100/80 transition duration-200"
             >
-              <Package className="w-6 h-6 text-orange-500" />
-              <span className="font-medium text-orange-700">Browse Restaurants</span>
+              <Package className="w-6 h-6 text-orange-600" />
+              <span className="font-bold text-slate-900">Explore Instant Order</span>
             </Link>
             <Link 
               to="/mess" 
-              className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-200"
+              className="flex items-center space-x-3 p-4 bg-slate-100 border border-slate-200 rounded-xl hover:bg-slate-200/80 transition duration-200"
             >
-              <Calendar className="w-6 h-6 text-green-500" />
-              <span className="font-medium text-green-700">View Meal Plans</span>
+              <Calendar className="w-6 h-6 text-slate-800" />
+              <span className="font-bold text-slate-900">View Mess Plans</span>
             </Link>
             <Link 
               to="/support" 
-              className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200"
+              className="flex items-center space-x-3 p-4 bg-orange-50 border border-orange-100 rounded-xl hover:bg-orange-100/80 transition duration-200"
             >
-              <MessageCircle className="w-6 h-6 text-blue-500" />
-              <span className="font-medium text-blue-700">Get Support</span>
+              <MessageCircle className="w-6 h-6 text-orange-600" />
+              <span className="font-bold text-slate-900">Get Support</span>
             </Link>
           </div>
         </div>

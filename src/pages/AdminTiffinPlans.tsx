@@ -301,12 +301,12 @@ const AdminTiffinPlans: React.FC = () => {
   // ── Status badge ──────────────────────────────────────────
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      active: 'bg-green-100 text-green-700',
-      paused: 'bg-yellow-100 text-yellow-700',
-      expired: 'bg-red-100 text-red-700',
-      cancelled: 'bg-gray-100 text-gray-600'
+      active: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+      paused: 'bg-amber-50 text-amber-700 border border-amber-200',
+      expired: 'bg-rose-50 text-rose-700 border border-rose-200',
+      cancelled: 'bg-slate-100 text-slate-500 line-through border border-slate-200'
     };
-    return `px-2 py-1 rounded-full text-xs font-bold ${map[status] || 'bg-gray-100 text-gray-600'}`;
+    return `px-2.5 py-1 rounded-full text-xs font-bold ${map[status] || 'bg-slate-100 text-slate-600'}`;
   };
 
   const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
@@ -317,33 +317,33 @@ const AdminTiffinPlans: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAF9F6]">
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-white font-semibold transition-all ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+        <div className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-white font-semibold transition-all ${toast.type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'}`}>
           {toast.type === 'success' ? '✅' : '❌'} {toast.msg}
         </div>
       )}
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-slate-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/admin')}
-              className="flex items-center gap-1 text-gray-500 hover:text-gray-800 text-sm font-medium"
+              className="flex items-center gap-1 text-slate-500 hover:text-slate-800 text-sm font-medium"
             >
               <ChevronLeft className="w-4 h-4" /> Admin Panel
             </button>
-            <div className="w-px h-5 bg-gray-300" />
+            <div className="w-px h-5 bg-slate-300" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">🍱 Tiffin Plans Management</h1>
-              <p className="text-xs text-gray-500">Manage plans, menus, extras & subscribers</p>
+              <h1 className="text-xl font-bold text-slate-900">🍱 Tiffin Plans Management</h1>
+              <p className="text-xs text-slate-500">Manage plans, menus, extras & subscribers</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs font-semibold text-orange-700">Backend Live</span>
+          <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-xs font-semibold text-emerald-700">Backend Live</span>
           </div>
         </div>
       </div>
@@ -352,17 +352,17 @@ const AdminTiffinPlans: React.FC = () => {
         {/* Stats Row — show subscription stats always */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Total Plans', value: plans.length, icon: <Package className="w-5 h-5 text-orange-500" />, color: 'bg-orange-50' },
-            { label: 'Active Subscribers', value: subStats.active, icon: <Users className="w-5 h-5 text-blue-500" />, color: 'bg-blue-50' },
-            { label: 'Total Revenue', value: `₹${subStats.revenue.toLocaleString()}`, icon: <DollarSign className="w-5 h-5 text-green-500" />, color: 'bg-green-50' },
-            { label: 'Extra Items', value: extras.length, icon: <ShoppingBag className="w-5 h-5 text-purple-500" />, color: 'bg-purple-50' }
+            { label: 'Total Plans', value: plans.length, icon: <Package className="w-5 h-5 text-orange-600" />, color: 'bg-orange-50 border border-orange-100' },
+            { label: 'Active Subscribers', value: subStats.active, icon: <Users className="w-5 h-5 text-emerald-600" />, color: 'bg-emerald-50 border border-emerald-100' },
+            { label: 'Total Revenue', value: `₹${subStats.revenue.toLocaleString()}`, icon: <DollarSign className="w-5 h-5 text-amber-600" />, color: 'bg-amber-50 border border-amber-100' },
+            { label: 'Extra Items', value: extras.length, icon: <ShoppingBag className="w-5 h-5 text-purple-600" />, color: 'bg-purple-50 border border-purple-100' }
           ].map((stat, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 flex items-center gap-4">
+            <div key={i} className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 flex items-center gap-4">
               <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center`}>
                 {stat.icon}
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
+                <p className="text-xs text-slate-500 font-medium">{stat.label}</p>
                 <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
               </div>
             </div>
@@ -418,38 +418,38 @@ const AdminTiffinPlans: React.FC = () => {
                       <div className="flex gap-2">
                         <button onClick={() => togglePlanActive(plan)} title="Toggle active">
                           {plan.isActive
-                            ? <ToggleRight className="w-6 h-6 text-green-500" />
-                            : <ToggleLeft className="w-6 h-6 text-gray-400" />}
+                            ? <ToggleRight className="w-6 h-6 text-orange-500" />
+                            : <ToggleLeft className="w-6 h-6 text-slate-400" />}
                         </button>
-                        <button onClick={() => openPlanModal(plan)} className="text-blue-500 hover:text-blue-700">
+                        <button onClick={() => openPlanModal(plan)} className="text-slate-700 hover:text-orange-600">
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button onClick={() => deletePlan(plan._id)} className="text-red-500 hover:text-red-700">
+                        <button onClick={() => deletePlan(plan._id)} className="text-slate-400 hover:text-slate-800">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="text-3xl font-black text-gray-900 mb-1">
+                    <div className="text-3xl font-black text-slate-900 mb-1">
                       ₹{plan.monthlyPrice.toLocaleString()}
-                      <span className="text-sm font-normal text-gray-400">/mo</span>
+                      <span className="text-sm font-normal text-slate-400">/mo</span>
                     </div>
-                    <p className="text-xs text-green-600 font-semibold mb-4">Semester: {plan.semesterDiscount}% off</p>
+                    <p className="text-xs text-orange-600 font-semibold mb-4">Semester: {plan.semesterDiscount}% off</p>
 
                     <ul className="space-y-2 mb-5">
                       {plan.features.map((f, i) => (
-                        <li key={i} className="text-xs text-gray-600 flex items-center gap-2">
-                          <span className="text-green-500">✓</span> {f}
+                        <li key={i} className="text-xs text-slate-600 flex items-center gap-2">
+                          <span className="text-orange-500 font-bold">✓</span> {f}
                         </li>
                       ))}
                     </ul>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <div className="flex items-center gap-1 text-sm text-blue-600 font-semibold">
-                        <Users className="w-4 h-4" />
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                      <div className="flex items-center gap-1 text-sm text-slate-800 font-semibold">
+                        <Users className="w-4 h-4 text-orange-500" />
                         {plan.activeSubscribers} active
                       </div>
-                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${plan.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${plan.isActive ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'bg-slate-100 text-slate-500'}`}>
                         {plan.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -475,10 +475,10 @@ const AdminTiffinPlans: React.FC = () => {
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="font-bold text-gray-900 text-lg">{day}</h3>
                           <div className="flex gap-2">
-                            <button onClick={saveMenu} className="flex items-center gap-1 bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-semibold">
+                            <button onClick={saveMenu} className="flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
                               <Save className="w-4 h-4" /> Save
                             </button>
-                            <button onClick={() => setEditDay(null)} className="flex items-center gap-1 bg-gray-100 text-gray-600 px-4 py-1.5 rounded-lg text-sm font-semibold">
+                            <button onClick={() => setEditDay(null)} className="flex items-center gap-1 bg-slate-100 text-slate-700 hover:bg-slate-200 px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
                               <X className="w-4 h-4" /> Cancel
                             </button>
                           </div>
@@ -486,12 +486,12 @@ const AdminTiffinPlans: React.FC = () => {
                         <div className="grid md:grid-cols-3 gap-4">
                           {(['breakfast', 'lunch', 'dinner'] as const).map(meal => (
                             <div key={meal}>
-                              <label className="block text-xs font-bold text-gray-500 uppercase mb-1 capitalize">{meal}</label>
+                              <label className="block text-xs font-bold text-slate-500 uppercase mb-1 capitalize">{meal}</label>
                               <textarea
                                 value={menuForm[meal]}
                                 onChange={e => setMenuForm({ ...menuForm, [meal]: e.target.value })}
                                 rows={3}
-                                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 outline-none resize-none"
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none resize-none"
                               />
                             </div>
                           ))}
@@ -499,7 +499,7 @@ const AdminTiffinPlans: React.FC = () => {
                       </div>
                     ) : (
                       <div className="p-5 flex items-center gap-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center font-bold text-orange-600 text-lg flex-shrink-0">
+                        <div className="w-14 h-14 bg-orange-50 border border-orange-200 rounded-xl flex items-center justify-center font-bold text-orange-600 text-lg flex-shrink-0">
                           {day}
                         </div>
                         <div className="flex-1 grid md:grid-cols-3 gap-2">
@@ -567,16 +567,16 @@ const AdminTiffinPlans: React.FC = () => {
                           </div>
                         </td>
                         <td className="py-3 px-5 text-sm text-gray-500">{item.category}</td>
-                        <td className="py-3 px-5 text-sm font-bold text-gray-800">₹{item.price}</td>
+                        <td className="py-3 px-5 text-sm font-bold text-slate-900">₹{item.price}</td>
                         <td className="py-3 px-5">
-                          <span className={`text-xs font-bold px-2 py-1 rounded-full ${item.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          <span className={`text-xs font-bold px-2 py-1 rounded-full ${item.isActive ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'bg-slate-100 text-slate-500'}`}>
                             {item.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </td>
                         <td className="py-3 px-5">
                           <div className="flex gap-3">
-                            <button onClick={() => openExtraModal(item)} className="text-blue-500 hover:text-blue-700"><Edit className="w-4 h-4" /></button>
-                            <button onClick={() => deleteExtra(item._id)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => openExtraModal(item)} className="text-slate-700 hover:text-orange-600"><Edit className="w-4 h-4" /></button>
+                            <button onClick={() => deleteExtra(item._id)} className="text-slate-400 hover:text-slate-800"><Trash2 className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
@@ -584,7 +584,7 @@ const AdminTiffinPlans: React.FC = () => {
                   </tbody>
                 </table>
                 {extras.length === 0 && (
-                  <div className="text-center py-12 text-gray-400">No extra items found. Add one!</div>
+                  <div className="text-center py-12 text-slate-400">No extra items found. Add one!</div>
                 )}
               </div>
             )}
@@ -597,47 +597,47 @@ const AdminTiffinPlans: React.FC = () => {
             {/* Mini stats */}
             <div className="grid grid-cols-4 gap-4 mb-6">
               {[
-                { label: 'Total', value: subStats.total, color: 'text-gray-900' },
-                { label: 'Active', value: subStats.active, color: 'text-green-600' },
-                { label: 'Expired', value: subStats.expired, color: 'text-red-500' },
-                { label: 'Revenue', value: `₹${subStats.revenue.toLocaleString()}`, color: 'text-blue-600' }
+                { label: 'Total', value: subStats.total, color: 'text-slate-900' },
+                { label: 'Active', value: subStats.active, color: 'text-orange-600' },
+                { label: 'Expired', value: subStats.expired, color: 'text-slate-500' },
+                { label: 'Revenue', value: `₹${subStats.revenue.toLocaleString()}`, color: 'text-slate-900' }
               ].map((s, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
+                <div key={i} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 text-center">
                   <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-                  <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+                  <p className="text-xs text-slate-500 mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mb-5">All Subscriptions</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-5">All Subscriptions</h2>
             {subLoading ? (
-              <div className="text-center py-16 text-gray-400">Loading subscriptions...</div>
+              <div className="text-center py-16 text-slate-400">Loading subscriptions...</div>
             ) : (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="text-left py-3 px-5 text-xs font-bold text-gray-500 uppercase">User</th>
-                      <th className="text-left py-3 px-5 text-xs font-bold text-gray-500 uppercase">Plan</th>
-                      <th className="text-left py-3 px-5 text-xs font-bold text-gray-500 uppercase">Cycle</th>
-                      <th className="text-left py-3 px-5 text-xs font-bold text-gray-500 uppercase">Meals Left</th>
-                      <th className="text-left py-3 px-5 text-xs font-bold text-gray-500 uppercase">Paid</th>
-                      <th className="text-left py-3 px-5 text-xs font-bold text-gray-500 uppercase">Expires</th>
-                      <th className="text-left py-3 px-5 text-xs font-bold text-gray-500 uppercase">Status</th>
+                      <th className="text-left py-3 px-5 text-xs font-bold text-slate-500 uppercase">User</th>
+                      <th className="text-left py-3 px-5 text-xs font-bold text-slate-500 uppercase">Plan</th>
+                      <th className="text-left py-3 px-5 text-xs font-bold text-slate-500 uppercase">Cycle</th>
+                      <th className="text-left py-3 px-5 text-xs font-bold text-slate-500 uppercase">Meals Left</th>
+                      <th className="text-left py-3 px-5 text-xs font-bold text-slate-500 uppercase">Paid</th>
+                      <th className="text-left py-3 px-5 text-xs font-bold text-slate-500 uppercase">Expires</th>
+                      <th className="text-left py-3 px-5 text-xs font-bold text-slate-500 uppercase">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {subscriptions.map(sub => (
-                      <tr key={sub._id} className="border-b border-gray-50 hover:bg-gray-50">
+                      <tr key={sub._id} className="border-b border-slate-100 hover:bg-slate-50">
                         <td className="py-3 px-5">
-                          <p className="font-semibold text-sm text-gray-800">{sub.userId?.name}</p>
-                          <p className="text-xs text-gray-400">{sub.userId?.email}</p>
+                          <p className="font-semibold text-sm text-slate-900">{sub.userId?.name}</p>
+                          <p className="text-xs text-slate-400">{sub.userId?.email}</p>
                         </td>
-                        <td className="py-3 px-5 text-sm text-gray-700 font-medium">{sub.planId?.name}</td>
-                        <td className="py-3 px-5 text-sm text-gray-500 capitalize">{sub.billingCycle}</td>
-                        <td className="py-3 px-5 text-sm font-bold text-gray-800">{sub.remainingMeals}</td>
-                        <td className="py-3 px-5 text-sm font-bold text-green-700">₹{sub.amountPaid.toLocaleString()}</td>
-                        <td className="py-3 px-5 text-sm text-gray-500">
+                        <td className="py-3 px-5 text-sm text-slate-800 font-medium">{sub.planId?.name}</td>
+                        <td className="py-3 px-5 text-sm text-slate-500 capitalize">{sub.billingCycle}</td>
+                        <td className="py-3 px-5 text-sm font-bold text-slate-900">{sub.remainingMeals}</td>
+                        <td className="py-3 px-5 text-sm font-bold text-slate-900">₹{sub.amountPaid.toLocaleString()}</td>
+                        <td className="py-3 px-5 text-sm text-slate-500">
                           {new Date(sub.endDate).toLocaleDateString('en-IN')}
                         </td>
                         <td className="py-3 px-5">
@@ -710,17 +710,17 @@ const AdminTiffinPlans: React.FC = () => {
                   <input type="checkbox" checked={planForm.isPopular} onChange={e => setPlanForm({ ...planForm, isPopular: e.target.checked })} className="accent-orange-500 w-4 h-4" />
                   Mark as Popular
                 </label>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 cursor-pointer">
-                  <input type="checkbox" checked={planForm.isActive} onChange={e => setPlanForm({ ...planForm, isActive: e.target.checked })} className="accent-green-500 w-4 h-4" />
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer">
+                  <input type="checkbox" checked={planForm.isActive} onChange={e => setPlanForm({ ...planForm, isActive: e.target.checked })} className="accent-orange-500 w-4 h-4" />
                   Active
                 </label>
               </div>
             </div>
-            <div className="flex gap-3 p-5 border-t border-gray-100">
+            <div className="flex gap-3 p-5 border-t border-slate-100">
               <button onClick={savePlan} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl font-bold text-sm">
                 {editingPlan ? 'Save Changes' : 'Create Plan'}
               </button>
-              <button onClick={() => setPlanModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl font-bold text-sm">
+              <button onClick={() => setPlanModal(false)} className="flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 py-2.5 rounded-xl font-bold text-sm">
                 Cancel
               </button>
             </div>
@@ -730,48 +730,48 @@ const AdminTiffinPlans: React.FC = () => {
 
       {/* ── EXTRA ITEM MODAL ─────────────────────────────────── */}
       {extraModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">{editingExtra ? 'Edit Item' : 'Add Extra Item'}</h3>
-              <button onClick={() => setExtraModal(false)}><X className="w-5 h-5 text-gray-400" /></button>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-slate-200">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-slate-900">{editingExtra ? 'Edit Item' : 'Add Extra Item'}</h3>
+              <button onClick={() => setExtraModal(false)}><X className="w-5 h-5 text-slate-400" /></button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-1">Item Name</label>
+                <label className="text-sm font-semibold text-slate-700 block mb-1">Item Name</label>
                 <input type="text" value={extraForm.name} onChange={e => setExtraForm({ ...extraForm, name: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 outline-none" />
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 block mb-1">Price (₹)</label>
+                  <label className="text-sm font-semibold text-slate-700 block mb-1">Price (₹)</label>
                   <input type="number" value={extraForm.price} onChange={e => setExtraForm({ ...extraForm, price: +e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 outline-none" />
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 block mb-1">Category</label>
+                  <label className="text-sm font-semibold text-slate-700 block mb-1">Category</label>
                   <select value={extraForm.category} onChange={e => setExtraForm({ ...extraForm, category: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 outline-none">
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none">
                     {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-1">Image URL</label>
+                <label className="text-sm font-semibold text-slate-700 block mb-1">Image URL</label>
                 <input type="text" value={extraForm.imageUrl} onChange={e => setExtraForm({ ...extraForm, imageUrl: e.target.value })}
                   placeholder="https://..."
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 outline-none" />
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
               </div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 cursor-pointer">
-                <input type="checkbox" checked={extraForm.isActive} onChange={e => setExtraForm({ ...extraForm, isActive: e.target.checked })} className="accent-green-500 w-4 h-4" />
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer">
+                <input type="checkbox" checked={extraForm.isActive} onChange={e => setExtraForm({ ...extraForm, isActive: e.target.checked })} className="accent-orange-500 w-4 h-4" />
                 Active (visible to users)
               </label>
             </div>
-            <div className="flex gap-3 p-5 border-t border-gray-100">
+            <div className="flex gap-3 p-5 border-t border-slate-100">
               <button onClick={saveExtra} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl font-bold text-sm">
                 {editingExtra ? 'Save Changes' : 'Add Item'}
               </button>
-              <button onClick={() => setExtraModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl font-bold text-sm">
+              <button onClick={() => setExtraModal(false)} className="flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 py-2.5 rounded-xl font-bold text-sm">
                 Cancel
               </button>
             </div>

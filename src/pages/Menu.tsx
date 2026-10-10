@@ -762,77 +762,76 @@ const Menu: React.FC = () => {
   const remainingForFreeDelivery = Math.max(0, freeDeliveryThreshold - totalAmount);
 
   return (
-    <div className="min-h-screen bg-slate-50/70 pb-28 text-slate-800">
+    <div className="min-h-screen bg-slate-50 pb-28 text-slate-800">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-fade-in bg-slate-900 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 text-sm font-semibold border border-slate-700">
-          <Sparkles className="w-4 h-4 text-amber-400" />
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-fade-in bg-gradient-to-r from-orange-600 to-amber-600 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 text-sm font-semibold border border-orange-400/40">
+          <Sparkles className="w-4 h-4 text-amber-200" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Banner Notice / Ticker */}
-      <div className="bg-gradient-to-r from-amber-700 via-orange-600 to-amber-700 text-white py-2 px-4 text-center text-xs sm:text-sm font-semibold tracking-wide shadow-xs flex items-center justify-center gap-2 flex-wrap">
-        <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider">
+      {/* Top Banner Notice / Ticker - Radiant Orange Theme */}
+      <div className="bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 text-white py-2 px-4 text-center text-xs sm:text-sm font-semibold tracking-wide shadow-xs flex items-center justify-center gap-2 flex-wrap">
+        <span className="bg-white text-orange-600 px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider shadow-xs">
           🔥 Super Saver
         </span>
         <span>
-          Use code <strong className="underline underline-offset-2">SAVE20</strong> for 20% OFF | Free Instant Delivery above ₹200!
+          Use code <strong className="underline underline-offset-2 text-amber-200">SAVE20</strong> for 20% OFF | Free Instant Delivery above ₹200!
         </span>
       </div>
 
-      {/* Restaurant Hero Atmosphere Card - Warm Amber & Spiced Orange Gourmet Theme */}
+      {/* Restaurant Hero Atmosphere Card - Warm Sunset Orange Brand Theme */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-stone-900 via-amber-950 to-orange-950 text-white shadow-2xl shadow-amber-950/25 border border-amber-500/30">
-          {/* Background image with gradient blend */}
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-orange-600 via-orange-500 to-amber-600 text-white shadow-2xl shadow-orange-500/25 border border-orange-400/30">
+          {/* Background image with blend */}
           <div className="absolute inset-0">
             <img
               src={restaurant.bannerImg}
               alt="Restaurant Cuisine"
-              className="w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 transition-transform duration-1000 hover:scale-100"
+              className="w-full h-full object-cover opacity-15 mix-blend-luminosity scale-105 transition-transform duration-1000 hover:scale-100"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-950/95 via-stone-950/80 to-orange-950/90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-700/85 via-orange-600/80 to-amber-600/85" />
           </div>
 
-          {/* Warm Ambient Radial Glow Orbs */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-amber-500/25 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-600/20 rounded-full blur-3xl pointer-events-none" />
+          {/* Warm Ambient Glow Orb */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative p-4 sm:p-10 z-10">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
               
               {/* Left Details */}
               <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500/25 to-orange-500/25 text-amber-200 border border-amber-400/40 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold mb-2.5 sm:mb-3.5 backdrop-blur-md shadow-xs">
-                  <ChefHat className="w-3.5 h-3.5 text-amber-300" />
+                <div className="inline-flex items-center gap-2 bg-white/20 text-white border border-white/30 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold mb-2.5 sm:mb-3.5 backdrop-blur-md shadow-xs">
+                  <ChefHat className="w-3.5 h-3.5 text-amber-200" />
                   <span>Master Chef Kitchen</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-emerald-300">Accepting Orders</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+                  <span className="text-amber-100">Accepting Orders</span>
                 </div>
 
                 <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-2 drop-shadow-sm">
                   {restaurant.name}
                 </h1>
                 
-                <p className="text-amber-100/85 text-xs sm:text-base mb-3.5 sm:mb-4.5 leading-relaxed max-w-xl">
+                <p className="text-orange-100 text-xs sm:text-base mb-3.5 sm:mb-4.5 leading-relaxed max-w-xl">
                   {restaurant.subtitle}
                 </p>
 
                 {/* Key stats row */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm font-semibold">
-                  <div className="flex items-center gap-1.5 bg-emerald-600 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl shadow-md border border-emerald-400/30">
-                    <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white" />
+                  <div className="flex items-center gap-1.5 bg-white text-orange-600 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl shadow-md font-bold">
+                    <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-orange-500 text-orange-500" />
                     <span>{restaurant.rating}</span>
-                    <span className="text-emerald-100 text-[10px] sm:text-xs font-normal">({restaurant.reviewsCount})</span>
+                    <span className="text-slate-500 text-[10px] sm:text-xs font-normal">({restaurant.reviewsCount})</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-xl border border-white/20 text-white text-xs">
-                    <Clock className="w-3.5 h-3.5 text-amber-300" />
+                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-xl border border-white/30 text-white text-xs">
+                    <Clock className="w-3.5 h-3.5 text-amber-200" />
                     <span>{restaurant.deliveryTime}</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-xl border border-white/20 text-white text-xs">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-xl border border-white/30 text-white text-xs">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-200" />
                     <span>FSSAI Certified</span>
                   </div>
                 </div>
@@ -840,32 +839,32 @@ const Menu: React.FC = () => {
 
               {/* Right: Active Coupon Pills */}
               <div className="lg:w-80 flex flex-col gap-3">
-                <div className="bg-gradient-to-b from-white/20 to-white/10 backdrop-blur-xl border border-amber-300/30 rounded-2xl p-3.5 sm:p-4.5 shadow-xl">
+                <div className="bg-white/15 backdrop-blur-xl border border-white/25 rounded-2xl p-3.5 sm:p-4.5 shadow-xl text-white">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                      <Percent className="w-3.5 h-3.5 text-amber-300" /> Best Deal Available
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-200 flex items-center gap-1.5">
+                      <Percent className="w-3.5 h-3.5 text-amber-200" /> Best Deal Available
                     </span>
-                    <span className="text-[10px] sm:text-[11px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-full shadow-sm">
+                    <span className="text-[10px] sm:text-[11px] bg-white text-orange-600 font-black px-2 py-0.5 rounded-full shadow-sm">
                       SAVE 20%
                     </span>
                   </div>
-                  <div className="flex items-center justify-between bg-black/45 border border-amber-400/30 rounded-xl px-3 py-1.5 sm:px-3.5 sm:py-2 shadow-inner">
+                  <div className="flex items-center justify-between bg-black/20 border border-white/20 rounded-xl px-3 py-1.5 sm:px-3.5 sm:py-2 shadow-inner">
                     <span className="font-mono font-black tracking-widest text-amber-300 text-sm sm:text-base">SAVE20</span>
                     <button
                       onClick={() => handleCopyCode('SAVE20')}
-                      className="text-xs bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md shadow-amber-500/25 transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
+                      className="text-xs bg-white hover:bg-orange-50 text-orange-600 font-extrabold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
                     >
                       {copiedCode === 'SAVE20' ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-slate-950" />
-                          <span>Copied</span>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-600">Copied</span>
                         </>
                       ) : (
                         <span>Copy Code</span>
                       )}
                     </button>
                   </div>
-                  <p className="text-[10px] sm:text-[11px] text-amber-200/75 mt-2 leading-snug">
+                  <p className="text-[10px] sm:text-[11px] text-orange-100 mt-2 leading-snug">
                     Apply at checkout for 20% off on all orders above ₹149!
                   </p>
                 </div>
@@ -878,16 +877,12 @@ const Menu: React.FC = () => {
 
       {/* Category Showcase Section */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:mt-6">
-        <div className="relative bg-[#FAF8F5] rounded-2xl sm:rounded-3xl p-3.5 sm:p-7 border border-amber-100/80 shadow-xs overflow-hidden">
-          {/* Subtle warm ambient background glow */}
-          <div className="absolute top-0 right-1/4 w-80 h-80 bg-amber-200/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-orange-200/15 rounded-full blur-3xl pointer-events-none" />
-
+        <div className="relative bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-7 border border-slate-200 shadow-xs overflow-hidden">
           {/* Section Header with Desktop Carousel Controls */}
           <div className="flex items-center justify-between mb-3 sm:mb-6 relative z-10">
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
                 <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
                   Inspiration for your order
                 </h2>
@@ -902,7 +897,7 @@ const Menu: React.FC = () => {
               <button
                 type="button"
                 onClick={() => scrollCategories('left')}
-                className="w-9 h-9 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:text-amber-600 hover:border-amber-300 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                className="w-9 h-9 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:text-orange-600 hover:border-orange-300 hover:shadow-md transition-all active:scale-95 cursor-pointer"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -910,7 +905,7 @@ const Menu: React.FC = () => {
               <button
                 type="button"
                 onClick={() => scrollCategories('right')}
-                className="w-9 h-9 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:text-amber-600 hover:border-amber-300 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                className="w-9 h-9 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:text-orange-600 hover:border-orange-300 hover:shadow-md transition-all active:scale-95 cursor-pointer"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -921,8 +916,8 @@ const Menu: React.FC = () => {
           {/* Horizontal Category Strip */}
           <div className="relative">
             {/* Soft Edge Fade Fringes */}
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 sm:w-6 bg-gradient-to-r from-[#FAF8F5] to-transparent z-10" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 sm:w-6 bg-gradient-to-l from-[#FAF8F5] to-transparent z-10" />
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 sm:w-6 bg-gradient-to-r from-white to-transparent z-10" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 sm:w-6 bg-gradient-to-l from-white to-transparent z-10" />
 
             <div
               ref={categoryScrollRef}
@@ -941,8 +936,8 @@ const Menu: React.FC = () => {
                     <div
                       className={`w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-full bg-white flex items-center justify-center transition-all duration-300 transform group-hover:-translate-y-1.5 ${
                         isActive
-                          ? 'ring-3 ring-amber-500 ring-offset-2 ring-offset-[#FAF8F5] shadow-[0_12px_28px_rgba(245,158,11,0.28)] bg-gradient-to-b from-white to-amber-50/50 scale-105'
-                          : 'shadow-[0_8px_20px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.04)] group-hover:shadow-[0_16px_30px_rgba(0,0,0,0.12)]'
+                          ? 'ring-3 ring-orange-500 ring-offset-2 ring-offset-white shadow-[0_12px_28px_rgba(234,88,12,0.25)] bg-orange-50 scale-105'
+                          : 'shadow-[0_8px_20px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.04)] border border-slate-100 group-hover:shadow-[0_16px_30px_rgba(0,0,0,0.12)]'
                       }`}
                     >
                       <img
@@ -966,14 +961,14 @@ const Menu: React.FC = () => {
                       <span
                         className={`block text-[11px] sm:text-sm tracking-tight transition-colors duration-200 leading-tight ${
                           isActive
-                            ? 'font-bold text-amber-600'
+                            ? 'font-bold text-orange-600'
                             : 'font-semibold text-slate-700 group-hover:text-slate-900'
                         }`}
                       >
                         {cat.name}
                       </span>
                       {isActive && (
-                        <div className="w-4 sm:w-5 h-1 bg-amber-500 rounded-full mx-auto mt-1" />
+                        <div className="w-4 sm:w-5 h-1 bg-orange-500 rounded-full mx-auto mt-1" />
                       )}
                     </div>
                   </button>
@@ -1000,7 +995,7 @@ const Menu: React.FC = () => {
                 placeholder="Search dishes (e.g. Biryani, Paneer)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all placeholder:text-slate-400 font-medium"
+                className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all placeholder:text-slate-400 font-medium"
               />
               {searchQuery && (
                 <button
@@ -1018,8 +1013,8 @@ const Menu: React.FC = () => {
                 onClick={() => setDietaryFilter('all')}
                 className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-center cursor-pointer ${
                   dietaryFilter === 'all'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-orange-500 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-orange-600'
                 }`}
               >
                 All Dishes
@@ -1029,21 +1024,21 @@ const Menu: React.FC = () => {
                 className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                   dietaryFilter === 'veg'
                     ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-emerald-700'
+                    : 'text-slate-600 hover:text-emerald-600'
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 border border-white shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-emerald-300 border border-white shrink-0" />
                 <span>Veg Only</span>
               </button>
               <button
                 onClick={() => setDietaryFilter('nonveg')}
                 className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                   dietaryFilter === 'nonveg'
-                    ? 'bg-rose-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-rose-700'
+                    ? 'bg-orange-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-orange-600'
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-rose-400 border border-white shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-amber-200 border border-white shrink-0" />
                 <span>Non-Veg</span>
               </button>
             </div>
@@ -1055,7 +1050,7 @@ const Menu: React.FC = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                  className="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 focus:outline-hidden focus:border-orange-500 cursor-pointer"
                 >
                   <option value="popular">🔥 Most Popular</option>
                   <option value="rating">⭐ Highest Rated</option>
@@ -1110,7 +1105,7 @@ const Menu: React.FC = () => {
                 onClick={() => setSelectedQuickFilter(q.id)}
                 className={`text-xs px-3 py-1.5 rounded-full font-bold transition-colors whitespace-nowrap cursor-pointer ${
                   selectedQuickFilter === q.id
-                    ? 'bg-slate-900 text-white'
+                    ? 'bg-orange-500 text-white'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
                 }`}
               >
@@ -1128,7 +1123,7 @@ const Menu: React.FC = () => {
             {(activeCategory !== 'all' || searchQuery || dietaryFilter !== 'all' || selectedQuickFilter !== 'all') && (
               <button
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-1 text-amber-600 hover:text-amber-700 hover:underline font-bold"
+                className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-700 hover:underline font-bold"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset Filters</span>
@@ -1144,7 +1139,7 @@ const Menu: React.FC = () => {
         {filteredItems.length === 0 ? (
           /* Empty state */
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm max-w-lg mx-auto">
-            <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+            <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
               🔍
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">No matching dishes found</h3>
@@ -1153,7 +1148,7 @@ const Menu: React.FC = () => {
             </p>
             <button
               onClick={handleResetFilters}
-              className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-md transition-colors"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-md transition-colors"
             >
               Reset All Filters
             </button>
@@ -1166,7 +1161,7 @@ const Menu: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className="group bg-white rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-amber-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full"
+                  className="group bg-white rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-slate-200 hover:border-orange-500 shadow-2xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full"
                 >
                   {/* Top Image & Badges */}
                   <div
@@ -1185,7 +1180,7 @@ const Menu: React.FC = () => {
 
                     {/* Tag badge (Bestseller, Chef Special, etc.) */}
                     {item.tag && (
-                      <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 bg-slate-900/85 backdrop-blur-md text-amber-400 font-extrabold text-[9px] sm:text-[11px] px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-xs flex items-center gap-1 border border-white/10">
+                      <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[9px] sm:text-[11px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-md flex items-center gap-1 border border-white/20">
                         {item.tag}
                       </div>
                     )}
@@ -1206,8 +1201,8 @@ const Menu: React.FC = () => {
                     </div>
 
                     {/* Prep time badge bottom-left */}
-                    <div className="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
+                    <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-md text-slate-800 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded shadow-xs border border-orange-200/80 flex items-center gap-1">
+                      <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-500" />
                       <span>{item.prepTime}</span>
                     </div>
 
@@ -1224,13 +1219,13 @@ const Menu: React.FC = () => {
                       <div className="flex items-start justify-between gap-1 mb-1">
                         <h3
                           onClick={() => setActiveModalItem(item)}
-                          className="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-tight group-hover:text-amber-600 transition-colors line-clamp-1 cursor-pointer"
+                          className="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-tight group-hover:text-orange-600 transition-colors line-clamp-1 cursor-pointer"
                           title={item.name}
                         >
                           {item.name}
                         </h3>
-                        <div className="flex items-center gap-0.5 bg-amber-50 px-1 py-0.5 rounded text-amber-800 text-[10px] sm:text-xs font-bold flex-shrink-0">
-                          <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-500 text-amber-500" />
+                        <div className="flex items-center gap-0.5 bg-orange-50 px-1 py-0.5 rounded text-orange-700 text-[10px] sm:text-xs font-bold flex-shrink-0 border border-orange-100">
+                          <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
                           <span>{item.rating}</span>
                         </div>
                       </div>
@@ -1257,7 +1252,7 @@ const Menu: React.FC = () => {
                           )}
                         </div>
                         {item.originalPrice > item.price && (
-                          <span className="text-[9px] sm:text-[10px] text-emerald-600 font-extrabold uppercase">
+                          <span className="text-[9px] sm:text-[10px] text-orange-600 font-extrabold uppercase">
                             {Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF
                           </span>
                         )}
@@ -1269,17 +1264,17 @@ const Menu: React.FC = () => {
                           <button
                             id={`add-btn-${item.id}`}
                             onClick={() => handleAdd(item)}
-                            className="bg-amber-500 hover:bg-amber-600 text-white text-[11px] sm:text-xs font-black px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl shadow-xs hover:shadow-md active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                            className="bg-orange-500 hover:bg-orange-600 text-white text-[11px] sm:text-xs font-black px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl shadow-xs hover:shadow-md active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
                           >
                             <Plus className="w-3 h-3 stroke-[3]" />
                             <span>ADD</span>
                           </button>
                         ) : (
-                          <div className="flex items-center bg-amber-50 border border-amber-300 rounded-lg sm:rounded-xl px-1.5 py-0.5 sm:px-2 sm:py-1 gap-1 sm:gap-1.5 shadow-xs">
+                          <div className="flex items-center bg-orange-50 border border-orange-200 rounded-lg sm:rounded-xl px-1.5 py-0.5 sm:px-2 sm:py-1 gap-1 sm:gap-1.5 shadow-xs">
                             <button
                               id={`minus-btn-${item.id}`}
                               onClick={() => updateQuantity(item.id, qty - 1)}
-                              className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition-colors"
+                              className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
                             >
                               <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
                             </button>
@@ -1287,7 +1282,7 @@ const Menu: React.FC = () => {
                             <button
                               id={`plus-btn-${item.id}`}
                               onClick={() => updateQuantity(item.id, qty + 1)}
-                              className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition-colors"
+                              className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
                             >
                               <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
                             </button>
@@ -1309,7 +1304,7 @@ const Menu: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className="group bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-amber-300 transition-all flex gap-3 sm:gap-4 justify-between items-center"
+                  className="group bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 hover:border-orange-500 shadow-2xs hover:shadow-lg transition-all flex gap-3 sm:gap-4 justify-between items-center"
                 >
                   {/* Left Side Content */}
                   <div className="flex-1 min-w-0">
@@ -1328,7 +1323,7 @@ const Menu: React.FC = () => {
                       </div>
 
                       {item.tag && (
-                        <span className="bg-amber-50 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200/60">
+                        <span className="bg-orange-50 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-orange-200/70">
                           {item.tag}
                         </span>
                       )}
@@ -1336,7 +1331,7 @@ const Menu: React.FC = () => {
 
                     <h3
                       onClick={() => setActiveModalItem(item)}
-                      className="font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-amber-600 transition-colors line-clamp-1 cursor-pointer"
+                      className="font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-orange-600 transition-colors line-clamp-1 cursor-pointer"
                       title={item.name}
                     >
                       {item.name}
@@ -1347,8 +1342,8 @@ const Menu: React.FC = () => {
                       {item.originalPrice > item.price && (
                         <span className="text-xs text-slate-400 line-through">₹{item.originalPrice}</span>
                       )}
-                      <div className="flex items-center gap-0.5 bg-amber-50 px-1.5 py-0.5 rounded text-amber-800 text-[11px] font-bold ml-1">
-                        <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                      <div className="flex items-center gap-0.5 bg-orange-50 px-1.5 py-0.5 rounded text-orange-700 text-[11px] font-bold ml-1 border border-orange-100">
+                        <Star className="w-3 h-3 fill-orange-500 text-orange-500" />
                         <span>{item.rating}</span>
                       </div>
                     </div>
@@ -1382,17 +1377,17 @@ const Menu: React.FC = () => {
                         <button
                           id={`add-btn-list-${item.id}`}
                           onClick={() => handleAdd(item)}
-                          className="bg-white hover:bg-amber-50 text-emerald-700 hover:text-emerald-800 font-black text-xs px-3.5 py-1 rounded-lg border border-slate-200 shadow-sm transition-all hover:scale-105 flex items-center gap-1 whitespace-nowrap cursor-pointer"
+                          className="bg-white hover:bg-orange-50 text-orange-600 font-black text-xs px-3.5 py-1 rounded-lg border border-slate-200 shadow-sm transition-all hover:scale-105 flex items-center gap-1 whitespace-nowrap cursor-pointer"
                         >
                           <Plus className="w-3 h-3 stroke-[3]" />
                           <span>ADD</span>
                         </button>
                       ) : (
-                        <div className="flex items-center bg-white border border-amber-300 rounded-lg px-1.5 py-0.5 gap-1.5 shadow-md">
+                        <div className="flex items-center bg-white border border-orange-200 rounded-lg px-1.5 py-0.5 gap-1.5 shadow-md">
                           <button
                             id={`minus-btn-list-${item.id}`}
                             onClick={() => updateQuantity(item.id, qty - 1)}
-                            className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition-colors"
+                            className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
                           >
                             <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
                           </button>
@@ -1400,7 +1395,7 @@ const Menu: React.FC = () => {
                           <button
                             id={`plus-btn-list-${item.id}`}
                             onClick={() => updateQuantity(item.id, qty + 1)}
-                            className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition-colors"
+                            className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
                           >
                             <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
                           </button>
@@ -1422,7 +1417,7 @@ const Menu: React.FC = () => {
           <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 animate-slide-up my-auto">
             
             {/* Modal Image Header */}
-            <div className="relative aspect-16/9 bg-slate-900">
+            <div className="relative aspect-16/9 bg-orange-100">
               <img
                 src={activeModalItem.image}
                 alt={activeModalItem.name}
@@ -1430,16 +1425,16 @@ const Menu: React.FC = () => {
               />
               <button
                 onClick={() => setActiveModalItem(null)}
-                className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-black/60 hover:bg-black text-white p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-orange-600/80 hover:bg-orange-600 text-white p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="absolute bottom-2.5 left-3 sm:bottom-3 sm:left-4 flex items-center gap-2">
-                <span className="bg-emerald-600 text-white text-[11px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                <span className="bg-orange-500 text-white text-[11px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                   <Star className="w-3 h-3 fill-white" /> {activeModalItem.rating} ({activeModalItem.reviews} reviews)
                 </span>
-                <span className="bg-black/70 backdrop-blur-md text-white text-[11px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded-full">
+                <span className="bg-orange-950/70 backdrop-blur-md text-white text-[11px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded-full">
                   ⏱️ {activeModalItem.prepTime}
                 </span>
               </div>
@@ -1450,7 +1445,7 @@ const Menu: React.FC = () => {
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div>
                   <h2 className="text-lg sm:text-xl font-black text-slate-900">{activeModalItem.name}</h2>
-                  <p className="text-[11px] sm:text-xs text-amber-600 font-bold uppercase tracking-wider mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-orange-600 font-bold uppercase tracking-wider mt-0.5">
                     {activeModalItem.serves} • Spice: {activeModalItem.spiceLevel}
                   </p>
                 </div>
@@ -1468,21 +1463,21 @@ const Menu: React.FC = () => {
 
               {/* Nutrition breakdown cards */}
               <div className="grid grid-cols-4 gap-1.5 sm:gap-2 mb-4 text-center">
-                <div className="bg-orange-50/60 p-1.5 sm:p-2 rounded-xl border border-orange-100">
+                <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl border border-slate-200">
                   <div className="text-[9px] sm:text-[10px] text-slate-500 font-semibold uppercase">Calories</div>
                   <div className="text-xs sm:text-sm font-black text-slate-900">{activeModalItem.calories} kcal</div>
                 </div>
-                <div className="bg-emerald-50/60 p-1.5 sm:p-2 rounded-xl border border-emerald-100">
+                <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl border border-slate-200">
                   <div className="text-[9px] sm:text-[10px] text-slate-500 font-semibold uppercase">Protein</div>
-                  <div className="text-xs sm:text-sm font-black text-emerald-700">{activeModalItem.protein}</div>
+                  <div className="text-xs sm:text-sm font-black text-slate-900">{activeModalItem.protein}</div>
                 </div>
-                <div className="bg-blue-50/60 p-1.5 sm:p-2 rounded-xl border border-blue-100">
+                <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl border border-slate-200">
                   <div className="text-[9px] sm:text-[10px] text-slate-500 font-semibold uppercase">Diet</div>
-                  <div className="text-xs sm:text-sm font-black text-blue-700">{activeModalItem.isVeg ? 'Veg' : 'Non-Veg'}</div>
+                  <div className="text-xs sm:text-sm font-black text-slate-900">{activeModalItem.isVeg ? 'Veg' : 'Non-Veg'}</div>
                 </div>
-                <div className="bg-purple-50/60 p-1.5 sm:p-2 rounded-xl border border-purple-100">
+                <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl border border-slate-200">
                   <div className="text-[9px] sm:text-[10px] text-slate-500 font-semibold uppercase">Spice</div>
-                  <div className="text-xs sm:text-sm font-black text-purple-700">{activeModalItem.spiceLevel}</div>
+                  <div className="text-xs sm:text-sm font-black text-slate-900">{activeModalItem.spiceLevel}</div>
                 </div>
               </div>
 
@@ -1505,7 +1500,7 @@ const Menu: React.FC = () => {
                     handleAdd(activeModalItem);
                     setActiveModalItem(null);
                   }}
-                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 text-xs sm:text-sm transition-all hover:-translate-y-0.5 cursor-pointer"
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 text-xs sm:text-sm transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   <span>Add to Cart • ₹{activeModalItem.price}</span>
@@ -1523,15 +1518,15 @@ const Menu: React.FC = () => {
         </div>
       )}
 
-      {/* Customer Trust & Quality Assurance Banner */}
+      {/* Customer Trust & Quality Assurance Banner - Warm Orange & Cream Theme */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16">
-        <div className="bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-rose-500/10 rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-orange-200/60">
+        <div className="bg-gradient-to-br from-orange-50 via-amber-50/70 to-orange-100/60 rounded-2xl sm:rounded-3xl p-6 sm:p-10 border-2 border-orange-200/80 text-slate-800 shadow-sm">
           <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-3 py-1 rounded-full">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-orange-700 bg-orange-100 px-3 py-1 rounded-full border border-orange-200">
               Bitez Promise
             </span>
             <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
-              Cooked Fresh with Mother's Touch & Hygiene
+              Cooked Fresh with Mother's Touch &amp; Hygiene
             </h3>
             <p className="text-slate-600 text-xs sm:text-sm mt-1">
               Every dish is freshly cooked on your order, packed in leak-proof insulated containers to arrive piping hot.
@@ -1539,32 +1534,32 @@ const Menu: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 text-center">
-            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-xs border border-orange-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
+            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-orange-100 shadow-2xs hover:border-orange-300 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
                 🧼
               </div>
               <h4 className="font-bold text-slate-900 text-xs sm:text-sm">FSSAI Certified</h4>
               <p className="text-[11px] sm:text-xs text-slate-500 mt-1">100% sanitized cloud kitchen.</p>
             </div>
 
-            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-xs border border-orange-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
+            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-orange-100 shadow-2xs hover:border-orange-300 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
                 ⚡
               </div>
               <h4 className="font-bold text-slate-900 text-xs sm:text-sm">Piping Hot Delivery</h4>
               <p className="text-[11px] sm:text-xs text-slate-500 mt-1">Insulated thermal boxes keep food hot.</p>
             </div>
 
-            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-xs border border-orange-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
+            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-orange-100 shadow-2xs hover:border-orange-300 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
                 🌱
               </div>
               <h4 className="font-bold text-slate-900 text-xs sm:text-sm">Pure Segregation</h4>
               <p className="text-[11px] sm:text-xs text-slate-500 mt-1">Dedicated utensils for veg food.</p>
             </div>
 
-            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-xs border border-orange-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
+            <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-orange-100 shadow-2xs hover:border-orange-300 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 text-lg sm:text-xl">
                 🔄
               </div>
               <h4 className="font-bold text-slate-900 text-xs sm:text-sm">Instant Replacement</h4>
@@ -1574,21 +1569,21 @@ const Menu: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Bottom Quick Cart Bar (Visible when items > 0) */}
+      {/* Floating Bottom Quick Cart Bar - Sunset Orange Brand Theme */}
       {totalItems > 0 && (
         <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-xl animate-slide-up">
-          <div className="bg-slate-950/95 backdrop-blur-xl border border-slate-800 text-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xl flex items-center justify-between gap-2 sm:gap-4">
+          <div className="bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 backdrop-blur-xl border border-orange-400/50 text-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xl shadow-orange-500/35 flex items-center justify-between gap-2 sm:gap-4">
             
             {/* Left cart stats */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="relative w-9 h-9 sm:w-11 sm:h-11 bg-amber-500 text-slate-950 rounded-lg sm:rounded-xl flex items-center justify-center font-black flex-shrink-0">
+              <div className="relative w-9 h-9 sm:w-11 sm:h-11 bg-white text-orange-600 rounded-lg sm:rounded-xl flex items-center justify-center font-black flex-shrink-0 shadow-sm">
                 <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="absolute -top-1 -right-1 bg-rose-600 text-white text-[10px] sm:text-[11px] font-black w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center border-2 border-slate-900">
+                <span className="absolute -top-1 -right-1 bg-amber-400 text-orange-950 text-[10px] sm:text-[11px] font-black w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center border-2 border-orange-600">
                   {totalItems}
                 </span>
               </div>
               <div className="min-w-0">
-                <div className="text-[11px] sm:text-xs text-slate-400 font-medium truncate">
+                <div className="text-[11px] sm:text-xs text-orange-100 font-medium truncate">
                   {totalItems} {totalItems === 1 ? 'dish' : 'dishes'} added
                 </div>
                 <div className="text-base sm:text-lg font-black text-white">
@@ -1598,11 +1593,11 @@ const Menu: React.FC = () => {
             </div>
 
             {/* Delivery threshold message (hidden on mobile, visible on desktop) */}
-            <div className="hidden md:block text-xs text-slate-300">
+            <div className="hidden md:block text-xs text-orange-100">
               {remainingForFreeDelivery > 0 ? (
-                <span>Add <strong className="text-amber-400">₹{remainingForFreeDelivery}</strong> for Free Delivery 🚚</span>
+                <span>Add <strong className="text-amber-200">₹{remainingForFreeDelivery}</strong> for Free Delivery 🚚</span>
               ) : (
-                <span className="text-emerald-400 font-bold">🎉 FREE Delivery!</span>
+                <span className="text-amber-200 font-bold">🎉 FREE Delivery!</span>
               )}
             </div>
 
@@ -1610,7 +1605,7 @@ const Menu: React.FC = () => {
             <Link
               to="/cart"
               id="view-cart-floating-btn"
-              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-1.5 sm:gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
+              className="bg-white hover:bg-orange-50 text-orange-600 font-black text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-lg shadow-orange-700/20 flex items-center gap-1.5 sm:gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
             >
               <span>View Cart</span>
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />

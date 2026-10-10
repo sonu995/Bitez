@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Phone, Mail, Clock, Search, Plus, FileText, AlertCircle, CheckCircle, Star, Send } from 'lucide-react';
+import { MessageCircle, Phone, Mail, Clock, Search, Plus, FileText, AlertCircle, CheckCircle, Star, Send, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Support: React.FC = () => {
@@ -90,63 +90,63 @@ const Support: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-800';
-      case 'in-progress': return 'bg-yellow-100 text-yellow-800';
-      case 'resolved': return 'bg-green-100 text-green-800';
-      case 'closed': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'open': return 'bg-amber-50 text-amber-700 border border-amber-200';
+      case 'in-progress': return 'bg-blue-50 text-blue-700 border border-blue-200';
+      case 'resolved': return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      case 'closed': return 'bg-slate-100 text-slate-600 border border-slate-200';
+      default: return 'bg-slate-100 text-slate-700';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#FAF9F6] py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Customer Support</h1>
-          <p className="text-xl text-gray-600">We're here to help you 24/7</p>
+          <h1 className="text-4xl font-extrabold text-slate-900 mb-2">Customer Support</h1>
+          <p className="text-base text-slate-600">We are here to assist you 24/7 with meals, mess plans, and deliveries</p>
         </div>
 
         {/* Quick Contact */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Phone className="w-6 h-6 text-green-600" />
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center shadow-sm">
+            <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-orange-200">
+              <Phone className="w-6 h-6 text-orange-600" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Call Us</h3>
-            <p className="text-gray-600 mb-3">Available 24/7</p>
-            <a href="tel:+919876543210" className="text-green-600 font-semibold hover:text-green-700">
+            <h3 className="text-base font-bold text-slate-900 mb-1">Call Us</h3>
+            <p className="text-xs text-slate-500 mb-3">Available 24/7</p>
+            <a href="tel:+919876543210" className="text-orange-600 font-bold hover:text-orange-700 text-sm">
               +91 98765 43210
             </a>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="w-6 h-6 text-blue-600" />
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center shadow-sm">
+            <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-200">
+              <MessageCircle className="w-6 h-6 text-slate-800" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Live Chat</h3>
-            <p className="text-gray-600 mb-3">Instant support</p>
-            <button className="text-blue-600 font-semibold hover:text-blue-700">
+            <h3 className="text-base font-bold text-slate-900 mb-1">Live Chat</h3>
+            <p className="text-xs text-slate-500 mb-3">Instant support</p>
+            <button className="text-slate-900 font-bold hover:text-orange-600 text-sm transition-colors">
               Start Chat
             </button>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center shadow-sm">
+            <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-orange-200">
               <Mail className="w-6 h-6 text-orange-600" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Email Us</h3>
-            <p className="text-gray-600 mb-3">Response within 2 hours</p>
-            <a href="mailto:support@foodieexpress.com" className="text-orange-600 font-semibold hover:text-orange-700">
-              support@foodieexpress.com
+            <h3 className="text-base font-bold text-slate-900 mb-1">Email Us</h3>
+            <p className="text-xs text-slate-500 mb-3">Response within 2 hours</p>
+            <a href="mailto:support@bitez.in" className="text-orange-600 font-bold hover:text-orange-700 text-sm">
+              support@bitez.in
             </a>
           </div>
         </div>
 
         {/* Tabs */}
         <div className="mb-8">
-          <div className="bg-white rounded-lg p-1 shadow-sm">
-            <div className="flex space-x-1">
+          <div className="bg-white rounded-2xl border border-slate-200 p-1.5 shadow-sm max-w-xl mx-auto">
+            <div className="flex space-x-2">
               {[
                 { key: 'help', label: 'Help Center' },
                 { key: 'complaints', label: 'My Complaints' },
@@ -155,10 +155,10 @@ const Support: React.FC = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex-1 px-6 py-3 rounded-md font-medium transition duration-200 ${
+                  className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${
                     activeTab === tab.key
-                      ? 'bg-orange-500 text-white'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`}
                 >
                   {tab.label}
@@ -173,30 +173,30 @@ const Support: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* FAQ Categories */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
-                <h3 className="text-lg font-semibold mb-4">Categories</h3>
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 sticky top-24 shadow-sm">
+                <h3 className="text-base font-bold text-slate-900 mb-4">Categories</h3>
                 
                 {/* Search */}
-                <div className="mb-6">
+                <div className="mb-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search FAQs..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <button
                     onClick={() => setSelectedCategory('')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition duration-200 ${
+                    className={`w-full text-left px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
                       !selectedCategory
-                        ? 'bg-orange-100 text-orange-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-orange-50 text-orange-700'
+                        : 'text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     All Categories
@@ -205,10 +205,10 @@ const Support: React.FC = () => {
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition duration-200 ${
+                      className={`w-full text-left px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
                         selectedCategory === category.id
-                          ? 'bg-orange-100 text-orange-700'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          ? 'bg-orange-50 text-orange-700'
+                          : 'text-slate-600 hover:bg-slate-50'
                       }`}
                     >
                       {category.name} ({category.count})
@@ -216,12 +216,12 @@ const Support: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="mt-6 pt-6 border-t border-slate-100">
                   <button
                     onClick={() => setShowComplaintForm(true)}
-                    className="w-full bg-red-500 text-white py-2 rounded-lg font-medium hover:bg-red-600 transition duration-200"
+                    className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-orange-500/20"
                   >
-                    <Plus className="w-4 h-4 inline mr-2" />
+                    <Plus className="w-4 h-4 inline mr-1.5" />
                     File Complaint
                   </button>
                 </div>
@@ -230,21 +230,21 @@ const Support: React.FC = () => {
 
             {/* FAQ Content */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h2 className="text-xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h2>
                 
                 {filteredFaqs.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No results found</h3>
-                    <p className="text-gray-600">Try adjusting your search or browse different categories</p>
+                  <div className="text-center py-10">
+                    <Search className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                    <h3 className="text-base font-bold text-slate-900 mb-1">No results found</h3>
+                    <p className="text-sm text-slate-500">Try adjusting your search or select another category</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {filteredFaqs.map((faq) => (
-                      <div key={faq.id} className="border border-gray-200 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">{faq.question}</h3>
-                        <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                      <div key={faq.id} className="border border-slate-200 rounded-xl p-5 hover:border-orange-300 transition-colors">
+                        <h3 className="text-base font-bold text-slate-900 mb-2">{faq.question}</h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">{faq.answer}</p>
                       </div>
                     ))}
                   </div>
@@ -258,12 +258,12 @@ const Support: React.FC = () => {
         {activeTab === 'complaints' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">My Complaints</h2>
+              <h2 className="text-2xl font-bold text-slate-900">My Complaints</h2>
               <button
                 onClick={() => setShowComplaintForm(true)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600"
+                className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-orange-500/20"
               >
-                <Plus className="w-4 h-4 inline mr-2" />
+                <Plus className="w-4 h-4 inline mr-1.5" />
                 New Complaint
               </button>
             </div>
@@ -271,55 +271,49 @@ const Support: React.FC = () => {
             {user ? (
               <div className="space-y-4">
                 {complaints.length === 0 ? (
-                  <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                    <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No complaints filed</h3>
-                    <p className="text-gray-600">We hope you're having a great experience with our service!</p>
+                  <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm">
+                    <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                    <h3 className="text-base font-bold text-slate-900 mb-1">No complaints filed</h3>
+                    <p className="text-slate-500 text-sm">We hope you are enjoying delicious fresh meals with Bitez!</p>
                   </div>
                 ) : (
                   complaints.map((complaint) => (
-                    <div key={complaint.id} className="bg-white rounded-xl shadow-sm p-6">
+                    <div key={complaint.id} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{complaint.title}</h3>
-                          <p className="text-sm text-gray-600">Complaint ID: {complaint.id}</p>
-                          <p className="text-sm text-gray-600">Order ID: {complaint.orderId}</p>
+                          <h3 className="text-base font-bold text-slate-900">{complaint.title}</h3>
+                          <p className="text-xs text-slate-500 mt-0.5">Complaint ID: {complaint.id} • Order: {complaint.orderId}</p>
                         </div>
                         <div className="text-right">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusColor(complaint.status)}`}>
                             {complaint.status === 'resolved' && <CheckCircle className="w-3 h-3 mr-1" />}
                             {complaint.status === 'in-progress' && <Clock className="w-3 h-3 mr-1" />}
-                            {complaint.status.charAt(0).toUpperCase() + complaint.status.slice(1)}
+                            {complaint.status}
                           </span>
-                          <p className="text-sm text-gray-500 mt-1">{complaint.date}</p>
+                          <p className="text-xs text-slate-400 mt-1 font-medium">{complaint.date}</p>
                         </div>
                       </div>
 
                       <div className="mb-4">
-                        <p className="text-gray-700">{complaint.description}</p>
+                        <p className="text-sm text-slate-700 leading-relaxed">{complaint.description}</p>
                       </div>
 
                       {complaint.response && (
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                          <h4 className="font-semibold text-green-800 mb-2">Our Response:</h4>
-                          <p className="text-green-700">{complaint.response}</p>
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4">
+                          <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider mb-1">Our Response:</h4>
+                          <p className="text-sm text-slate-600">{complaint.response}</p>
                         </div>
                       )}
 
-                      <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
-                        <span className="text-sm text-gray-600">Category: {complaint.category}</span>
-                        <div className="space-x-2">
+                      <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Category: {complaint.category}</span>
+                        <div className="space-x-3">
                           <Link
                             to={`/complaint/${complaint.id}`}
-                            className="text-orange-500 hover:text-orange-600 text-sm font-medium"
+                            className="text-orange-600 hover:text-orange-700 text-sm font-bold"
                           >
                             View Details
                           </Link>
-                          {complaint.status === 'resolved' && (
-                            <button className="text-green-500 hover:text-green-600 text-sm font-medium">
-                              Rate Resolution
-                            </button>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -327,11 +321,11 @@ const Support: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Login Required</h3>
-                <p className="text-gray-600 mb-6">Please login to view and manage your complaints</p>
-                <Link to="/login" className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600">
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm">
+                <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                <h3 className="text-lg font-bold text-slate-900 mb-1">Login Required</h3>
+                <p className="text-slate-500 text-sm mb-6">Please login to view and track your complaints</p>
+                <Link to="/login" className="bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-orange-600 transition-colors inline-block">
                   Login
                 </Link>
               </div>
@@ -343,55 +337,54 @@ const Support: React.FC = () => {
         {activeTab === 'feedback' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">Feedback & Suggestions</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Feedback & Suggestions</h2>
               <button
                 onClick={() => setShowFeedbackForm(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600"
+                className="bg-orange-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-orange-600 transition-colors shadow-sm"
               >
-                <Plus className="w-4 h-4 inline mr-2" />
+                <Plus className="w-4 h-4 inline mr-1.5" />
                 Give Feedback
               </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4">We Value Your Opinion</h3>
-              <p className="text-gray-600 mb-6">
-                Your feedback helps us improve our service and provide better food experiences. 
-                Share your thoughts, suggestions, or report any issues you've encountered.
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">We Value Your Opinion</h3>
+              <p className="text-slate-600 text-sm mb-6">
+                Your feedback helps Bitez elevate food quality, packaging, and timely campus deliveries.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <Star className="w-8 h-8 text-blue-500 mb-3" />
-                  <h4 className="font-semibold text-blue-900 mb-2">Service Feedback</h4>
-                  <p className="text-blue-700 text-sm">Rate our delivery, food quality, and overall experience</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-5">
+                  <Star className="w-7 h-7 text-orange-600 mb-2.5" />
+                  <h4 className="font-bold text-slate-900 text-sm mb-1">Service Feedback</h4>
+                  <p className="text-xs text-slate-600">Rate your food quality, delivery punctuality, and overall experience</p>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <MessageCircle className="w-8 h-8 text-green-500 mb-3" />
-                  <h4 className="font-semibold text-green-900 mb-2">Suggestions</h4>
-                  <p className="text-green-700 text-sm">Share ideas to help us serve you better</p>
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+                  <MessageCircle className="w-7 h-7 text-slate-700 mb-2.5" />
+                  <h4 className="font-bold text-slate-900 text-sm mb-1">Menu Suggestions</h4>
+                  <p className="text-xs text-slate-600">Suggest new recipes or meal combos you would love to see on Bitez</p>
                 </div>
               </div>
             </div>
 
             {/* Recent Feedback */}
             {user && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="text-lg font-semibold mb-4">Your Recent Feedback</h3>
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h3 className="text-base font-bold text-slate-900 mb-4">Your Recent Feedback</h3>
                 <div className="space-y-4">
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-slate-200 rounded-xl p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-semibold">Great food quality!</h4>
+                      <h4 className="font-bold text-slate-900 text-sm">Great food quality!</h4>
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <Star key={star} className="w-4 h-4 text-yellow-500 fill-current" />
+                          <Star key={star} className="w-4 h-4 text-orange-500 fill-orange-500" />
                         ))}
                       </div>
                     </div>
-                    <p className="text-gray-600 text-sm mb-2">
-                      The dal rice combo was excellent. Keep up the good work!
+                    <p className="text-xs text-slate-600 mb-2">
+                      The dal rice combo was hot, fresh, and perfectly seasoned.
                     </p>
-                    <p className="text-gray-500 text-xs">Submitted on 2024-01-15</p>
+                    <p className="text-[11px] font-medium text-slate-400">Submitted on 2024-01-15</p>
                   </div>
                 </div>
               </div>
@@ -445,27 +438,25 @@ const ComplaintForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, 
       alert('Please login to file a complaint');
       return;
     }
-    
-    // Simulate complaint submission
     alert('Complaint submitted successfully! You will receive updates via email and SMS.');
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-900">File a Complaint</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              <X className="w-6 h-6" />
+            <h2 className="text-xl font-bold text-slate-900">File a Complaint</h2>
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100">
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
               Complaint Title *
             </label>
             <input
@@ -473,21 +464,21 @@ const ComplaintForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, 
               required
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
               placeholder="Brief description of the issue"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
                 Category *
               </label>
               <select
                 required
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
               >
                 <option value="">Select category</option>
                 {categories.map((category) => (
@@ -497,42 +488,42 @@ const ComplaintForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
                 Related Order ID (if applicable)
               </label>
               <input
                 type="text"
                 value={formData.orderId}
                 onChange={(e) => setFormData({...formData, orderId: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
                 placeholder="ORD123456"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
               Priority Level
             </label>
             <div className="flex space-x-4">
               {['low', 'medium', 'high'].map((priority) => (
-                <label key={priority} className="flex items-center">
+                <label key={priority} className="flex items-center text-sm font-medium text-slate-700">
                   <input
                     type="radio"
                     name="priority"
                     value={priority}
                     checked={formData.priority === priority}
                     onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                    className="text-orange-500 focus:ring-orange-500"
+                    className="text-orange-500 focus:ring-orange-500 h-4 w-4"
                   />
-                  <span className="ml-2 text-sm capitalize">{priority}</span>
+                  <span className="ml-2 capitalize">{priority}</span>
                 </label>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
               Detailed Description *
             </label>
             <textarea
@@ -540,22 +531,22 @@ const ComplaintForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, 
               rows={4}
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
               placeholder="Please provide detailed information about your complaint..."
             />
           </div>
 
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end space-x-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="px-5 py-2.5 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              className="px-6 py-2.5 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-sm"
             >
               Submit Complaint
             </button>
@@ -590,34 +581,32 @@ const FeedbackForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, u
       alert('Please login to submit feedback');
       return;
     }
-    
-    // Simulate feedback submission
     alert('Thank you for your feedback! We appreciate your input and will use it to improve our service.');
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-900">Share Your Feedback</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              <X className="w-6 h-6" />
+            <h2 className="text-xl font-bold text-slate-900">Share Your Feedback</h2>
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100">
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
               Feedback Type *
             </label>
             <select
               required
               value={formData.type}
               onChange={(e) => setFormData({...formData, type: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
             >
               <option value="">Select feedback type</option>
               {feedbackTypes.map((type) => (
@@ -627,7 +616,7 @@ const FeedbackForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, u
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
               Overall Rating *
             </label>
             <div className="flex space-x-2">
@@ -636,13 +625,13 @@ const FeedbackForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, u
                   key={star}
                   type="button"
                   onClick={() => setFormData({...formData, rating: star})}
-                  className="focus:outline-none"
+                  className="p-1 focus:outline-none transition-transform hover:scale-110"
                 >
                   <Star 
-                    className={`w-8 h-8 ${
+                    className={`w-7 h-7 ${
                       star <= formData.rating 
-                        ? 'text-yellow-500 fill-current' 
-                        : 'text-gray-300'
+                        ? 'text-orange-500 fill-orange-500' 
+                        : 'text-slate-300'
                     }`} 
                   />
                 </button>
@@ -651,20 +640,20 @@ const FeedbackForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, u
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
               Related Order ID (optional)
             </label>
             <input
               type="text"
               value={formData.orderId}
               onChange={(e) => setFormData({...formData, orderId: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
               placeholder="ORD123456"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-800 mb-1.5">
               Your Feedback *
             </label>
             <textarea
@@ -672,25 +661,25 @@ const FeedbackForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, u
               rows={4}
               value={formData.message}
               onChange={(e) => setFormData({...formData, message: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm text-slate-900 outline-none"
               placeholder="Share your experience, suggestions, or any issues you faced..."
             />
           </div>
 
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end space-x-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="px-5 py-2.5 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              className="px-6 py-2.5 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-sm flex items-center space-x-2"
             >
-              <Send className="w-4 h-4 inline mr-2" />
-              Submit Feedback
+              <Send className="w-4 h-4" />
+              <span>Submit Feedback</span>
             </button>
           </div>
         </form>

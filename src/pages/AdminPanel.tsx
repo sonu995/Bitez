@@ -32,8 +32,8 @@ const salesData = [
 ];
 
 const planDistData = [
-  { name: 'Basic', value: 210, color: '#F97316' },
-  { name: 'Standard', value: 450, color: '#8B5CF6' },
+  { name: 'Basic', value: 210, color: '#F59E0B' },
+  { name: 'Standard', value: 450, color: '#FF5200' },
   { name: 'Premium', value: 230, color: '#10B981' },
 ];
 
@@ -120,29 +120,29 @@ const mealSchedule: Record<string, { breakfast: boolean; lunch: boolean; dinner:
 
 // ─── Status Colors ────────────────────────────────────────────
 const statusColor: Record<string, string> = {
-  confirmed: 'bg-blue-100 text-blue-700',
-  preparing: 'bg-yellow-100 text-yellow-700',
-  'on-the-way': 'bg-purple-100 text-purple-700',
-  delivered: 'bg-green-100 text-green-700',
-  cancelled: 'bg-red-100 text-red-700',
-  active: 'bg-green-100 text-green-700',
-  available: 'bg-green-100 text-green-700',
-  expired: 'bg-red-100 text-red-700',
-  paused: 'bg-gray-100 text-gray-600',
-  offline: 'bg-gray-100 text-gray-600',
-  busy: 'bg-yellow-100 text-yellow-700',
-  'no-plan': 'bg-orange-100 text-orange-700',
-  pending: 'bg-orange-100 text-orange-700',
-  approved: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-700',
-  open: 'bg-red-100 text-red-700',
-  'in-progress': 'bg-yellow-100 text-yellow-700',
-  resolved: 'bg-green-100 text-green-700',
-  high: 'bg-red-100 text-red-700',
-  medium: 'bg-yellow-100 text-yellow-700',
-  low: 'bg-blue-100 text-blue-700',
-  credit: 'bg-green-100 text-green-700',
-  debit: 'bg-red-100 text-red-700',
+  confirmed: 'bg-blue-50 text-blue-700 border border-blue-200',
+  preparing: 'bg-amber-50 text-amber-700 border border-amber-200',
+  'on-the-way': 'bg-orange-500 text-white shadow-xs',
+  delivered: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  cancelled: 'bg-rose-50 text-rose-700 border border-rose-200 line-through',
+  active: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  available: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  expired: 'bg-rose-50 text-rose-700 border border-rose-200',
+  paused: 'bg-amber-50 text-amber-700 border border-amber-200',
+  offline: 'bg-slate-100 text-slate-500 border border-slate-200',
+  busy: 'bg-orange-50 text-orange-700 border border-orange-200',
+  'no-plan': 'bg-slate-100 text-slate-600 border border-slate-200',
+  pending: 'bg-amber-50 text-amber-700 border border-amber-200',
+  approved: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  rejected: 'bg-rose-50 text-rose-700 border border-rose-200 line-through',
+  open: 'bg-amber-50 text-amber-700 border border-amber-200',
+  'in-progress': 'bg-blue-50 text-blue-700 border border-blue-200',
+  resolved: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  high: 'bg-rose-500 text-white shadow-xs',
+  medium: 'bg-amber-500 text-white shadow-xs',
+  low: 'bg-slate-100 text-slate-700 border border-slate-200',
+  credit: 'bg-emerald-50 text-emerald-700 font-bold border border-emerald-200',
+  debit: 'bg-rose-50 text-rose-700 font-bold border border-rose-200',
 };
 
 // ─── New Mock Data ─────────────────────────────────────────────
@@ -302,12 +302,12 @@ const AdminPanel: React.FC = () => {
       <div className="w-64 bg-white shadow-sm min-h-screen flex-shrink-0 flex flex-col">
         <div className="p-5 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-black text-lg">M</span>
+            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl flex items-center justify-center shadow-md shadow-orange-500/20">
+              <span className="text-white font-black text-lg">B</span>
             </div>
             <div>
-              <p className="font-black text-gray-900 leading-none">MessApp</p>
-              <p className="text-xs text-gray-400 font-medium">Admin Panel</p>
+              <p className="font-black text-gray-900 leading-none">Bitez Admin</p>
+              <p className="text-xs text-gray-400 font-medium">Operations Hub</p>
             </div>
           </div>
         </div>
@@ -379,14 +379,14 @@ const AdminPanel: React.FC = () => {
             <div className="space-y-6">
               {/* Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Total Users" value={stats.totalUsers.toLocaleString()} icon={Users} color="bg-blue-50 text-blue-500" sub="+12% this month" />
-                <StatCard label="Active Subscriptions" value={stats.activeSubscriptions} icon={Calendar} color="bg-green-50 text-green-500" sub="+8% this month" />
-                <StatCard label="Today's Meals" value={stats.todayMeals} icon={UtensilsCrossed} color="bg-orange-50 text-orange-500" sub="Across all plans" />
-                <StatCard label="Monthly Revenue" value={`₹${(stats.monthlyRevenue / 1000).toFixed(0)}K`} icon={DollarSign} color="bg-purple-50 text-purple-500" sub="+22% this month" />
-                <StatCard label="Total Orders" value={stats.totalOrders.toLocaleString()} icon={ShoppingCart} color="bg-yellow-50 text-yellow-500" sub="+15% this month" />
-                <StatCard label="Pending Deliveries" value={stats.pendingDeliveries} icon={Truck} color="bg-red-50 text-red-500" sub="Assign riders" />
-                <StatCard label="Open Tickets" value={stats.openTickets} icon={MessageSquare} color="bg-pink-50 text-pink-500" sub="Need response" />
-                <StatCard label="Active Coupons" value={stats.activeCoupons} icon={Tag} color="bg-teal-50 text-teal-500" sub="Running offers" />
+                <StatCard label="Total Users" value={stats.totalUsers.toLocaleString()} icon={Users} color="bg-blue-50 text-blue-600" sub="+12% this month" />
+                <StatCard label="Active Subscriptions" value={stats.activeSubscriptions} icon={Calendar} color="bg-emerald-50 text-emerald-600" sub="+8% this month" />
+                <StatCard label="Today's Meals" value={stats.todayMeals} icon={UtensilsCrossed} color="bg-orange-50 text-orange-600" sub="Across all plans" />
+                <StatCard label="Monthly Revenue" value={`₹${(stats.monthlyRevenue / 1000).toFixed(0)}K`} icon={DollarSign} color="bg-amber-50 text-amber-600" sub="+22% this month" />
+                <StatCard label="Total Orders" value={stats.totalOrders.toLocaleString()} icon={ShoppingCart} color="bg-purple-50 text-purple-600" sub="+15% this month" />
+                <StatCard label="Pending Deliveries" value={stats.pendingDeliveries} icon={Truck} color="bg-amber-50 text-amber-600" sub="Assign riders" />
+                <StatCard label="Open Tickets" value={stats.openTickets} icon={MessageSquare} color="bg-rose-50 text-rose-600" sub="Need response" />
+                <StatCard label="Active Coupons" value={stats.activeCoupons} icon={Tag} color="bg-indigo-50 text-indigo-600" sub="Running offers" />
               </div>
 
               {/* Charts */}
@@ -400,8 +400,8 @@ const AdminPanel: React.FC = () => {
                       <YAxis tick={{ fontSize: 12 }} />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="orders" fill="#F97316" radius={[4,4,0,0]} name="Orders" />
-                      <Bar dataKey="subs" fill="#8B5CF6" radius={[4,4,0,0]} name="New Subs" />
+                      <Bar dataKey="orders" fill="#FF5200" radius={[4,4,0,0]} name="Orders" />
+                      <Bar dataKey="subs" fill="#10B981" radius={[4,4,0,0]} name="New Subs" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

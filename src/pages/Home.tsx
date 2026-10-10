@@ -203,24 +203,24 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* HERO SECTION - TIFFINMATE REFERENCE DESIGN */}
-      <section className="relative overflow-hidden bg-[#FAF7F2] pt-8 pb-4 lg:pt-10 lg:pb-6">
+      {/* HERO SECTION - WARM CULINARY PALETTE */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-orange-50/50 via-amber-50/20 to-transparent pt-8 pb-4 lg:pt-10 lg:pb-6 border-b border-orange-100/60">
         {/* Soft background ambient blurs */}
-        <div className="absolute top-0 right-10 w-[500px] h-[500px] bg-amber-200/20 rounded-full blur-3xl pointer-events-none -z-0"></div>
-        <div className="absolute top-20 right-48 w-80 h-80 bg-sky-200/20 rounded-full blur-3xl pointer-events-none -z-0"></div>
+        <div className="absolute top-0 right-10 w-[500px] h-[500px] bg-gradient-to-br from-orange-500/15 to-amber-500/10 rounded-full blur-3xl pointer-events-none -z-0"></div>
+        <div className="absolute top-20 right-48 w-80 h-80 bg-orange-500/8 rounded-full blur-3xl pointer-events-none -z-0"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-6 items-center">
             
-            {/* LEFT CONTENT COLUMN (Below image ONLY on mobile < 768px; on left on tablet & desktop >= 768px) */}
+            {/* LEFT CONTENT COLUMN */}
             <div className="md:col-span-6 text-center md:text-left order-2 md:order-1">
               {/* Handwritten script badge */}
               <div className="inline-flex flex-col items-center md:items-start mb-3">
-                <span className="font-handwritten text-2xl sm:text-3xl text-emerald-950 font-bold tracking-wide">
+                <span className="font-handwritten text-2xl sm:text-3xl text-slate-900 font-bold tracking-wide">
                   Healthy Food • Fresh Meals • Always On Time
                 </span>
-                {/* Yellow hand-drawn accent brush underline under 'Healthy Food' */}
-                <svg className="w-28 sm:w-32 h-2.5 text-amber-500 fill-none -mt-1" viewBox="0 0 120 10">
+                {/* Brand hand-drawn accent brush underline */}
+                <svg className="w-28 sm:w-32 h-2.5 text-orange-500 fill-none -mt-1" viewBox="0 0 120 10">
                   <path d="M 4 7 Q 60 2 116 6" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
                 </svg>
               </div>
@@ -228,7 +228,7 @@ const Home: React.FC = () => {
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-[54px] font-black text-slate-900 tracking-tight leading-[1.14] mb-4 sm:mb-5">
                 Mess &amp; Instant Order <br />
-                All in <span className="text-amber-500">One Place</span>
+                All in <span className="text-orange-600">One Place</span>
               </h1>
 
               {/* Subtitle */}
@@ -236,13 +236,13 @@ const Home: React.FC = () => {
                 Get fresh, home-style mess plans for your daily meals and fast instant orders for your cravings — quick, easy and reliable.
               </p>
 
-              {/* THE TWO MAIN ACTION CARDS - DIRECT, CONCISE, ZERO DUPLICATION */}
+              {/* THE TWO MAIN ACTION CARDS */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-lg mx-auto md:mx-0 mb-6">
                 {/* 1. Explore Mess */}
                 <button
                   id="hero-explore-mess"
                   onClick={() => navigate('/mess')}
-                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all text-left group cursor-pointer"
+                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all text-left group cursor-pointer"
                 >
                   <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
                     🍱
@@ -260,9 +260,9 @@ const Home: React.FC = () => {
                 <button
                   id="hero-order-food-now"
                   onClick={() => navigate('/menu')}
-                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-slate-900 text-slate-900 hover:text-white border-2 border-slate-900 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all text-left group cursor-pointer"
+                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-orange-50 text-orange-700 hover:text-orange-800 border-2 border-orange-400 hover:border-orange-500 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all text-left group cursor-pointer"
                 >
-                  <div className="w-11 h-11 rounded-xl bg-amber-100 group-hover:bg-white/20 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <div className="w-11 h-11 rounded-xl bg-orange-50 group-hover:bg-orange-100 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
                     ⚡
                   </div>
                   <div className="min-w-0 flex-1">
@@ -270,50 +270,50 @@ const Home: React.FC = () => {
                       <span>Instant Order</span>
                       <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </div>
-                    <p className="text-[11px] text-slate-500 group-hover:text-white/80 font-medium truncate">⚡ 25 Min Express</p>
+                    <p className="text-[11px] text-slate-500 group-hover:text-orange-700 font-medium truncate">⚡ 25 Min Express</p>
                   </div>
                 </button>
               </div>
 
               {/* SLEEK TRUST BADGES ROW */}
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-2 text-[11px] font-semibold text-slate-600">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/70">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-2 text-[11px] font-semibold text-slate-700">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-800 border border-slate-200 shadow-2xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-600 flex-shrink-0" />
                   <span>100% Homestyle Taste</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/70">
-                  <Clock className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-orange-800 border border-orange-200/70 shadow-2xs">
+                  <Clock className="w-3.5 h-3.5 text-orange-600 flex-shrink-0" />
                   <span>On-Time Delivery</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200/70">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-slate-800 border border-slate-200 shadow-2xs">
+                  <ShieldCheck className="w-3.5 h-3.5 text-slate-700 flex-shrink-0" />
                   <span>FSSAI Certified</span>
                 </span>
               </div>
             </div>
 
-            {/* RIGHT COMPOSITE VISUAL COLUMN (First on mobile < 768px, second/right on tablet & desktop >= 768px) */}
+            {/* RIGHT COMPOSITE VISUAL COLUMN */}
             <div className="md:col-span-6 relative flex items-center justify-center pt-2 md:pt-0 order-1 md:order-2 mb-4 sm:mb-6 md:mb-0">
               
               <div className="relative w-full max-w-[620px] group">
                 
                 {/* 1. Ambient Background Glowing Light Orbs */}
-                <div className="absolute -top-10 -right-10 w-64 h-64 bg-amber-400/25 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
-                <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-orange-400/20 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
+                <div className="absolute -top-10 -right-10 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
                 
-                {/* 2. Rotating Decorative Dashed Orbital Shape - constrained to avoid horizontal overflow */}
-                <div className="absolute inset-0 sm:-inset-4 border-2 border-dashed border-amber-300/40 rounded-[2.25rem] sm:rounded-[3.75rem] pointer-events-none animate-spin-slow opacity-80" />
+                {/* 2. Rotating Decorative Dashed Orbital Shape */}
+                <div className="absolute inset-0 sm:-inset-4 border-2 border-dashed border-orange-200/60 rounded-[2.25rem] sm:rounded-[3.75rem] pointer-events-none animate-spin-slow opacity-80" />
 
                 {/* 3. Floating Sparkle Accent */}
                 <div className="absolute -top-3 left-1/4 z-30 animate-bounce-gentle pointer-events-none hidden sm:block">
-                  <Sparkles className="w-5 h-5 text-amber-400 drop-shadow" />
+                  <Sparkles className="w-5 h-5 text-orange-500 drop-shadow" />
                 </div>
 
                 {/* 4. Main Organic Shaped Container with Glassmorphism Border */}
-                <div className="relative p-2 sm:p-3.5 bg-gradient-to-tr from-amber-400/35 via-white/90 to-orange-400/35 backdrop-blur-xl rounded-[2rem] sm:rounded-[3.25rem] lg:rounded-[3.5rem] shadow-[0_25px_60px_-15px_rgba(234,88,12,0.22)] border border-white/90 transition-all duration-700 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_30px_70px_-12px_rgba(234,88,12,0.3)]">
+                <div className="relative p-2 sm:p-3.5 bg-white/90 backdrop-blur-xl rounded-[2rem] sm:rounded-[3.25rem] lg:rounded-[3.5rem] shadow-[0_20px_50px_-15px_rgba(234,88,12,0.15)] border border-slate-200/80 transition-all duration-700 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_25px_60px_-12px_rgba(234,88,12,0.25)]">
                   
-                  {/* Inner Shaped Frame with Soft Food Tint */}
-                  <div className="relative overflow-hidden rounded-[1.75rem] sm:rounded-[2.75rem] lg:rounded-[3rem] bg-gradient-to-b from-[#FAF4EC] via-[#F5ECE0] to-[#EFE2D2] aspect-[16/10] sm:aspect-[16/9.5] flex items-center justify-center">
+                  {/* Inner Shaped Frame */}
+                  <div className="relative overflow-hidden rounded-[1.75rem] sm:rounded-[2.75rem] lg:rounded-[3rem] bg-slate-100 aspect-[16/10] sm:aspect-[16/9.5] flex items-center justify-center">
                     
                     {/* Top glass shine effect */}
                     <div className="absolute inset-x-0 top-0 h-20 sm:h-28 bg-gradient-to-b from-white/40 to-transparent pointer-events-none z-10" />
@@ -326,18 +326,18 @@ const Home: React.FC = () => {
                     />
 
                     {/* Subtle bottom gradient tint */}
-                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-amber-950/5 to-transparent pointer-events-none" />
+                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-900/10 to-transparent pointer-events-none" />
                   </div>
 
                 </div>
 
-                {/* 5. FLOATING ANIMATED BADGES - Perfectly spaced for mobile & tablet */}
+                {/* 5. FLOATING ANIMATED BADGES */}
 
-                {/* Top-Right Badge: "Instant Order & Fast Delivery" */}
-                <div className="hidden min-[480px]:flex absolute -top-3.5 right-4 sm:right-6 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-lg shadow-orange-500/10 border border-amber-100/90 items-center gap-2 z-20 animate-float-smooth hover:scale-105 transition-transform cursor-pointer">
+                {/* Top-Right Badge: "Instant Order & Express Delivery" */}
+                <div className="hidden min-[480px]:flex absolute -top-3.5 right-4 sm:right-6 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-lg shadow-slate-900/10 border border-slate-200 items-center gap-2 z-20 animate-float-smooth hover:scale-105 transition-transform cursor-pointer">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                   </span>
                   <span className="font-handwritten text-base sm:text-lg font-bold text-slate-800 tracking-wide">
                     Instant Order &amp; Express Delivery
@@ -346,28 +346,28 @@ const Home: React.FC = () => {
                 </div>
 
                 {/* Top-Left Badge: "100% Homestyle Taste" */}
-                <div className="absolute top-2 left-2 sm:-top-3.5 sm:-left-3 bg-white/95 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-lg shadow-emerald-500/10 border border-emerald-100/90 flex items-center gap-1.5 sm:gap-2 z-20 animate-float-delay hover:scale-105 transition-transform cursor-pointer">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-2xs">
+                <div className="absolute top-2 left-2 sm:-top-3.5 sm:-left-3 bg-white/95 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-lg shadow-slate-900/10 border border-slate-200 flex items-center gap-1.5 sm:gap-2 z-20 animate-float-delay hover:scale-105 transition-transform cursor-pointer">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 shadow-2xs">
                     <Leaf className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   </div>
-                  <span className="text-[10px] sm:text-xs font-bold text-emerald-950 tracking-tight">
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-900 tracking-tight">
                     100% Homestyle Taste
                   </span>
                 </div>
 
                 {/* Bottom-Left Badge: "4.9 ⭐ (10k+ Tiffins)" */}
-                <div className="absolute bottom-2 left-2 sm:-bottom-3 sm:-left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-xl sm:rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-100 flex items-center gap-1.5 sm:gap-2 z-20 animate-float-reverse hover:scale-105 transition-transform cursor-pointer">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center font-bold text-[10px] sm:text-xs shadow-sm flex-shrink-0">
+                <div className="absolute bottom-2 left-2 sm:-bottom-3 sm:-left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-xl sm:rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200 flex items-center gap-1.5 sm:gap-2 z-20 animate-float-reverse hover:scale-105 transition-transform cursor-pointer">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-[10px] sm:text-xs shadow-sm flex-shrink-0">
                     🍱
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-0.5 sm:gap-1">
-                      <div className="flex text-amber-400">
-                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
-                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
-                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
-                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
-                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
+                      <div className="flex text-orange-500">
+                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
+                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
+                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
+                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
+                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
                       </div>
                       <span className="text-[10px] sm:text-xs font-black text-slate-900 ml-0.5">4.9</span>
                     </div>
@@ -376,13 +376,13 @@ const Home: React.FC = () => {
                 </div>
 
                 {/* Bottom-Right Badge: "⚡ 25 Min Express Delivery" */}
-                <div className="absolute bottom-2 right-2 sm:-bottom-3 sm:right-3 bg-slate-900/95 backdrop-blur-md text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-xl shadow-slate-900/25 border border-slate-800 flex items-center gap-1 sm:gap-1.5 z-20 animate-float-slow hover:scale-105 transition-transform cursor-pointer">
+                <div className="absolute bottom-2 right-2 sm:-bottom-3 sm:right-3 bg-white/95 backdrop-blur-md text-slate-800 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg shadow-orange-500/10 border border-orange-200/80 flex items-center gap-1 sm:gap-1.5 z-20 animate-float-slow hover:scale-105 transition-transform cursor-pointer">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                   </span>
-                  <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
-                  <span className="text-[10px] sm:text-xs font-bold text-white tracking-wide">
+                  <Zap className="w-3 h-3 text-orange-500 fill-orange-500" />
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-800 tracking-wide">
                     25 Min Express
                   </span>
                 </div>
@@ -396,7 +396,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* MESS PLANS */}
+      {/* MESS PLANS - 3-COLOR THEME */}
       <section id="mess-plans" className="py-14 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-14">
@@ -405,30 +405,30 @@ const Home: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8 max-w-7xl mx-auto items-stretch">
             {messPlans.map((plan, i) => (
-              <div key={i} className={`relative bg-white rounded-3xl p-6 sm:p-7 lg:p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 border border-orange-100/80 flex flex-col justify-between ${plan.popular ? 'ring-2 ring-orange-500 md:scale-105 shadow-xl shadow-orange-100 z-10' : 'hover:shadow-xl'}`}>
-                {plan.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2"><span className="bg-gradient-to-r from-orange-500 via-amber-500 to-amber-600 text-white px-5 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">🔥 Most Popular</span></div>}
+              <div key={i} className={`relative bg-white rounded-3xl p-6 sm:p-7 lg:p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 border border-slate-200 flex flex-col justify-between ${plan.popular ? 'ring-2 ring-orange-500 md:scale-105 shadow-xl shadow-orange-500/10 z-10' : 'hover:shadow-lg hover:border-orange-200'}`}>
+                {plan.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2"><span className="bg-orange-500 text-white px-5 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-md shadow-orange-500/25 whitespace-nowrap">🔥 Most Popular</span></div>}
                 <div className="text-center">
                   <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-1">{plan.name}</h3>
                   <p className="text-orange-600 font-bold mb-1 text-sm sm:text-base">{plan.meals}</p>
                   <p className="text-slate-400 text-xs sm:text-sm mb-4">{plan.duration}</p>
-                  <div className="text-3xl sm:text-4xl font-extrabold text-gradient-orange mb-6">₹{plan.price}<span className="text-base font-normal text-slate-400">/mo</span></div>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-orange-600 mb-6">₹{plan.price}<span className="text-base font-normal text-slate-400">/mo</span></div>
                   <ul className="space-y-2.5 sm:space-y-3 mb-8 text-left">
                     {plan.features.map((f, j) => (
                       <li key={j} className="flex items-start text-xs sm:text-sm text-slate-600">
-                        <span className="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center mr-2.5 mt-0.5 flex-shrink-0 text-xs text-emerald-600 font-bold">✓</span>{f}
+                        <span className="w-5 h-5 bg-orange-50 rounded-full flex items-center justify-center mr-2.5 mt-0.5 flex-shrink-0 text-xs text-orange-600 font-bold">✓</span>{f}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <button onClick={() => navigate('/mess')} className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base transition-all cursor-pointer ${plan.popular ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-amber-600 text-white hover:from-orange-600 hover:to-amber-700 shadow-lg shadow-orange-500/25' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>Subscribe Now</button>
+                <button onClick={() => navigate('/mess')} className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base transition-all cursor-pointer ${plan.popular ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-lg shadow-orange-500/25' : 'bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 hover:border-orange-500 shadow-xs hover:shadow-md'}`}>Subscribe Now</button>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* TODAY'S MENU */}
-      <section id="todays-menu" className="py-12 sm:py-16 bg-orange-50/25 border-y border-orange-100/60">
+      {/* TODAY'S MENU - WARM SURFACE */}
+      <section id="todays-menu" className="py-12 sm:py-16 bg-[#FBF9F5] border-y border-orange-100/60">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2 sm:mb-3">Today's Mess Menu 🍱</h2>
@@ -436,7 +436,7 @@ const Home: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             {Object.entries(todaysMenu).map(([meal, data]) => (
-              <div key={meal} className="bg-white rounded-3xl p-6 sm:p-7 text-center hover:-translate-y-1 transition-all duration-300 border border-orange-100/80 shadow-sm hover:shadow-md">
+              <div key={meal} className="bg-white rounded-3xl p-6 sm:p-7 text-center hover:-translate-y-1 transition-all duration-300 border border-slate-200 shadow-xs hover:shadow-md hover:border-orange-200">
                 <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">{data.emoji}</div>
                 <h3 className="text-base sm:text-lg font-extrabold text-slate-900 capitalize mb-1.5">{meal}</h3>
                 <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{data.items}</p>
@@ -444,33 +444,29 @@ const Home: React.FC = () => {
             ))}
           </div>
           <div className="text-center mt-7 sm:mt-8">
-            <Link to="/mess" className="inline-flex items-center space-x-2 text-amber-600 font-bold hover:text-amber-700 transition-colors text-sm sm:text-base">
+            <Link to="/mess" className="inline-flex items-center space-x-2 text-orange-600 font-bold hover:text-orange-700 transition-colors text-sm sm:text-base">
               <span>View Full Weekly Mess Schedule</span><span>→</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* INSTANT ORDER */}
-      <section id="food-delivery" className="relative py-14 sm:py-20 bg-[#FAF7F2] overflow-hidden border-t border-orange-100/60">
-        {/* Soft background ambient blurs */}
-        <div className="absolute top-10 right-10 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-orange-200/15 rounded-full blur-3xl pointer-events-none" />
-
+      {/* INSTANT ORDER - 3-COLOR THEME */}
+      <section id="food-delivery" className="relative py-14 sm:py-20 bg-white overflow-hidden border-t border-slate-200/80">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* 1. SECTION HEADER */}
           <div className="text-center max-w-2xl mx-auto mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/90 border border-amber-200 text-amber-950 text-xs font-bold uppercase tracking-wider mb-2.5 shadow-2xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-800 text-xs font-bold uppercase tracking-wider mb-2.5 shadow-2xs">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
               </span>
               <span>⚡ Express Instant Delivery in 20–25 Mins</span>
             </div>
 
             <h2 className="text-2xl sm:text-4xl lg:text-[42px] font-black text-slate-900 tracking-tight leading-[1.15] mb-2 sm:mb-2.5">
-              Hungry? <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-amber-500 to-rose-500">Instant Order Now</span> 🍔
+              Hungry? <span className="text-orange-600">Instant Order Now</span> 🍔
             </h2>
 
             <p className="text-slate-600 text-xs sm:text-base leading-relaxed">
@@ -478,25 +474,21 @@ const Home: React.FC = () => {
             </p>
           </div>
 
-          {/* 2. CIRCULAR CATEGORY SHOWCASE BAR (Exact 3D Icon design from user reference) */}
-          <div className="relative mb-8 bg-white/70 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-amber-100/90 shadow-xs overflow-hidden">
-            {/* Ambient Warm Gradient Glows */}
-            <div className="absolute top-0 right-1/4 w-72 h-72 bg-amber-200/25 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-72 h-72 bg-orange-200/20 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Strip Sub-header with Desktop Navigation Chevrons */}
+          {/* 2. CIRCULAR CATEGORY SHOWCASE BAR */}
+          <div className="relative mb-8 bg-slate-50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-slate-200 shadow-xs overflow-hidden">
+            {/* Strip Sub-header */}
             <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
               <span className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                 Select a Cuisine or Category
               </span>
 
-              {/* Scroll controls for desktop */}
+              {/* Scroll controls */}
               <div className="hidden sm:flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => scrollHomeCategories('left')}
-                  className="w-8 h-8 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-600 hover:text-amber-600 hover:border-amber-300 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-600 hover:text-orange-600 hover:border-orange-300 transition-all active:scale-95 cursor-pointer"
                   aria-label="Scroll left"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -504,7 +496,7 @@ const Home: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => scrollHomeCategories('right')}
-                  className="w-8 h-8 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-600 hover:text-amber-600 hover:border-amber-300 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-600 hover:text-orange-600 hover:border-orange-300 transition-all active:scale-95 cursor-pointer"
                   aria-label="Scroll right"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -514,10 +506,6 @@ const Home: React.FC = () => {
 
             {/* Horizontal Scrolling Circular Category Cards */}
             <div className="relative">
-              {/* Fade fringes on edges */}
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 sm:w-6 bg-gradient-to-r from-white/90 to-transparent z-10" />
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 sm:w-6 bg-gradient-to-l from-white/90 to-transparent z-10" />
-
               <div
                 ref={homeCategoryScrollRef}
                 className="flex items-start gap-3 sm:gap-6 md:gap-7 overflow-x-auto scroll-smooth py-2 px-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -531,12 +519,12 @@ const Home: React.FC = () => {
                       className="group flex flex-col items-center flex-shrink-0 cursor-pointer transition-all duration-200 outline-none focus:outline-none focus-visible:outline-none select-none"
                       style={{ minWidth: '74px', maxWidth: '96px' }}
                     >
-                      {/* Floating Circular Card with Soft Drop Shadow */}
+                      {/* Floating Circular Card */}
                       <div
                         className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white flex items-center justify-center transition-all duration-300 transform group-hover:-translate-y-1.5 ${
                           isActive
-                            ? 'ring-3 ring-amber-500 ring-offset-2 ring-offset-[#FAF7F2] shadow-[0_12px_28px_rgba(245,158,11,0.28)] bg-gradient-to-b from-white to-amber-50/50 scale-105'
-                            : 'shadow-[0_8px_20px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.04)] group-hover:shadow-[0_16px_30px_rgba(0,0,0,0.12)] border border-slate-100'
+                            ? 'ring-2 ring-orange-500 shadow-md bg-white scale-105'
+                            : 'shadow-xs group-hover:shadow-md border border-slate-200'
                         }`}
                       >
                         <img
@@ -560,14 +548,14 @@ const Home: React.FC = () => {
                         <span
                           className={`block text-xs sm:text-sm tracking-tight transition-colors duration-200 leading-tight ${
                             isActive
-                              ? 'font-bold text-amber-600'
+                              ? 'font-bold text-orange-600'
                               : 'font-semibold text-slate-700 group-hover:text-slate-900'
                           }`}
                         >
                           {c.name}
                         </span>
                         {isActive && (
-                          <div className="w-5 h-1 bg-amber-500 rounded-full mx-auto mt-1 animate-pulse" />
+                          <div className="w-5 h-1 bg-orange-500 rounded-full mx-auto mt-1" />
                         )}
                       </div>
                     </button>
@@ -577,10 +565,10 @@ const Home: React.FC = () => {
             </div>
 
             {/* Bottom Sub-bar with Item Count, Veg Filter, and Link to Full Menu */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 mt-2 border-t border-slate-200/60 relative z-10 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 mt-2 border-t border-slate-200 relative z-10 text-xs">
               <span className="text-slate-500 font-medium">
                 Showing <strong className="text-slate-800">{filteredFoodItems.length}</strong> items in{' '}
-                <span className="text-amber-600 font-bold">
+                <span className="text-orange-600 font-bold">
                   {hungryCategories.find(c => c.cat === selectedCategory)?.name || 'All Dishes'}
                 </span>
               </span>
@@ -591,8 +579,8 @@ const Home: React.FC = () => {
                   onClick={() => setVegOnly(!vegOnly)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold border transition-all cursor-pointer ${
                     vegOnly
-                      ? 'bg-emerald-500 text-white border-emerald-600 shadow-xs'
-                      : 'bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   <div className={`w-3 h-3 rounded border flex items-center justify-center ${vegOnly ? 'border-white bg-emerald-600' : 'border-emerald-600 bg-white'}`}>
@@ -601,10 +589,10 @@ const Home: React.FC = () => {
                   <span>Veg Only</span>
                 </button>
 
-                {/* View Full Menu link with selected category */}
+                {/* View Full Menu link */}
                 <Link
                   to={selectedCategory ? `/menu?category=${selectedCategory}` : '/menu'}
-                  className="inline-flex items-center gap-1 text-amber-600 hover:text-amber-700 font-bold transition-colors"
+                  className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-700 font-bold transition-colors"
                 >
                   <span>Full Menu</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -614,7 +602,7 @@ const Home: React.FC = () => {
 
           </div>
 
-          {/* 3. RESPONSIVE FOOD GRID (1 col mobile, 2 cols 440px+, 3 cols tablet, 4 cols desktop) */}
+          {/* 3. RESPONSIVE FOOD GRID */}
           {filteredFoodItems.length === 0 ? (
             <div className="bg-white rounded-3xl p-10 text-center border border-slate-200 shadow-sm max-w-md mx-auto mb-10">
               <p className="text-4xl mb-2">🥗</p>
@@ -622,7 +610,7 @@ const Home: React.FC = () => {
               <p className="text-slate-500 text-xs mb-4">No matching dishes with current filters.</p>
               <button
                 onClick={() => { setSelectedCategory(''); setVegOnly(false); }}
-                className="px-4 py-2 rounded-full bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-full bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 transition-colors cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -634,7 +622,7 @@ const Home: React.FC = () => {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-3.5 border border-slate-100 hover:border-amber-300 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group"
+                    className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-3.5 border border-slate-200 hover:border-orange-300 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group"
                   >
                     {/* Top Content & Image */}
                     <div>
@@ -658,11 +646,11 @@ const Home: React.FC = () => {
 
                           {/* Tag or Discount */}
                           {item.tag ? (
-                            <span className="px-2 py-0.5 rounded-full bg-slate-900/85 backdrop-blur-md text-white text-[10px] font-bold shadow-xs">
+                            <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 text-white text-[10px] font-bold shadow-xs">
                               {item.tag}
                             </span>
                           ) : item.originalPrice ? (
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-xs">
+                            <span className="px-2 py-0.5 rounded-full bg-orange-600 text-white text-[10px] font-bold shadow-xs">
                               {Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF
                             </span>
                           ) : null}
@@ -670,14 +658,14 @@ const Home: React.FC = () => {
 
                         {/* Prep Time */}
                         <div className="absolute bottom-2.5 left-2.5 bg-white/95 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-700 flex items-center gap-1 shadow-xs">
-                          <Clock className="w-2.5 h-2.5 text-amber-500" />
+                          <Clock className="w-2.5 h-2.5 text-orange-500" />
                           <span>{item.prepTime || '20m'}</span>
                         </div>
                       </div>
 
                       {/* Category & Kitchen */}
                       <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1">
-                        <span className="text-amber-600 uppercase tracking-wider text-[10px]">
+                        <span className="text-orange-600 uppercase tracking-wider text-[10px]">
                           {item.category.replace('_', ' ')}
                         </span>
                         <span className="truncate max-w-[110px] font-medium text-slate-500">
@@ -686,14 +674,14 @@ const Home: React.FC = () => {
                       </div>
 
                       {/* Name */}
-                      <h3 className="font-extrabold text-slate-900 text-sm sm:text-base mb-1.5 group-hover:text-amber-600 transition-colors line-clamp-1">
+                      <h3 className="font-extrabold text-slate-900 text-sm sm:text-base mb-1.5 group-hover:text-orange-600 transition-colors line-clamp-1">
                         {item.name}
                       </h3>
 
                       {/* Rating */}
                       <div className="flex items-center gap-1.5 mb-3">
-                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200/60">
-                          <Star className="w-3 h-3 fill-emerald-600 text-emerald-600" />
+                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-orange-50 text-orange-800 text-[11px] font-bold border border-orange-200/60">
+                          <Star className="w-3 h-3 fill-orange-500 text-orange-500" />
                           <span>{item.rating}</span>
                         </div>
                         <span className="text-[11px] text-slate-400 font-medium">
@@ -718,13 +706,13 @@ const Home: React.FC = () => {
                       {qty === 0 ? (
                         <button
                           onClick={() => handleAddToCart(item)}
-                          className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all flex items-center gap-1 cursor-pointer"
+                          className="px-4 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all flex items-center gap-1 cursor-pointer"
                         >
                           <span>ADD</span>
                           <Plus className="w-3.5 h-3.5 stroke-[3]" />
                         </button>
                       ) : (
-                        <div className="flex items-center bg-amber-500 text-white rounded-xl shadow-sm px-1 py-0.5 gap-1">
+                        <div className="flex items-center bg-orange-500 text-white rounded-xl shadow-sm px-1 py-0.5 gap-1">
                           <button
                             onClick={() => updateQuantity(item.id, qty - 1)}
                             className="w-6 h-6 rounded-lg hover:bg-white/20 flex items-center justify-center font-bold text-xs transition-colors cursor-pointer"
@@ -747,48 +735,48 @@ const Home: React.FC = () => {
             </div>
           )}
 
-          {/* 4. "SEE MORE" BUTTON REDIRECTING TO /menu */}
+          {/* 4. "SEE MORE" BUTTON */}
           <div className="flex flex-col items-center justify-center text-center">
             <Link
               to="/menu"
               id="hungry-see-more-btn"
-              className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-amber-500/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 group cursor-pointer"
+              className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-orange-500/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 group cursor-pointer"
             >
               <span>See More Dishes</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
             <p className="text-xs text-slate-500 font-medium mt-2.5">
-              Explore 50+ more burgers, rolls, pizzas, biryanis & desserts on the full menu
+              Explore 50+ more dishes on the full instant menu
             </p>
           </div>
 
         </div>
       </section>
 
-      {/* OFFERS */}
-      <section id="offers" className="py-12 sm:py-16 bg-orange-50/25">
+      {/* OFFERS - 3-COLOR THEME */}
+      <section id="offers" className="py-12 sm:py-16 bg-slate-50 border-t border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 rounded-3xl p-6 sm:p-8 md:p-10 text-white relative overflow-hidden shadow-lg shadow-orange-500/15 flex flex-col justify-between">
-              <div className="absolute top-4 right-6 text-5xl sm:text-6xl opacity-30 pointer-events-none">🍔</div>
+            <div className="bg-orange-500 rounded-3xl p-6 sm:p-8 md:p-10 text-white relative overflow-hidden shadow-lg shadow-orange-500/15 flex flex-col justify-between">
+              <div className="absolute top-4 right-6 text-5xl sm:text-6xl opacity-20 pointer-events-none">🍔</div>
               <div>
-                <p className="text-xs sm:text-sm font-bold text-yellow-200 mb-1.5 sm:mb-2">🔥 Today's Fast-Food Special</p>
+                <p className="text-xs sm:text-sm font-bold text-white/90 mb-1.5 sm:mb-2">🔥 Today's Fast-Food Special</p>
                 <h3 className="text-2xl sm:text-3xl font-extrabold mb-2 sm:mb-3">Special Combo @ ₹99</h3>
-                <p className="text-white/90 text-xs sm:text-sm mb-6 leading-relaxed">Crispy Chicken / Veg Burger + Salted Peri Peri Fries + Cold Beverage</p>
+                <p className="text-white/90 text-xs sm:text-sm mb-6 leading-relaxed">Crispy Burger + Salted Peri Peri Fries + Cold Beverage</p>
               </div>
               <div>
-                <Link to="/menu" className="inline-block bg-white text-orange-600 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl hover:bg-amber-100 hover:text-orange-700 transition-all shadow-md active:scale-95">Order Combo Now →</Link>
+                <Link to="/menu" className="inline-block bg-white text-orange-600 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl hover:bg-slate-100 transition-all shadow-md active:scale-95">Order Combo Now →</Link>
               </div>
             </div>
-            <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 relative overflow-hidden border border-orange-200 shadow-md flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-amber-500 via-orange-600 to-orange-700 rounded-3xl p-6 sm:p-8 md:p-10 text-white relative overflow-hidden shadow-xl shadow-orange-500/20 flex flex-col justify-between">
               <div className="absolute top-4 right-6 text-5xl sm:text-6xl opacity-20 pointer-events-none">🍱</div>
               <div>
-                <p className="text-xs sm:text-sm font-bold text-orange-600 mb-1.5 sm:mb-2">🎉 New Student Subscription Offer</p>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2 sm:mb-3">First Month @ ₹999</h3>
-                <p className="text-slate-600 text-xs sm:text-sm mb-6 leading-relaxed">Subscribe this month and get free express delivery + weekend dessert specials included.</p>
+                <p className="text-xs sm:text-sm font-bold text-amber-200 mb-1.5 sm:mb-2">🎉 New Student Subscription Offer</p>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 sm:mb-3">First Month @ ₹999</h3>
+                <p className="text-orange-100 text-xs sm:text-sm mb-6 leading-relaxed">Subscribe this month and get free express delivery + weekend dessert specials included.</p>
               </div>
               <div>
-                <Link to="/mess" className="inline-block bg-gradient-to-r from-orange-500 to-rose-500 text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl hover:from-orange-600 hover:to-rose-600 transition-all shadow-md shadow-orange-500/25 active:scale-95">Subscribe to Mess →</Link>
+                <Link to="/mess" className="inline-block bg-white text-orange-600 hover:bg-slate-50 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-md active:scale-95">Subscribe to Mess →</Link>
               </div>
             </div>
           </div>
@@ -827,14 +815,14 @@ const Home: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 sm:p-10 mb-4 border border-orange-200/80 shadow-md">
             <div className="text-6xl sm:text-7xl mb-4 sm:mb-6">🗺️</div>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3 max-w-md mx-auto">
-              <input type="text" placeholder="Enter your campus, PG, or area" className="flex-1 w-full px-5 py-3 border border-orange-200 rounded-2xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400 text-xs sm:text-sm outline-none" />
-              <button className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-xs sm:text-sm rounded-2xl hover:from-amber-600 hover:to-orange-600 transition-all shadow-md shadow-orange-500/20 whitespace-nowrap cursor-pointer">Check Availability</button>
+              <input type="text" placeholder="Enter your campus, PG, or area" className="flex-1 w-full px-5 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs sm:text-sm outline-none" />
+              <button className="w-full sm:w-auto px-6 py-3 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-2xl hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 whitespace-nowrap cursor-pointer">Check Availability</button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CUSTOMER REVIEWS */}
+      {/* CUSTOMER REVIEWS - 3-COLOR THEME */}
       <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
@@ -843,13 +831,13 @@ const Home: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {reviews.map((review, i) => (
-              <div key={i} className="bg-white rounded-3xl p-6 sm:p-7 shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-orange-100/60 flex flex-col justify-between">
+              <div key={i} className="bg-slate-50 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-lg hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 hover:border-orange-200 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center space-x-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className={`w-4 h-4 ${j < review.rating ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />)}</div>
+                  <div className="flex items-center space-x-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className={`w-4 h-4 ${j < review.rating ? 'text-orange-500 fill-orange-500' : 'text-slate-200'}`} />)}</div>
                   <p className="text-slate-600 text-xs sm:text-sm mb-5 leading-relaxed italic">"{review.text}"</p>
                 </div>
-                <div className="flex items-center space-x-3 pt-3 border-t border-slate-100">
-                  <div className="w-9 h-9 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center text-lg">{review.avatar}</div>
+                <div className="flex items-center space-x-3 pt-3 border-t border-slate-200">
+                  <div className="w-9 h-9 bg-orange-100 rounded-full flex items-center justify-center text-lg">{review.avatar}</div>
                   <span className="font-bold text-slate-900 text-xs sm:text-sm">— {review.name}</span>
                 </div>
               </div>
@@ -858,12 +846,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* FREQUENTLY ASKED QUESTIONS */}
-      <section id="faqs" className="relative py-20 lg:py-24 bg-[#FAF7F2] overflow-hidden border-t border-orange-100/60">
-        {/* Ambient subtle glow backdrops */}
-        <div className="absolute top-1/4 -left-20 w-80 h-80 bg-amber-200/25 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 -right-20 w-96 h-96 bg-orange-200/25 rounded-full blur-3xl pointer-events-none" />
-
+      {/* FREQUENTLY ASKED QUESTIONS - 3-COLOR THEME */}
+      <section id="faqs" className="relative py-20 lg:py-24 bg-slate-50 overflow-hidden border-t border-slate-200/80">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             
@@ -871,15 +855,15 @@ const Home: React.FC = () => {
             <div className="lg:col-span-4 lg:sticky lg:top-24">
               
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/90 border border-amber-200/90 text-amber-900 text-xs font-bold uppercase tracking-wider mb-4 shadow-2xs">
-                <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200 text-orange-800 text-xs font-bold uppercase tracking-wider mb-4 shadow-2xs">
+                <HelpCircle className="w-3.5 h-3.5 text-orange-600" />
                 <span>Got Questions?</span>
               </div>
 
               {/* Title */}
               <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black text-slate-900 tracking-tight leading-[1.15] mb-4">
                 Frequently Asked <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500">
+                <span className="text-orange-600">
                   Questions
                 </span> ❓
               </h2>
@@ -889,12 +873,10 @@ const Home: React.FC = () => {
               </p>
 
               {/* Interactive Help & Live Support Card */}
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 border border-amber-100 shadow-xl shadow-amber-950/5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-amber-100/60 to-transparent rounded-bl-full pointer-events-none" />
-                
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-md relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-2xl bg-amber-50 border border-amber-200/70 flex items-center justify-center text-amber-600 font-bold">
+                    <div className="w-9 h-9 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600 font-bold">
                       💬
                     </div>
                     <div>
@@ -902,10 +884,10 @@ const Home: React.FC = () => {
                       <p className="text-[11px] text-slate-500">Support desk is active</p>
                     </div>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200/80 shadow-2xs">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 text-[11px] font-bold border border-slate-200 shadow-2xs">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                     </span>
                     Live
                   </span>
@@ -920,7 +902,7 @@ const Home: React.FC = () => {
                     href="https://wa.me/919876543210"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-orange-500/20 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span>Chat on WhatsApp</span>
@@ -949,7 +931,7 @@ const Home: React.FC = () => {
                   placeholder="Search questions (e.g. skip meal, pause plan, UPI, delivery time...)"
                   value={faqSearch}
                   onChange={(e) => setFaqSearch(e.target.value)}
-                  className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-white border border-slate-200/90 focus:border-amber-500 focus:ring-4 focus:ring-amber-200/50 outline-none text-sm text-slate-900 placeholder:text-slate-400 shadow-xs transition-all"
+                  className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 outline-none text-sm text-slate-900 placeholder:text-slate-400 shadow-xs transition-all"
                 />
                 {faqSearch && (
                   <button
@@ -971,8 +953,8 @@ const Home: React.FC = () => {
                       onClick={() => setFaqCategory(cat.id)}
                       className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${
                         isActive
-                          ? 'bg-slate-900 text-white shadow-md shadow-slate-900/10 scale-102'
-                          : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-orange-50/70 border border-slate-200/80 shadow-2xs'
+                          ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 scale-102'
+                          : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 shadow-2xs'
                       }`}
                     >
                       {cat.icon && <span>{cat.icon}</span>}
@@ -994,7 +976,7 @@ const Home: React.FC = () => {
                     <p className="text-slate-500 text-xs mb-4">Try searching with a different keyword or reset filters.</p>
                     <button
                       onClick={() => { setFaqSearch(''); setFaqCategory('all'); }}
-                      className="px-4 py-2 rounded-full bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors cursor-pointer"
+                      className="px-4 py-2 rounded-full bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 transition-colors cursor-pointer"
                     >
                       Reset Search & Filters
                     </button>
@@ -1007,8 +989,8 @@ const Home: React.FC = () => {
                         key={faq.id}
                         className={`rounded-2xl sm:rounded-3xl transition-all duration-300 overflow-hidden ${
                           isOpen
-                            ? 'bg-white border-2 border-amber-400 shadow-xl shadow-amber-500/10 ring-4 ring-amber-100/50'
-                            : 'bg-white/95 hover:bg-white border border-slate-200/80 hover:border-amber-300 shadow-2xs hover:shadow-md'
+                            ? 'bg-white border-2 border-orange-500 shadow-md ring-4 ring-orange-100'
+                            : 'bg-white hover:bg-white border border-slate-200 hover:border-orange-200 shadow-2xs hover:shadow-md'
                         }`}
                       >
                         <button
@@ -1017,7 +999,7 @@ const Home: React.FC = () => {
                         >
                           <div className="flex items-center gap-3.5 sm:gap-4 flex-1">
                             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 transition-transform duration-300 group-hover:scale-105 shadow-2xs ${
-                              isOpen ? 'bg-amber-100 border border-amber-300/80 text-amber-700' : 'bg-orange-50/80 border border-orange-100 text-orange-600'
+                              isOpen ? 'bg-orange-50 border border-orange-200 text-orange-700' : 'bg-slate-50 border border-slate-200 text-slate-700'
                             }`}>
                               {faq.icon}
                             </div>
@@ -1026,7 +1008,7 @@ const Home: React.FC = () => {
                                 {faq.tag}
                               </div>
                               <h3 className={`text-sm sm:text-base font-bold transition-colors leading-snug ${
-                                isOpen ? 'text-amber-950 font-extrabold' : 'text-slate-800 group-hover:text-amber-600'
+                                isOpen ? 'text-orange-600 font-extrabold' : 'text-slate-800 group-hover:text-orange-600'
                               }`}>
                                 {faq.q}
                               </h3>
@@ -1035,21 +1017,21 @@ const Home: React.FC = () => {
 
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
                             isOpen
-                              ? 'bg-amber-500 text-white rotate-180 shadow-sm'
-                              : 'bg-slate-100 text-slate-400 group-hover:bg-amber-100 group-hover:text-amber-700'
+                              ? 'bg-orange-500 text-white rotate-180 shadow-sm'
+                              : 'bg-slate-100 text-slate-400 group-hover:bg-orange-50 group-hover:text-orange-600'
                           }`}>
                             <ChevronDown className="w-4 h-4" />
                           </div>
                         </button>
 
                         {isOpen && (
-                          <div className="px-5 sm:px-6 pb-5 pt-1 animate-fade-in border-t border-amber-100/80">
+                          <div className="px-5 sm:px-6 pb-5 pt-1 animate-fade-in border-t border-slate-100">
                             <p className="text-slate-600 text-sm sm:text-[15px] leading-relaxed mb-3.5 pl-[52px] sm:pl-[56px]">
                               {faq.a}
                             </p>
                             {faq.tip && (
-                              <div className="ml-[52px] sm:ml-[56px] p-3 rounded-xl bg-amber-50/80 border border-amber-200/70 flex items-start gap-2.5 text-xs text-amber-900 font-medium">
-                                <Sparkles className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+                              <div className="ml-[52px] sm:ml-[56px] p-3 rounded-xl bg-orange-50 border border-orange-200/70 flex items-start gap-2.5 text-xs text-orange-900 font-medium">
+                                <Sparkles className="w-3.5 h-3.5 text-orange-600 flex-shrink-0 mt-0.5" />
                                 <span>{faq.tip}</span>
                               </div>
                             )}

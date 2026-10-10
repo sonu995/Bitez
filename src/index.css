@@ -10,103 +10,96 @@
   }
 
   body {
-    @apply bg-gradient-to-b from-orange-50/40 via-amber-50/20 to-white text-slate-900;
+    @apply bg-[#FAFAF8] text-slate-900;
     font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
     max-width: 100vw;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Warm food scrollbar */
+  /* Professional warm food scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-orange-50;
+    @apply bg-orange-50/50;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-orange-400 to-amber-500 rounded-full;
+    @apply bg-gradient-to-b from-orange-500 to-amber-500 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply from-orange-500 to-amber-600;
+    @apply from-orange-600 to-amber-600;
   }
 }
 
 @layer components {
-  /* Hero gradient bg - Warm appetizing food theme */
+  /* Hero background - Appetizing Warm Sunset Brand Gradient */
   .hero-gradient {
-    background: linear-gradient(135deg, #ea580c 0%, #f97316 25%, #f59e0b 50%, #f43f5e 75%, #e11d48 100%);
-    background-size: 300% 300%;
-    animation: gradientShift 5s ease infinite;
+    background: linear-gradient(135deg, #FF5200 0%, #FA5A1E 45%, #F59E0B 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
   }
 
-  /* Neon glow button */
+  /* Primary Action Button - Radiant Orange CTA */
   .btn-neon {
-    @apply bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white font-bold py-3.5 px-8 rounded-2xl
-           hover:from-orange-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-105;
-    box-shadow: 0 4px 25px rgba(249, 115, 22, 0.45);
+    @apply bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold py-3.5 px-8 rounded-2xl
+           shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/35 transition-all duration-300 transform hover:scale-[1.02];
   }
 
-  .btn-neon:hover {
-    box-shadow: 0 6px 35px rgba(249, 115, 22, 0.65);
-  }
-
-  /* Outline fun button */
+  /* Outline Button - Warm Brand Orange */
   .btn-fun-outline {
-    @apply border-2 border-white/80 text-white font-bold py-3.5 px-8 rounded-2xl
-           hover:bg-white/20 backdrop-blur-sm transition-all duration-300;
+    @apply border-2 border-orange-500 text-orange-600 font-bold py-3.5 px-8 rounded-2xl
+           hover:bg-gradient-to-r hover:from-orange-500 hover:to-amber-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md;
   }
 
-  /* Pastel card */
+  /* Clean Surface Card - Soft Warm Porcelain with subtle glow border */
   .pastel-card {
-    @apply bg-white rounded-3xl shadow-lg border border-orange-100/70
-           hover:shadow-xl hover:shadow-orange-200/40 transition-all duration-300;
+    @apply bg-white rounded-3xl shadow-sm border border-orange-100/60
+           hover:shadow-md hover:border-orange-300/80 transition-all duration-300;
   }
 
-  /* Glassmorphism card with warm tint */
+  /* Glassmorphism Card */
   .glass-purple,
   .glass-warm {
-    @apply bg-white/70 backdrop-blur-xl rounded-3xl border border-orange-200/60 shadow-lg;
+    @apply bg-white/95 backdrop-blur-xl rounded-3xl border border-orange-100/70 shadow-sm;
   }
 
-  /* Category chip */
+  /* Category Chip */
   .category-chip {
     @apply flex items-center space-x-2 px-5 py-2.5 rounded-full cursor-pointer
-           bg-white border border-gray-200 shadow-sm
-           hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50
-           hover:border-orange-300 hover:shadow-md
+           bg-white border border-slate-200/90 shadow-2xs
+           hover:bg-orange-50/80 hover:border-orange-300 hover:text-orange-600
            transition-all duration-300 text-slate-700 font-medium whitespace-nowrap;
   }
 
   .category-chip.active {
-    @apply bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white border-transparent shadow-lg;
-    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+    @apply bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-md shadow-orange-500/30 font-bold;
   }
 
-  /* Neon border card */
+  /* Brand accent border card */
   .neon-card {
-    @apply bg-gradient-to-br from-orange-600 to-rose-600 rounded-3xl p-[2px];
+    @apply bg-gradient-to-r from-orange-500 to-amber-500 rounded-3xl p-[2px];
   }
 
   .neon-card-inner {
-    @apply bg-gradient-to-br from-slate-900 to-neutral-900 rounded-3xl p-6;
+    @apply bg-gradient-to-br from-orange-600 to-amber-600 rounded-3xl p-6 text-white;
   }
 
-  /* Section styles */
+  /* Section Headings */
   .section-heading {
     @apply text-3xl md:text-4xl font-extrabold text-slate-900 mb-2;
   }
 
   .section-subheading {
-    @apply text-slate-500 text-lg mb-10;
+    @apply text-slate-600 text-lg mb-10;
   }
 
-  /* Stats gradient card */
+  /* Stats Brand Gradient */
   .stats-gradient {
-    background: linear-gradient(135deg, #fbbf24 0%, #fb923c 30%, #f43f5e 60%, #ea580c 100%);
+    background: linear-gradient(135deg, #FF5200 0%, #FA5A1E 50%, #F59E0B 100%);
   }
 }
 
@@ -121,18 +114,15 @@
     display: none;
   }
 
-  /* Text gradients */
+  /* Brand Text Gradients - rich culinary palette */
   .text-gradient-purple,
-  .text-gradient-orange {
-    @apply bg-gradient-to-r from-orange-600 via-amber-500 to-rose-500 bg-clip-text text-transparent;
-  }
-
+  .text-gradient-orange,
   .text-gradient-fun {
-    @apply bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-orange-600 via-amber-500 to-orange-500 bg-clip-text text-transparent;
   }
 
   .text-gradient-rainbow {
-    background: linear-gradient(90deg, #ea580c, #f97316, #f59e0b, #f43f5e, #fbbf24);
+    background: linear-gradient(90deg, #FF5200, #F59E0B);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
