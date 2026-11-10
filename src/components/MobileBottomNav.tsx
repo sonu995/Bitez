@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, UtensilsCrossed, ShoppingBag, ShoppingCart, User, Clock } from 'lucide-react';
+import { Home, LayoutDashboard, ShoppingBag, ShoppingCart, User, Clock, UtensilsCrossed } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 
 export const MobileBottomNav: React.FC = () => {
   const location = useLocation();
   const { totalItems } = useCart();
-  const { user } = useAuth();
+  const { user, hasActiveSub } = useAuth();
 
   const navItems = [
     {
@@ -17,19 +17,18 @@ export const MobileBottomNav: React.FC = () => {
       isActive: location.pathname === '/',
     },
     {
-      to: '/mess',
-      label: 'Mess',
-      sublabel: 'Plans',
-      icon: UtensilsCrossed,
-      isActive: location.pathname === '/mess',
-      badge: 'Daily',
+      to: hasActiveSub ? '/dashboard' : '/mess',
+      label: hasActiveSub ? 'Dashboard' : 'Mess',
+      icon: hasActiveSub ? LayoutDashboard : UtensilsCrossed,
+      isActive: hasActiveSub
+        ? location.pathname === '/dashboard'
+        : (location.pathname === '/mess' || location.pathname === '/plans' || location.pathname === '/subscriptions'),
     },
     {
       to: '/menu',
-      label: 'Instant Order',
+      label: 'Food',
       icon: ShoppingBag,
       isActive: location.pathname.startsWith('/menu'),
-      badge: '25m',
     },
     {
       to: '/cart',
@@ -39,17 +38,17 @@ export const MobileBottomNav: React.FC = () => {
       count: totalItems,
     },
     {
-      to: user ? '/dashboard' : '/login',
-      label: user ? 'Account' : 'Login',
-      icon: user ? User : User,
-      isActive: location.pathname === '/dashboard' || location.pathname === '/login' || location.pathname === '/orders',
+      to: user ? '/orders' : '/login',
+      label: user ? 'Orders' : 'Login',
+      icon: user ? Clock : User,
+      isActive: location.pathname === '/orders' || location.pathname === '/login' || location.pathname.startsWith('/track'),
     },
   ];
 
   return (
     <nav
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] px-1 pt-1.5 transition-all"
-      style={{ paddingBottom: 'max(0.45rem, env(safe-area-inset-bottom))' }}
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] px-1"
+      style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
       aria-label="Mobile Navigation"
     >
       <div className="flex items-center justify-around max-w-md mx-auto w-full">
@@ -60,45 +59,32 @@ export const MobileBottomNav: React.FC = () => {
             <Link
               key={item.label}
               to={item.to}
-              className={`relative flex flex-col items-center justify-center py-0.5 px-2 rounded-xl transition-all duration-200 select-none flex-1 ${
+              className={`relative flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all duration-200 select-none flex-1 ${
                 active
-                  ? 'text-orange-600 font-extrabold'
-                  : 'text-slate-500 hover:text-slate-800 font-medium'
+                  ? 'text-orange-600'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              {/* Icon Container with active highlight pill */}
-              <div
-                className={`relative p-1 rounded-xl transition-all duration-200 ${
-                  active
-                    ? 'bg-orange-50 text-orange-600 scale-105'
-                    : 'text-slate-600'
-                }`}
-              >
-                <Icon className="w-5 h-5 transition-transform" />
+              {/* Icon Container */}
+              <div className="relative">
+                <Icon className={`w-5 h-5 transition-all ${active ? 'scale-110' : 'scale-100'}`} />
 
                 {/* Badge count for Cart */}
                 {typeof item.count === 'number' && item.count > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs animate-scale-in">
-                    {item.count}
-                  </span>
-                )}
-
-                {/* Micro text badge for Mess/Menu */}
-                {item.badge && !active && (
-                  <span className="absolute -top-1.5 -right-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[8px] font-black px-1 rounded-full shadow-2xs">
-                    {item.badge}
+                  <span className="absolute -top-1.5 -right-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-md">
+                    {item.count > 9 ? '9+' : item.count}
                   </span>
                 )}
               </div>
 
               {/* Label */}
-              <span className="text-[10px] tracking-tight mt-0.5 leading-none text-center truncate max-w-full">
+              <span className={`text-[10px] mt-1 leading-none ${active ? 'font-semibold' : 'font-medium'}`}>
                 {item.label}
               </span>
 
-              {/* Active bottom indicator pill */}
+              {/* Active indicator */}
               {active && (
-                <span className="w-4 h-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full mt-1 shadow-xs" />
+                <span className="absolute -bottom-0.5 w-1 h-1 bg-orange-600 rounded-full" />
               )}
             </Link>
           );

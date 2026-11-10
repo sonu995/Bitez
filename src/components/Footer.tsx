@@ -237,10 +237,11 @@ const Footer: React.FC = () => {
               Quick Links
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/mess" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Daily Mess Plans</Link></li>
+              <li><Link to="/timetable" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Weekly Mess Timetable 📅</Link></li>
+              <li><Link to="/mess" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Mess Plans & Subscriptions</Link></li>
               <li><Link to="/menu" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Instant Order Menu</Link></li>
               <li><Link to="/orders" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Track Live Order</Link></li>
-              <li><Link to="/dashboard" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">My Account</Link></li>
+              <li><Link to="/dashboard" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Student Dashboard</Link></li>
               <li><Link to="/support" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Help & FAQs</Link></li>
               <li><Link to="/support" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Terms & Refund</Link></li>
               <li><Link to="/support" className="text-slate-600 hover:text-orange-600 transition-colors font-medium">Privacy Policy</Link></li>

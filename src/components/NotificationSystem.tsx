@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Bell, Clock, Package, Wallet, Star } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { ordersAPI, subscriptionsAPI } from '../services/api';
 
 interface Notification {
   id: string;
@@ -12,46 +14,80 @@ interface Notification {
 }
 
 const NotificationSystem: React.FC = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      type: 'order',
-      title: 'Order Delivered',
-      message: 'Your order #ORD001 from Bitez Kitchen has been delivered successfully.',
-      time: '2 mins ago',
-      read: false,
-      icon: <Package className="w-5 h-5 text-emerald-600" />
-    },
-    {
-      id: '2',
-      type: 'subscription',
-      title: 'Meal Plan Expiring Soon',
-      message: 'Your Monthly Standard plan will expire in 3 days. Renew to continue uninterrupted meals.',
-      time: '1 hour ago',
-      read: false,
-      icon: <Clock className="w-5 h-5 text-amber-600" />
-    },
-    {
-      id: '3',
-      type: 'wallet',
-      title: 'Low Wallet Balance',
-      message: 'Your wallet balance is ₹50. Recharge to avoid order checkout interruptions.',
-      time: '3 hours ago',
-      read: true,
-      icon: <Wallet className="w-5 h-5 text-rose-600" />
-    },
-    {
-      id: '4',
-      type: 'general',
-      title: 'Rate Your Recent Order',
-      message: 'How was your experience with Bitez? Share your feedback to help us serve better.',
-      time: '1 day ago',
-      read: true,
-      icon: <Star className="w-5 h-5 text-orange-600" />
-    }
-  ]);
-
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  useEffect(() => {
+    const loadLiveNotifications = async () => {
+      const list: Notification[] = [];
+
+      if (!user) {
+        list.push({
+          id: 'welcome',
+          type: 'general',
+          title: 'Welcome to Bitez Mess!',
+          message: 'Subscribe to a meal plan or explore our delicious homestyle menu.',
+          time: 'Just now',
+          read: false,
+          icon: <Star className="w-5 h-5 text-orange-600" />
+        });
+        setNotifications(list);
+        return;
+      }
+
+      // Wallet notification
+      list.push({
+        id: 'wallet',
+        type: 'wallet',
+        title: `Wallet Balance: ₹${user.walletBalance ?? 0}`,
+        message: (user.walletBalance ?? 0) < 100
+          ? 'Your wallet balance is low. Tap to top up for fast 1-click checkout.'
+          : 'Your campus wallet is ready for instant food & extra tiffin orders.',
+        time: 'Active',
+        read: (user.walletBalance ?? 0) >= 100,
+        icon: <Wallet className="w-5 h-5 text-emerald-600" />
+      });
+
+      // Live subscription notification
+      try {
+        const subRes = await subscriptionsAPI.getMine();
+        if (subRes?.subscription) {
+          const sub = subRes.subscription;
+          list.push({
+            id: 'sub',
+            type: 'subscription',
+            title: `${sub.planId?.name || 'Mess'} Plan (${sub.status.toUpperCase()})`,
+            message: `${sub.remainingMeals ?? 0} meals remaining. Valid until ${new Date(sub.endDate).toLocaleDateString('en-IN')}.`,
+            time: 'Current Plan',
+            read: false,
+            icon: <Clock className="w-5 h-5 text-amber-600" />
+          });
+        }
+      } catch {}
+
+      // Latest order notification
+      try {
+        const ordersRes = await ordersAPI.getMyOrders();
+        if (ordersRes?.orders && ordersRes.orders.length > 0) {
+          const latest = ordersRes.orders[0];
+          list.push({
+            id: latest.orderId || latest._id || 'latest-order',
+            type: 'order',
+            title: `Order #${latest.orderId || 'Active'}: ${latest.status.toUpperCase()}`,
+            message: `Total ₹${latest.totalAmount} • ${latest.items?.length || 1} item(s) • ${latest.status === 'delivered' ? 'Delivered successfully' : 'In kitchen preparation/dispatch'}`,
+            time: latest.createdAt ? new Date(latest.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent',
+            read: latest.status === 'delivered',
+            icon: <Package className="w-5 h-5 text-orange-600" />
+          });
+        }
+      } catch {}
+
+      setNotifications(list);
+    };
+
+    loadLiveNotifications();
+  }, [user]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

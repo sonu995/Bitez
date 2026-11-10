@@ -6,6 +6,7 @@
   "homepage": "https://bitezzz.netlify.app/",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "cd backend && npm run dev",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

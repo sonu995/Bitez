@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   price: number;
@@ -8,11 +8,13 @@ interface CartItem {
   image: string;
   restaurant: string;
   isVeg: boolean;
+  isExtra?: boolean;
+  mealSlot?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
+  addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
@@ -34,7 +36,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
       const storedCart = localStorage.getItem('cart');
-      return storedCart ? JSON.parse(storedCart) : [];
+      if (!storedCart) return [];
+      const parsed = JSON.parse(storedCart);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -42,21 +46,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     try {
-      localStorage.setItem('cart', JSON.stringify(items));
+      localStorage.setItem('cart', JSON.stringify(Array.isArray(items) ? items : []));
     } catch (e) {
       console.error('Failed to save cart to localStorage', e);
     }
   }, [items]);
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
+    const qty = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
     setItems(prevItems => {
-      const existingItem = prevItems.find(i => i.id === item.id);
-      if (existingItem) {
-        return prevItems.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+      const list = Array.isArray(prevItems) ? prevItems : [];
+      const existingIndex = list.findIndex(i => String(i.id) === String(item.id));
+      if (existingIndex > -1) {
+        return list.map((i, idx) =>
+          idx === existingIndex ? { ...i, quantity: (Number(i.quantity) || 1) + qty } : i
         );
       }
-      return [...prevItems, { ...item, quantity: 1 }];
+      return [...list, { ...item, id: String(item.id), price: Number(item.price) || 0, quantity: qty }];
     });
   };
 
@@ -65,27 +73,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       removeFromCart(id);
       return;
     }
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
+    setItems(prevItems => {
+      const list = Array.isArray(prevItems) ? prevItems : [];
+      return list.map(item =>
+        String(item.id) === String(id) ? { ...item, quantity } : item
+      );
+    });
   };
 
   const removeFromCart = (id: string) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
+    setItems(prevItems => {
+      const list = Array.isArray(prevItems) ? prevItems : [];
+      return list.filter(item => String(item.id) !== String(id));
+    });
   };
 
   const clearCart = () => {
     setItems([]);
   };
 
-  const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalAmount = safeItems.reduce((sum, item) => sum + (Number(item?.price) || 0) * (Number(item?.quantity) || 1), 0);
+  const totalItems = safeItems.reduce((sum, item) => sum + (Number(item?.quantity) || 1), 0);
 
   return (
     <CartContext.Provider value={{
-      items,
+      items: safeItems,
       addToCart,
       updateQuantity,
       removeFromCart,
@@ -96,4 +108,4 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </CartContext.Provider>
   );
-};
+};

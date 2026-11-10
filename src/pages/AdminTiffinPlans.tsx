@@ -7,6 +7,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { plansAPI, menuAPI, extrasAPI, subscriptionsAPI } from '../services/api';
+import TiffinMateLogo from '../components/TiffinMateLogo';
 
 // ─── Types ──────────────────────────────────────────────────
 interface Plan {
@@ -110,14 +111,10 @@ const AdminTiffinPlans: React.FC = () => {
     setPlanLoading(true);
     try {
       const data = await plansAPI.getAllAdmin();
-      setPlans(data.plans);
+      setPlans(data.plans || []);
     } catch (e: any) {
-      // Backend nahi hai — mock data use karo
-      setPlans([
-        { _id: '1', name: 'Basic', mealsPerDay: 1, description: 'Perfect for 1 meal/day', monthlyPrice: 2499, semesterDiscount: 15, features: ['Lunch or Dinner', 'Basic Menu', '2 Skips/Month', '5% OFF Extra Orders'], isPopular: false, isActive: true, activeSubscribers: 12 },
-        { _id: '2', name: 'Standard', mealsPerDay: 2, description: 'Lunch + Dinner daily', monthlyPrice: 4299, semesterDiscount: 15, features: ['Lunch + Dinner', 'Full Premium Menu', 'Unlimited Skips', 'Weekend Specials', '5% OFF Extra Orders'], isPopular: true, isActive: true, activeSubscribers: 45 },
-        { _id: '3', name: 'Premium', mealsPerDay: 3, description: '3 meals + snacks', monthlyPrice: 5999, semesterDiscount: 15, features: ['Breakfast + Lunch + Dinner + Snacks', 'Priority Delivery', 'Free Weekly Desserts', 'Dedicated Support', '5% OFF Extra Orders'], isPopular: false, isActive: true, activeSubscribers: 23 },
-      ]);
+      showToast(e.message || 'Failed to fetch plans from backend', 'error');
+      setPlans([]);
     } finally {
       setPlanLoading(false);
     }
@@ -127,18 +124,10 @@ const AdminTiffinPlans: React.FC = () => {
     setMenuLoading(true);
     try {
       const data = await menuAPI.getAll();
-      setWeeklyMenu(data.menu);
+      setWeeklyMenu(data.menu || {});
     } catch (e: any) {
-      // Mock menu fallback
-      setWeeklyMenu({
-        Mon: { breakfast: 'Aloo Paratha + Curd + Chai', lunch: 'Dal Makhani + Jeera Rice + 3 Roti', dinner: 'Paneer Butter Masala + Rice + 3 Roti' },
-        Tue: { breakfast: 'Poha + Boiled Eggs + Juice', lunch: 'Chole Masala + Puri + Raita', dinner: 'Kadhai Paneer + Dal Fry + 3 Roti' },
-        Wed: { breakfast: 'Idli Sambar + Coconut Chutney', lunch: 'Chicken Curry / Mix Veg + Rice + 3 Roti', dinner: 'Veg Hakka Noodles + Manchurian' },
-        Thu: { breakfast: 'Bread Butter + Omelette + Chai', lunch: 'Rajma Rice + Papad + Pickle', dinner: 'Chicken Tikka Masala + Rice + 3 Roti' },
-        Fri: { breakfast: 'Upma + Fruit Bowl + Juice', lunch: 'Dal Tadka + Jeera Rice + Sabji + 3 Roti', dinner: 'Veg Biryani + Raita + Salan' },
-        Sat: { breakfast: 'Chole Bhature + Lassi', lunch: 'Pav Bhaji + Butter Pav', dinner: 'Egg Curry / Palak Paneer + Rice + Roti' },
-        Sun: { breakfast: 'Puri Sabji + Halwa + Chai', lunch: "Special Sunday Thali (Chef's Choice)", dinner: 'Butter Chicken / Mix Veg + Naan + Gulab Jamun 🎉' },
-      });
+      showToast(e.message || 'Failed to fetch weekly menu from backend', 'error');
+      setWeeklyMenu({});
     } finally {
       setMenuLoading(false);
     }
@@ -148,17 +137,10 @@ const AdminTiffinPlans: React.FC = () => {
     setExtrasLoading(true);
     try {
       const data = await extrasAPI.getAllAdmin();
-      setExtras(data.items);
+      setExtras(data.items || []);
     } catch (e: any) {
-      // Mock extras fallback
-      setExtras([
-        { _id: '1', name: 'Extra Roti (2)', price: 15, imageUrl: 'https://images.pexels.com/photos/10860591/pexels-photo-10860591.jpeg?auto=compress&cs=tinysrgb&w=150', category: 'Roti', isActive: true },
-        { _id: '2', name: 'Extra Paneer', price: 45, imageUrl: 'https://images.pexels.com/photos/9738981/pexels-photo-9738981.jpeg?auto=compress&cs=tinysrgb&w=150', category: 'Side', isActive: true },
-        { _id: '3', name: 'Gulab Jamun', price: 30, imageUrl: 'https://images.pexels.com/photos/13435133/pexels-photo-13435133.jpeg?auto=compress&cs=tinysrgb&w=150', category: 'Sweet', isActive: true },
-        { _id: '4', name: 'Sweet Lassi', price: 35, imageUrl: 'https://images.pexels.com/photos/10153303/pexels-photo-10153303.jpeg?auto=compress&cs=tinysrgb&w=150', category: 'Beverage', isActive: true },
-        { _id: '5', name: 'Butter Naan', price: 25, imageUrl: 'https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=150', category: 'Roti', isActive: true },
-        { _id: '6', name: 'Mango Shake', price: 50, imageUrl: 'https://images.pexels.com/photos/3625372/pexels-photo-3625372.jpeg?auto=compress&cs=tinysrgb&w=150', category: 'Beverage', isActive: false },
-      ]);
+      showToast(e.message || 'Failed to fetch extra items from backend', 'error');
+      setExtras([]);
     } finally {
       setExtrasLoading(false);
     }
@@ -168,11 +150,11 @@ const AdminTiffinPlans: React.FC = () => {
     setSubLoading(true);
     try {
       const data = await subscriptionsAPI.getAll();
-      setSubscriptions(data.subscriptions);
-      setSubStats(data.stats);
+      setSubscriptions(data.subscriptions || []);
+      setSubStats(data.stats || { total: 0, active: 0, expired: 0, revenue: 0 });
     } catch (e: any) {
-      // Mock subscription stats fallback
-      setSubStats({ total: 80, active: 45, expired: 25, revenue: 185000 });
+      showToast(e.message || 'Failed to fetch subscriptions from backend', 'error');
+      setSubStats({ total: 0, active: 0, expired: 0, revenue: 0 });
       setSubscriptions([]);
     } finally {
       setSubLoading(false);
@@ -326,59 +308,61 @@ const AdminTiffinPlans: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4">
+      <div className="bg-white border-b border-slate-200 px-6 py-3.5 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
+            <TiffinMateLogo size="sm" showSubtitle={false} />
+            <div className="w-px h-5 bg-slate-200" />
             <button
               onClick={() => navigate('/admin')}
-              className="flex items-center gap-1 text-slate-500 hover:text-slate-800 text-sm font-medium"
+              className="flex items-center gap-1.5 text-slate-500 hover:text-orange-600 text-xs font-bold transition px-2.5 py-1 rounded-lg hover:bg-orange-50 cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" /> Admin Panel
+              <ChevronLeft className="w-3.5 h-3.5" /> Back to Console
             </button>
-            <div className="w-px h-5 bg-slate-300" />
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">🍱 Tiffin Plans Management</h1>
-              <p className="text-xs text-slate-500">Manage plans, menus, extras & subscribers</p>
+            <div className="hidden sm:block text-slate-300">•</div>
+            <div className="hidden sm:block">
+              <h1 className="text-sm font-black text-slate-900 leading-tight">Meal Plans & Menus</h1>
+              <p className="text-[10px] text-slate-400 font-medium">Fullstack Tiffin Subscriptions</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+          <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-xs font-semibold text-emerald-700">Backend Live</span>
+            <span className="text-[11px] font-extrabold text-emerald-700">Port 5000 Active</span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Stats Row — show subscription stats always */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
             { label: 'Total Plans', value: plans.length, icon: <Package className="w-5 h-5 text-orange-600" />, color: 'bg-orange-50 border border-orange-100' },
             { label: 'Active Subscribers', value: subStats.active, icon: <Users className="w-5 h-5 text-emerald-600" />, color: 'bg-emerald-50 border border-emerald-100' },
             { label: 'Total Revenue', value: `₹${subStats.revenue.toLocaleString()}`, icon: <DollarSign className="w-5 h-5 text-amber-600" />, color: 'bg-amber-50 border border-amber-100' },
             { label: 'Extra Items', value: extras.length, icon: <ShoppingBag className="w-5 h-5 text-purple-600" />, color: 'bg-purple-50 border border-purple-100' }
           ].map((stat, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 flex items-center gap-4">
-              <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center`}>
+            <div key={i} className="bg-white rounded-2xl shadow-xs p-4 sm:p-5 border border-slate-200 flex items-center gap-3.5 hover:shadow-md transition">
+              <div className={`w-11 h-11 ${stat.color} rounded-xl flex items-center justify-center shrink-0`}>
                 {stat.icon}
               </div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{stat.label}</p>
+                <p className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{stat.value}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-2xl border border-gray-200 shadow-sm w-fit">
+        <div className="flex gap-1.5 mb-6 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-2xs w-fit overflow-x-auto">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === tab.key
-                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs font-black'
+                  : 'text-slate-600 hover:text-orange-600 hover:bg-orange-50/60'
               }`}
             >
               {tab.icon} {tab.label}

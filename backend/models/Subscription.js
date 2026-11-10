@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { getModel } = require('../config/adapter');
 
 const SubscriptionSchema = new mongoose.Schema({
   userId: {
@@ -24,9 +25,16 @@ const SubscriptionSchema = new mongoose.Schema({
     default: 'active'
   },
   remainingMeals: { type: Number, default: 0 },
+  totalMeals: { type: Number, default: 60 },
   amountPaid: { type: Number, required: true },
   skippedMeals: { type: Number, default: 0 },
-  walletCredits: { type: Number, default: 0 }
+  walletCredits: { type: Number, default: 0 },
+  hostelAddress: { type: String, default: '' },
+  room: { type: String, default: '' },
+  zoneCode: { type: String, default: 'NC-01' },
+  dietPreference: { type: String, default: 'Standard Homestyle' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Subscription', SubscriptionSchema);
+const MongooseSubscription = mongoose.models.Subscription || mongoose.model('Subscription', SubscriptionSchema);
+
+module.exports = getModel('subscriptions', MongooseSubscription);

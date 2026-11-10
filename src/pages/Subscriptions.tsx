@@ -1,54 +1,486 @@
-import React, { useState } from 'react';
-import { ArrowRight, CheckCircle2, Star, ShieldCheck, ChevronDown, ChevronUp, Plus, Tag, Sparkles, HelpCircle, MessageCircle, Leaf, UtensilsCrossed, Bike, MapPin, Clock, CalendarDays, ChefHat, RotateCcw, HeartHandshake, Percent, Award, ThumbsUp, Quote, Flame, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
-const weeklyMenu: Record<string, { breakfast: string; lunch: string; dinner: string }> = {
-  Mon: { breakfast: 'Aloo Paratha + Curd + Chai', lunch: 'Dal Makhani + Jeera Rice + 3 Roti + Salad', dinner: 'Paneer Butter Masala + Rice + 3 Roti' },
-  Tue: { breakfast: 'Poha + Boiled Eggs + Juice', lunch: 'Chole Masala + Puri + Raita', dinner: 'Kadhai Paneer + Dal Fry + 3 Roti' },
-  Wed: { breakfast: 'Idli Sambar + Coconut Chutney', lunch: 'Chicken Curry / Mix Veg + Rice + 3 Roti', dinner: 'Veg Hakka Noodles + Manchurian' },
-  Thu: { breakfast: 'Bread Butter + Omelette + Chai', lunch: 'Rajma Rice + Papad + Pickle', dinner: 'Chicken Tikka Masala + Rice + 3 Roti' },
-  Fri: { breakfast: 'Upma + Fruit Bowl + Juice', lunch: 'Dal Tadka + Jeera Rice + Sabji + 3 Roti', dinner: 'Veg Biryani + Raita + Salan' },
-  Sat: { breakfast: 'Chole Bhature + Lassi', lunch: 'Pav Bhaji + Butter Pav', dinner: 'Egg Curry / Palak Paneer + Rice + Roti' },
-  Sun: { breakfast: 'Puri Sabji + Halwa + Chai', lunch: 'Special Sunday Thali (Chef\'s Choice)', dinner: 'Butter Chicken / Mix Veg + Naan + Gulab Jamun 🎉' },
-};
-
-const extraItems = [
-  { name: 'Extra Roti (2)', original: 15, img: 'https://images.pexels.com/photos/10860591/pexels-photo-10860591.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Extra Paneer', original: 45, img: 'https://images.pexels.com/photos/9738981/pexels-photo-9738981.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Gulab Jamun', original: 30, img: 'https://images.pexels.com/photos/13435133/pexels-photo-13435133.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Fresh Curd', original: 20, img: 'https://images.pexels.com/photos/4113888/pexels-photo-4113888.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Sweet Lassi', original: 35, img: 'https://images.pexels.com/photos/10153303/pexels-photo-10153303.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Boiled Eggs (2)', original: 25, img: 'https://images.pexels.com/photos/824635/pexels-photo-824635.jpeg?auto=compress&cs=tinysrgb&w=150' },
-];
-
-const allExtraItems = [
-  ...extraItems,
-  { name: 'Mango Shake', original: 50, img: 'https://images.pexels.com/photos/3625372/pexels-photo-3625372.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Jeera Rice', original: 40, img: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Papad (2)', original: 10, img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Achar / Pickle', original: 10, img: 'https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Butter Naan', original: 25, img: 'https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=150' },
-  { name: 'Fruit Salad', original: 55, img: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=150' },
-];
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Star,
+  ShieldCheck,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Tag,
+  Sparkles,
+  HelpCircle,
+  MessageCircle,
+  Leaf,
+  UtensilsCrossed,
+  Bike,
+  MapPin,
+  Clock,
+  CalendarDays,
+  ChefHat,
+  RotateCcw,
+  HeartHandshake,
+  Percent,
+  Award,
+  ThumbsUp,
+  Quote,
+  Flame,
+  X,
+  Check,
+  Wallet,
+  CreditCard,
+  AlertCircle,
+  Calendar,
+  Users,
+  Edit,
+  Sun,
+  Moon,
+  Coffee,
+  Crown,
+  TrendingUp,
+  RefreshCw,
+  Sliders,
+  Shield
+} from 'lucide-react';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import { subscriptionsAPI, plansAPI, menuAPI, ordersAPI, extrasAPI, adminAPI } from '../services/api';
+import SkipMealModal from '../components/SkipMealModal';
+import OrderExtraModal from '../components/OrderExtraModal';
+import MealLoadingScreen from '../components/MealLoadingScreen';
 
 const Subscriptions = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isPlansRoute = location.pathname === '/plans' || location.search.includes('view=plans');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'semester'>('monthly');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [activeDay, setActiveDay] = useState('Mon');
+
+  const getTodayDayName = () => {
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return dayNames[new Date().getDay()];
+  };
+
+  const [activeDay, setActiveDay] = useState(getTodayDayName());
   const [showAllExtras, setShowAllExtras] = useState(false);
   const [addedItems, setAddedItems] = useState<Record<string, boolean>>({});
-  const [selectedPlanModal, setSelectedPlanModal] = useState<{ name: string; price: number; meals: string } | null>(null);
+  const [dbPlans, setDbPlans] = useState<any[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+  const [dynamicWeeklyMenu, setDynamicWeeklyMenu] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
+  const [dynamicExtras, setDynamicExtras] = useState<any[]>([]);
 
-  const handleAddItem = (name: string) => {
-    setAddedItems(prev => ({ ...prev, [name]: true }));
-    setTimeout(() => {
-      setAddedItems(prev => ({ ...prev, [name]: false }));
-    }, 1800);
+  // User Mess Subscription & Dashboard State
+  const [currentSub, setCurrentSub] = useState<any>(null);
+  const [subLoading, setSubLoading] = useState(true);
+  const [showPlansView, setShowPlansView] = useState(isPlansRoute);
+
+  useEffect(() => {
+    if (isPlansRoute) {
+      setShowPlansView(true);
+    }
+  }, [isPlansRoute]);
+
+  const [skipModalOpen, setSkipModalOpen] = useState(false);
+  const [subActionMsg, setSubActionMsg] = useState('');
+  const [pauseLoading, setPauseLoading] = useState(false);
+  const [todayMenuData, setTodayMenuData] = useState<any>(null);
+
+  // Subscriptions Plans Carousel / Scroll State
+  const subPlansScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollSubLeft, setCanScrollSubLeft] = useState(false);
+  const [canScrollSubRight, setCanScrollSubRight] = useState(true);
+  const [activeSubIndex, setActiveSubIndex] = useState(0);
+
+  const scrollSubPlans = (direction: 'left' | 'right') => {
+    if (subPlansScrollRef.current) {
+      const scrollAmount = 360;
+      subPlansScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleSubPlansScroll = () => {
+    if (subPlansScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = subPlansScrollRef.current;
+      setCanScrollSubLeft(scrollLeft > 15);
+      setCanScrollSubRight(scrollLeft < scrollWidth - clientWidth - 15);
+      const cardWidth = 340;
+      const index = Math.round(scrollLeft / cardWidth);
+      setActiveSubIndex(Math.min(Math.max(index, 0), dbPlans.length - 1));
+    }
+  };
+
+  const [selectedPlanModal, setSelectedPlanModal] = useState<{
+    name: string;
+    price: number;
+    meals: string;
+    planId?: string;
+  } | null>(null);
+  const { user, refreshUser } = useAuth();
+  const { addToCart } = useCart();
+  const [subscribing, setSubscribing] = useState(false);
+  const [subSuccess, setSubSuccess] = useState<string | null>(null);
+
+  // Extra add-on order states
+  const [selectedExtraModal, setSelectedExtraModal] = useState<{
+    name: string;
+    original: number;
+    img: string;
+  } | null>(null);
+  const [extraOrdering, setExtraOrdering] = useState(false);
+  const [extraNotification, setExtraNotification] = useState<{
+    msg: string;
+    type: 'success' | 'info';
+    orderId?: string;
+  } | null>(null);
+  const [extraPaymentMethod, setExtraPaymentMethod] = useState<'cod' | 'wallet' | 'upi'>('cod');
+
+  // Delivery & preferences form state
+  const [deliveryZones, setDeliveryZones] = useState<any[]>([]);
+  const [hostel, setHostel] = useState(user?.hostel || '');
+  const [room, setRoom] = useState(user?.room || '');
+  const [zoneCode, setZoneCode] = useState('NC-01');
+  const [dietPreference, setDietPreference] = useState(user?.dietPreference || 'Standard Homestyle');
+  const [paymentMethod, setPaymentMethod] = useState('Bitez Wallet / UPI');
+  const [hasExistingSubError, setHasExistingSubError] = useState(false);
+
+  // Sync profile details if logged-in user state updates
+  useEffect(() => {
+    if (user) {
+      if (user.hostel) setHostel(user.hostel);
+      if (user.room) setRoom(user.room);
+      if (user.dietPreference) setDietPreference(user.dietPreference);
+    }
+  }, [user]);
+
+  // Fetch current user's active/paused mess subscription
+  useEffect(() => {
+    if (!user) {
+      setCurrentSub(null);
+      setSubLoading(false);
+      return;
+    }
+
+    setSubLoading(true);
+    subscriptionsAPI.getMine()
+      .then(res => {
+        if (res?.subscription && (res.subscription.status === 'active' || res.subscription.status === 'paused')) {
+          setCurrentSub(res.subscription);
+        } else {
+          setCurrentSub(null);
+        }
+      })
+      .catch(() => {
+        setCurrentSub(null);
+      })
+      .finally(() => {
+        setSubLoading(false);
+      });
+  }, [user]);
+
+  // Fetch today's live kitchen menu
+  useEffect(() => {
+    menuAPI.getToday()
+      .then(res => {
+        if (res?.menu) setTodayMenuData(res.menu);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleOpenSkipModal = () => {
+    if (!currentSub) return;
+    if ((currentSub.remainingMeals || 0) <= 0) {
+      alert('You have no remaining meals left in this subscription cycle to skip.');
+      return;
+    }
+    setSkipModalOpen(true);
+  };
+
+  const handleSkipSuccess = async (message: string, _credit: number) => {
+    setSubActionMsg(message);
+    await refreshUser();
+    const updated = await subscriptionsAPI.getMine();
+    if (updated?.subscription) {
+      setCurrentSub(updated.subscription);
+    }
+    setTimeout(() => setSubActionMsg(''), 6000);
+  };
+
+  const handleTogglePause = async () => {
+    const subId = currentSub?._id || currentSub?.id;
+    if (!subId) return;
+    const isPaused = currentSub.status === 'paused';
+    const actionText = isPaused ? 'resume' : 'pause';
+    if (!window.confirm(`Do you want to ${actionText} your daily tiffin subscription?`)) return;
+
+    setPauseLoading(true);
+    try {
+      await subscriptionsAPI.pause(subId);
+      await refreshUser();
+      const updated = await subscriptionsAPI.getMine();
+      setCurrentSub(updated?.subscription || null);
+      setSubActionMsg(
+        isPaused
+          ? '🎉 Subscription resumed! Your daily meal packing is active.'
+          : '⏸️ Subscription paused! Meal packing is held and your plan validity is saved.'
+      );
+      setTimeout(() => setSubActionMsg(''), 5000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to update subscription status');
+    } finally {
+      setPauseLoading(false);
+    }
+  };
+
+  const handleCancelSub = async () => {
+    const subId = currentSub?._id || currentSub?.id;
+    if (!subId) return;
+    if (!window.confirm('Are you sure you want to cancel your meal subscription?')) return;
+    try {
+      await subscriptionsAPI.cancel(subId);
+      await refreshUser();
+      const updated = await subscriptionsAPI.getMine();
+      setCurrentSub(updated?.subscription || null);
+      setSubActionMsg('Subscription cancelled.');
+      setTimeout(() => setSubActionMsg(''), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to cancel subscription');
+    }
+  };
+
+  useEffect(() => {
+    setPlansLoading(true);
+    // 1. Fetch live mess plans from backend
+    plansAPI.getAll()
+      .then(res => {
+        if (res?.plans && res.plans.length > 0) {
+          const activePlans = res.plans.filter((p: any) => p.isActive !== false);
+          setDbPlans(activePlans.length > 0 ? activePlans : res.plans);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setPlansLoading(false));
+
+    // Fetch delivery zones for realtime sync with admin hub
+    adminAPI.getZones()
+      .then(res => {
+        if (res?.zones && res.zones.length > 0) {
+          setDeliveryZones(res.zones);
+          if (res.zones[0]?.code) setZoneCode(res.zones[0].code);
+        }
+      })
+      .catch(() => {});
+
+    // 2. Fetch live rotating weekly menu from backend
+    menuAPI.getAll()
+      .then(res => {
+        if (res?.menu) {
+          setDynamicWeeklyMenu(res.menu);
+        }
+      })
+      .catch(() => {});
+
+    // 3. Fetch live extra items from backend
+    extrasAPI.getAll()
+      .then(res => {
+        if (res?.items && res.items.length > 0) {
+          const getFallbackImg = (name: string) => {
+            const lower = (name || '').toLowerCase();
+            if (lower.includes('jamun') || lower.includes('sweet') || lower.includes('halwa')) {
+              return 'https://images.pexels.com/photos/14460596/pexels-photo-14460596.jpeg?auto=compress&cs=tinysrgb&w=300';
+            }
+            if (lower.includes('paneer') || lower.includes('curry') || lower.includes('sabji')) {
+              return 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=300';
+            }
+            if (lower.includes('roti') || lower.includes('paratha') || lower.includes('phulka')) {
+              return 'https://images.pexels.com/photos/10860591/pexels-photo-10860591.jpeg?auto=compress&cs=tinysrgb&w=300';
+            }
+            if (lower.includes('lassi') || lower.includes('chaas') || lower.includes('dahi') || lower.includes('curd')) {
+              return 'https://images.pexels.com/photos/8992928/pexels-photo-8992928.jpeg?auto=compress&cs=tinysrgb&w=300';
+            }
+            return 'https://images.pexels.com/photos/10860591/pexels-photo-10860591.jpeg?auto=compress&cs=tinysrgb&w=300';
+          };
+
+          const mapped = res.items.map((it: any) => ({
+            name: it.name,
+            original: Number(it.price) || 30,
+            img: (it.imageUrl && !it.imageUrl.includes('placeholder')) ? it.imageUrl : (it.image || getFallbackImg(it.name)),
+            id: it._id || it.id
+          }));
+          setDynamicExtras(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Pre-select plan if navigated from Home page with state
+  useEffect(() => {
+    if (location.state?.selectedPlan && dbPlans.length > 0) {
+      const match = dbPlans.find((p: any) =>
+        (p.name || '').toLowerCase() === (location.state.selectedPlan || '').toLowerCase() ||
+        p._id === location.state.planId ||
+        p.id === location.state.planId
+      );
+      if (match) {
+        const base = Number(match.monthlyPrice) || 2499;
+        const disc = Number(match.semesterDiscount) || 15;
+        const semPrice = Math.round(base * (1 - disc / 100));
+        const price = billingCycle === 'semester' ? semPrice : base;
+        setSelectedPlanModal({
+          name: match.name,
+          price,
+          meals: match.description || `${match.mealsPerDay || 2} Meals / Day`,
+          planId: match._id || match.id
+        });
+      }
+    }
+  }, [location.state, dbPlans, billingCycle]);
+
+  const getPlanId = (planName: string) => {
+    const found = dbPlans.find(p =>
+      (p.name && p.name.toLowerCase() === planName.toLowerCase()) ||
+      p.id === planName ||
+      p._id === planName
+    );
+    if (found) return found._id || found.id;
+    if (planName.toLowerCase().includes('basic')) return '666611110000000000000001';
+    if (planName.toLowerCase().includes('standard')) return '666611110000000000000002';
+    if (planName.toLowerCase().includes('premium')) return '666611110000000000000003';
+    return dbPlans[0]?._id || dbPlans[0]?.id || '666611110000000000000002';
+  };
+
+  const handleInstantSubscribe = async (forceReplace = false) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (!selectedPlanModal) return;
+    setSubscribing(true);
+    setSubSuccess(null);
+    setHasExistingSubError(false);
+
+    try {
+      const planId = selectedPlanModal.planId || getPlanId(selectedPlanModal.name);
+
+      await subscriptionsAPI.subscribe({
+        planId,
+        billingCycle,
+        hostelAddress: hostel,
+        room,
+        zoneCode,
+        dietPreference,
+        paymentMethod,
+        forceReplace
+      });
+
+      await refreshUser();
+      setSubSuccess('🎉 Congratulations! Your mess subscription is now active!');
+      setTimeout(() => {
+        setSelectedPlanModal(null);
+        setSubSuccess(null);
+        setHasExistingSubError(false);
+        navigate('/dashboard');
+      }, 1600);
+    } catch (err: any) {
+      if (err.hasActiveSubscription || err.message?.includes('already have an active subscription')) {
+        setHasExistingSubError(true);
+      } else {
+        alert(err.message || 'Subscription failed. Please check your details or try again.');
+      }
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   const getPrice = (base: number) => billingCycle === 'semester' ? Math.round(base * 0.85) : base;
   const getDiscounted = (price: number) => Math.round(price * 0.95);
+
+  const handleAddItem = (item: { name: string; original: number; img: string }) => {
+    const discounted = getDiscounted(item.original);
+    addToCart({
+      id: 'extra-' + item.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      name: item.name,
+      price: discounted,
+      image: item.img,
+      restaurant: 'Bitez Campus Mess',
+      isVeg: true
+    });
+    setAddedItems(prev => ({ ...prev, [item.name]: true }));
+    setTimeout(() => {
+      setAddedItems(prev => ({ ...prev, [item.name]: false }));
+    }, 2000);
+    setExtraNotification({
+      msg: `Added "${item.name}" (₹${discounted}) to your meal order!`,
+      type: 'info'
+    });
+  };
+
+  const handleOpenInstantExtra = (item: any) => {
+    if (!user) {
+      navigate('/login?redirect=/mess');
+      return;
+    }
+    const discounted = getDiscounted(item.original || item.price || 30);
+    setSelectedExtraModal({
+      ...item,
+      price: discounted,
+      image: item.img || item.image || 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=compress&cs=tinysrgb&w=300'
+    });
+  };
+
+  const handleConfirmInstantExtraOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedExtraModal) return;
+    setExtraOrdering(true);
+    try {
+      const discounted = getDiscounted(selectedExtraModal.original);
+      const deliveryAddress = user?.deliveryAddress || `${hostel}, Room ${room} (${zoneCode})`;
+      const chosenPayment = extraPaymentMethod === 'wallet'
+        ? 'Bitez Campus Wallet'
+        : extraPaymentMethod === 'upi'
+        ? 'Online UPI'
+        : 'Cash on Delivery';
+
+      const res = await ordersAPI.create({
+        items: [{
+          name: selectedExtraModal.name,
+          price: discounted,
+          quantity: 1,
+          image: selectedExtraModal.img,
+          isVeg: true
+        }],
+        totalAmount: discounted,
+        deliveryAddress,
+        paymentMethod: chosenPayment,
+        isExtraOrder: true,
+        orderType: 'extra_addon',
+        notes: `1-Tap extra add-on ordered for student mess delivery`,
+        customerName: user?.name,
+        customerPhone: user?.phone
+      });
+
+      if (res?.success) {
+        const orderId = res.order?.orderId || res.order?._id || 'CONFIRMED';
+        setSelectedExtraModal(null);
+        setExtraNotification({
+          msg: `🎉 Extra Order #${orderId} confirmed! Dispatched with your meal.`,
+          type: 'success',
+          orderId
+        });
+        await refreshUser();
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to place extra order. Please try again.');
+    } finally {
+      setExtraOrdering(false);
+    }
+  };
 
   const faqs = [
     {
@@ -57,14 +489,14 @@ const Subscriptions = () => {
       tag: 'Subscription',
       q: 'How does the mess subscription work?',
       a: 'Choose your preferred Basic (1 meal), Standard (2 meals), or Premium (3 meals) plan, complete your online checkout, and fresh home-cooked meals will be delivered daily directly to your doorstep on your chosen time slots.',
-      tip: 'Flexible delivery time slots available for lunch (12:00–1:30 PM) and dinner (7:30–9:00 PM).'
+      tip: 'Flexible delivery time slots available for breakfast (08:00–09:30 AM), lunch (12:00–1:30 PM) and dinner (7:30–9:00 PM).'
     },
     {
       id: 1,
       icon: '⏭️',
       tag: 'Skip Meal',
       q: 'Can I skip an upcoming meal if I am eating out?',
-      a: 'Yes! You can easily skip any meal directly from the app before the daily cutoff time (10 AM for Lunch, 5 PM for Dinner). The credited amount is automatically saved to your wallet.',
+      a: 'Yes! You can easily skip any meal directly from the app before the daily cutoff time (07:00 AM for Breakfast, 10:30 AM for Lunch, 05:30 PM for Dinner). The credited amount is automatically saved to your wallet.',
       tip: '100% money credited back to your Bitez wallet on skips.'
     },
     {
@@ -93,11 +525,846 @@ const Subscriptions = () => {
     },
   ];
 
+  const [liveWeeklyMenu, setLiveWeeklyMenu] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
+
+  useEffect(() => {
+    menuAPI.getAll()
+      .then(res => {
+        if (res?.menu) setLiveWeeklyMenu(res.menu);
+      })
+      .catch(() => {});
+  }, []);
+
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const menu = weeklyMenu[activeDay];
+  const menu = liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay] || { breakfast: '', lunch: '', dinner: '' };
+
+  // ── MESS STUDENT DASHBOARD (Shown when student has active/paused subscription) ──
+  const renderMessDashboard = () => {
+    const remaining = currentSub?.remainingMeals ?? 30;
+    const mealsPerDay = currentSub?.planId?.mealsPerDay || 2;
+    const totalMeals = currentSub?.totalMeals || (currentSub?.billingCycle === 'semester' ? 180 : mealsPerDay * 30);
+    const progressPercent = Math.min(100, Math.max(0, Math.round((remaining / totalMeals) * 100)));
+    const planName = currentSub?.planId?.name || 'Standard';
+    const isPaused = currentSub?.status === 'paused';
+    const hostelAddress = currentSub?.hostelAddress || (user?.hostel ? `${user.hostel}, Room ${user.room || ''}` : 'Tagore Hostel, Room 204');
+    const dietStyle = currentSub?.dietPreference || user?.dietPreference || 'Standard Homestyle Veg';
+
+    const startDateStr = currentSub?.startDate
+      ? new Date(currentSub.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+      : 'Active';
+    const endDateStr = currentSub?.endDate
+      ? new Date(currentSub.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '30 Days';
+
+    const daysRemaining = currentSub?.endDate
+      ? Math.max(0, Math.ceil((new Date(currentSub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+      : 30;
+
+    // Time calculations for live kitchen shifts in IST
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+    const ist = new Date(utc + istOffset);
+    const currentMins = ist.getHours() * 60 + ist.getMinutes();
+
+    // Breakfast cutoff 07:00 AM (420 mins), Lunch cutoff 10:30 AM (630 mins), Dinner cutoff 5:30 PM (1050 mins)
+    const isBreakfastCutoffPassed = currentMins > 420;
+    const isLunchCutoffPassed = currentMins > 630;
+    const isDinnerCutoffPassed = currentMins > 1050;
+
+    // Active shift detection
+    let activeShiftName: 'breakfast' | 'lunch' | 'dinner' = 'lunch';
+    if (currentMins < 600) {
+      activeShiftName = 'breakfast';
+    } else if (currentMins < 930) {
+      activeShiftName = 'lunch';
+    } else {
+      activeShiftName = 'dinner';
+    }
+
+    // Dish descriptions for today
+    const currentDayMenu = liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay] || {};
+    const lunchDishes = todayMenuData?.lunch || currentDayMenu.lunch || 'Paneer Butter Masala, Dal Tadka, 4 Butter Phulkas, Jeera Rice, Salad, Gulab Jamun';
+    const dinnerDishes = todayMenuData?.dinner || currentDayMenu.dinner || 'Seasonal Mix Veg, Dal Makhani, 4 Butter Rotis, Steamed Rice, Boondi Raita';
+    const breakfastDishes = todayMenuData?.breakfast || currentDayMenu.breakfast || 'Poha / Aloo Paratha, Fresh Curd, Masala Chai';
+
+    const greetingTime = ist.getHours() < 12 ? 'Good morning' : ist.getHours() < 17 ? 'Good afternoon' : 'Good evening';
+
+    return (
+      <div className="min-h-screen bg-[#FAF9F6] pb-24 sm:pb-16">
+        {/* Top Sticky Hub Strip — Warm Glassmorphism Matching Bitez Theme */}
+        <div className="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-14 sm:top-20 z-30 px-4 py-2.5 shadow-2xs">
+          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-black tracking-widest bg-orange-50 text-orange-600 border border-orange-200/80 px-2.5 py-0.5 rounded-full">
+                Mess Dashboard
+              </span>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-bold text-[11px] ${
+                isPaused
+                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              }`}>
+                <span className={`w-2 h-2 rounded-full ${isPaused ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'}`}></span>
+                {isPaused ? 'Deliveries Paused' : 'Live Active Dispatch'}
+              </span>
+              <span className="text-slate-300 hidden sm:inline">•</span>
+              <span className="text-slate-600 font-semibold hidden sm:inline">📍 {hostelAddress}</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setShowPlansView(true)}
+                className="px-3.5 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-100" /> View All Plans / Upgrade
+              </button>
+              <button
+                onClick={() => navigate('/support')}
+                className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold rounded-xl transition cursor-pointer hidden md:flex items-center gap-1.5 shadow-2xs"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-orange-600" /> Help
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 space-y-6 sm:space-y-8">
+          
+          {/* Welcome Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 border border-orange-200 px-2.5 py-0.5 rounded-full">
+                  Student Mess Portal
+                </span>
+                <span className="text-xs text-slate-400">•</span>
+                <span className="text-xs font-medium text-slate-500">Live Campus Kitchen Feed</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                {greetingTime}, {user?.name || 'Student'} 👋
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Here is your live daily tiffin status, meal balance, skip manager, and kitchen schedule.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <div className="bg-white border border-slate-200 rounded-2xl px-4 py-2.5 shadow-2xs flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
+                  <Wallet className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="block text-[10px] uppercase font-bold text-slate-400">Campus Wallet</span>
+                  <span className="text-sm font-extrabold text-slate-900">₹{user?.walletBalance ?? 0}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Notification Toast */}
+          {subActionMsg && (
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm font-bold text-center shadow-xs flex items-center justify-center gap-2 animate-fade-in">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+              <span>{subActionMsg}</span>
+            </div>
+          )}
+
+          {/* If Paused Alert Banner */}
+          {isPaused && (
+            <div className="p-4 sm:p-5 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-300 rounded-2xl sm:rounded-3xl shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-xs">
+                  ⏸️
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-amber-950">Subscription Deliveries are PAUSED</h4>
+                  <p className="text-xs text-amber-800 mt-0.5">
+                    Your daily meal packing is on hold. No meals will be deducted. When you resume, your end date extends automatically!
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleTogglePause}
+                disabled={pauseLoading}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition-all cursor-pointer shrink-0 disabled:opacity-50"
+              >
+                {pauseLoading ? 'Resuming...' : '▶️ Resume Meal Deliveries'}
+              </button>
+            </div>
+          )}
+
+          {/* ── 1. DIGITAL STUDENT MESS PASS (CLEAN CULINARY BRAND PASSCARD) ── */}
+          <div className="bg-white rounded-3xl border border-slate-200/90 shadow-lg shadow-slate-900/5 overflow-hidden relative transition-all">
+            {/* Top Signature Warm Accent Bar */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600" />
+
+            <div className="p-4 sm:p-7 space-y-4 sm:space-y-6">
+              
+              {/* Card Top: Pass Label & Status */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-slate-100">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white p-2.5 shadow-md shadow-orange-500/20 flex items-center justify-center text-2xl font-black shrink-0">
+                    🍱
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-orange-600 bg-orange-50 border border-orange-200 px-2.5 py-0.5 rounded-full">
+                        BITEZ STUDENT MEAL PASS
+                      </span>
+                      <span className="text-[10px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-mono font-bold">
+                        #{String(currentSub?._id || currentSub?.id || 'PASS').slice(-6).toUpperCase()}
+                      </span>
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
+                      {user?.name || 'Student Member'}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black tracking-wider uppercase border shadow-2xs ${
+                    isPaused
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${isPaused ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'}`} />
+                    {isPaused ? '⏸️ PAUSED' : '🟢 ACTIVE & PACKING'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Card Middle: Core Key Metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
+                
+                {/* Remaining Meals with Progress */}
+                <div className="bg-orange-50/60 border border-orange-200/70 rounded-2xl p-4 shadow-2xs hover:border-orange-300 transition-all">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-orange-800 mb-1">
+                    Meals Remaining
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl sm:text-4xl font-black text-orange-600">{remaining}</span>
+                    <span className="text-xs font-bold text-slate-500">/ {totalMeals} meals</span>
+                  </div>
+                  <div className="w-full bg-orange-200/60 h-2.5 rounded-full mt-2.5 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-orange-500 to-amber-500 rounded-full transition-all duration-500 shadow-sm"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                  <span className="block text-[11px] text-orange-800 mt-1 font-bold">
+                    {progressPercent}% balance left in cycle
+                  </span>
+                </div>
+
+                {/* Plan Tier & Frequency */}
+                <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 shadow-2xs hover:border-orange-200 transition-all">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Current Plan
+                  </span>
+                  <span className="text-xl font-black text-slate-900 block truncate">
+                    {planName} Plan
+                  </span>
+                  <span className="text-xs text-orange-600 font-bold block mt-0.5 truncate">
+                    {mealsPerDay} Meals / Day ({mealsPerDay === 1 ? 'Lunch or Dinner' : mealsPerDay === 3 ? 'Breakfast + Lunch + Dinner' : 'Lunch + Dinner'})
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-medium block mt-1">
+                    Billed {currentSub?.billingCycle || 'monthly'}
+                  </span>
+                </div>
+
+                {/* Validity */}
+                <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 shadow-2xs hover:border-orange-200 transition-all">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Plan Validity
+                  </span>
+                  <span className="text-lg font-black text-slate-900 block">
+                    {endDateStr}
+                  </span>
+                  <span className="text-xs text-amber-900 font-black bg-amber-100 px-2.5 py-0.5 rounded-full inline-block mt-0.5">
+                    ⏳ {daysRemaining} days left
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-medium block mt-1">
+                    Started: {startDateStr}
+                  </span>
+                </div>
+
+                {/* Dietary Preference & Room */}
+                <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 shadow-2xs hover:border-orange-200 transition-all">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Hostel &amp; Diet
+                  </span>
+                  <span className="text-sm font-black text-slate-900 block truncate">
+                    📍 {hostelAddress}
+                  </span>
+                  <span className="text-xs text-emerald-700 font-bold block mt-0.5 truncate">
+                    🥗 {dietStyle}
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-medium block mt-1">
+                    Zone: {currentSub?.zoneCode || 'NC-01'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Card Bottom: Fast Actions Strip */}
+              <div className="bg-slate-50/70 border-t border-slate-100 px-6 py-4 rounded-b-3xl -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 mt-6 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <button
+                    onClick={handleOpenSkipModal}
+                    className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm rounded-xl shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                  >
+                    <span>⏭️ Skip Meal</span>
+                    <span className="bg-white/25 text-white text-[10px] px-2 py-0.5 rounded font-black">
+                      +1 Meal Rollover
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={handleTogglePause}
+                    disabled={pauseLoading}
+                    className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shadow-2xs"
+                  >
+                    {pauseLoading ? 'Updating...' : isPaused ? '▶️ Resume Plan' : '⏸️ Pause Plan'}
+                  </button>
+
+                  <button
+                    onClick={() => setShowPlansView(true)}
+                    className="px-4 py-2.5 bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Change Plan</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleCancelSub}
+                    className="text-xs font-semibold text-slate-400 hover:text-rose-600 underline decoration-slate-300 transition cursor-pointer"
+                  >
+                    Cancel Subscription
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* ── 2. TODAY'S LIVE MEALS & KITCHEN DISPATCH TRACKER ── */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                  <span>🍲</span> Today's Live Meals &amp; Kitchen Dispatch
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Real-time status of breakfast, lunch, and dinner directly from the central mess kitchen.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-600 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-full">
+                  <Clock className="w-3 h-3" /> Cutoff: 2 hours prior to delivery
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              {/* Breakfast Shift */}
+              <div className={`bg-white rounded-3xl border p-5 transition-all shadow-2xs relative ${
+                activeShiftName === 'breakfast'
+                  ? 'border-2 border-orange-500 shadow-md shadow-orange-500/10'
+                  : 'border-slate-200/80 hover:border-orange-200'
+              }`}>
+                {activeShiftName === 'breakfast' && (
+                  <span className="absolute -top-2.5 right-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">
+                    Current Shift
+                  </span>
+                )}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-lg shadow-2xs">
+                      🌅
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">Morning Breakfast</h4>
+                      <span className="text-[11px] text-slate-400 font-medium">07:30 AM – 09:30 AM</span>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                    currentMins >= 570
+                      ? 'bg-slate-100 text-slate-600'
+                      : mealsPerDay === 3
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-orange-50 text-orange-600 border border-orange-200'
+                  }`}>
+                    {currentMins >= 570 ? 'Served' : mealsPerDay === 3 ? 'Included' : 'Add-on'}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 mb-3">
+                  <span className="block text-[10px] font-bold uppercase text-slate-500 mb-1">On the Menu:</span>
+                  <p className="text-xs font-semibold text-slate-800 leading-relaxed">
+                    {breakfastDishes}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100">
+                  <span className="text-slate-500 font-medium">
+                    {currentMins >= 570 ? '✅ Breakfast finished' : '⚡ Served hot in dining hall & doorstep'}
+                  </span>
+                  {!isBreakfastCutoffPassed && !isPaused && mealsPerDay >= 3 ? (
+                    <button
+                      onClick={() => setIsSkipModalOpen(true)}
+                      className="text-orange-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Skip Breakfast →
+                    </button>
+                  ) : mealsPerDay < 3 ? (
+                    <button
+                      onClick={() => navigate('/menu')}
+                      className="text-orange-600 font-bold hover:underline cursor-pointer"
+                    >
+                      + Order Breakfast
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Lunch Shift */}
+              <div className={`bg-white rounded-3xl border p-5 transition-all shadow-2xs relative ${
+                activeShiftName === 'lunch'
+                  ? 'border-2 border-orange-500 shadow-md shadow-orange-500/10'
+                  : 'border-slate-200/80 hover:border-orange-200'
+              }`}>
+                {activeShiftName === 'lunch' && (
+                  <span className="absolute -top-2.5 right-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">
+                    Current Shift
+                  </span>
+                )}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 border border-orange-100 flex items-center justify-center text-lg shadow-2xs">
+                      ☀️
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">Afternoon Lunch</h4>
+                      <span className="text-[11px] text-slate-400 font-medium">12:30 PM – 02:30 PM</span>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                    currentMins >= 900
+                      ? 'bg-slate-100 text-slate-600'
+                      : currentMins >= 750
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-2xs animate-pulse'
+                      : !isLunchCutoffPassed
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-amber-50 text-amber-800 border border-amber-200'
+                  }`}>
+                    {currentMins >= 900
+                      ? 'Delivered'
+                      : currentMins >= 750
+                      ? '🛵 Out for Delivery'
+                      : !isLunchCutoffPassed
+                      ? 'Skip Open'
+                      : 'Packing'}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 mb-3">
+                  <span className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Today's Tiffin Box:</span>
+                  <p className="text-xs font-semibold text-slate-800 leading-relaxed">
+                    {lunchDishes}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100">
+                  <span className="text-slate-500 font-medium">
+                    Cutoff: <strong className="text-slate-700">10:30 AM</strong>
+                  </span>
+                  {!isLunchCutoffPassed && !isPaused && (
+                    <button
+                      onClick={handleOpenSkipModal}
+                      className="text-orange-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Skip Lunch →
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Dinner Shift — Warm Twilight Amber */}
+              <div className={`bg-white rounded-3xl border p-5 transition-all shadow-2xs relative ${
+                activeShiftName === 'dinner'
+                  ? 'border-2 border-orange-500 shadow-md shadow-orange-500/10'
+                  : 'border-slate-200/80 hover:border-orange-200'
+              }`}>
+                {activeShiftName === 'dinner' && (
+                  <span className="absolute -top-2.5 right-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">
+                    Current Shift
+                  </span>
+                )}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center text-lg shadow-2xs">
+                      🌙
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">Evening Dinner</h4>
+                      <span className="text-[11px] text-slate-400 font-medium">07:30 PM – 09:30 PM</span>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                    currentMins >= 1320
+                      ? 'bg-slate-100 text-slate-600'
+                      : currentMins >= 1170
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-2xs animate-pulse'
+                      : !isDinnerCutoffPassed
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-amber-50 text-amber-800 border border-amber-200'
+                  }`}>
+                    {currentMins >= 1320
+                      ? 'Delivered'
+                      : currentMins >= 1170
+                      ? '🛵 Out for Delivery'
+                      : !isDinnerCutoffPassed
+                      ? 'Skip Open'
+                      : 'Kitchen Prep'}
+                  </span>
+                </div>
+
+                <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-3.5 mb-3">
+                  <span className="block text-[10px] font-bold uppercase text-orange-800 mb-1">Tonight's Tiffin Box:</span>
+                  <p className="text-xs font-semibold text-slate-800 leading-relaxed">
+                    {dinnerDishes}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100">
+                  <span className="text-slate-500 font-medium">
+                    Cutoff: <strong className="text-slate-700">05:30 PM</strong>
+                  </span>
+                  {!isDinnerCutoffPassed && !isPaused && (
+                    <button
+                      onClick={handleOpenSkipModal}
+                      className="text-orange-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Skip Dinner →
+                    </button>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* ── 3. WEEKLY ROTATING TIMETABLE (7-DAY SCHEDULE) ── */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-2xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-orange-500" /> Weekly Mess Menu Timetable
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Select any day to preview what's cooking this week and plan your meals or skips.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/timetable')}
+                className="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+              >
+                <span>Full Timetable Page</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Day Pills */}
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+              {days.map((day) => {
+                const isSelected = activeDay === day;
+                const isToday = getTodayDayName() === day;
+                return (
+                  <button
+                    key={day}
+                    onClick={() => setActiveDay(day)}
+                    className={`px-4 py-2 rounded-2xl font-black text-xs transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs'
+                        : 'bg-white text-slate-700 border border-slate-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200'
+                    }`}
+                  >
+                    <span>{day}</span>
+                    {isToday && (
+                      <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase ${
+                        isSelected ? 'bg-white text-orange-600' : 'bg-orange-500 text-white'
+                      }`}>
+                        Today
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected Day Food Schedule Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-1">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 hover:border-orange-200 transition-all">
+                <div className="flex items-center gap-2 text-xs font-black text-slate-900 mb-1.5">
+                  <span>🌅</span> Breakfast (07:30 AM)
+                </div>
+                <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                  {(liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay])?.breakfast || 'Poha, Boiled Sprouts, Masala Chai'}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 hover:border-orange-200 transition-all">
+                <div className="flex items-center gap-2 text-xs font-black text-slate-900 mb-1.5">
+                  <span>☀️</span> Lunch (12:30 PM)
+                </div>
+                <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                  {(liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay])?.lunch || 'Paneer Butter Masala, Dal Tadka, 4 Butter Phulkas, Jeera Rice, Salad, Gulab Jamun'}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 hover:border-orange-200 transition-all">
+                <div className="flex items-center gap-2 text-xs font-black text-slate-900 mb-1.5">
+                  <span>🌙</span> Dinner (07:30 PM)
+                </div>
+                <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                  {(liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay])?.dinner || 'Seasonal Mix Veg, Dal Makhani, 4 Butter Rotis, Steamed Rice, Boondi Raita'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 4. INSTANT TIFFIN ADD-ONS (EXTRAS) ── */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                  <Flame className="w-5 h-5 text-orange-500" /> Extra Treats for Today's Tiffin
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Add sweet treats, extra rotis, or beverages packed directly with your scheduled delivery box.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1 rounded-full self-start sm:self-auto">
+                ⭐ 5% Student Discount Applied
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+              {(dynamicExtras.length > 0 ? dynamicExtras.slice(0, 5) : [
+                { name: 'Extra Butter Roti (2 pcs)', original: 20, img: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=compress&cs=tinysrgb&w=300' },
+                { name: 'Hot Gulab Jamun (2 pcs)', original: 40, img: 'https://images.pexels.com/photos/14460596/pexels-photo-14460596.jpeg?auto=compress&cs=tinysrgb&w=150' },
+                { name: 'Chilled Sweet Lassi', original: 45, img: 'https://images.pexels.com/photos/8992928/pexels-photo-8992928.jpeg?auto=compress&cs=tinysrgb&w=150' },
+                { name: 'Curd / Boondi Raita', original: 25, img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=150' },
+                { name: 'Masala Chaas', original: 20, img: 'https://images.pexels.com/photos/8992928/pexels-photo-8992928.jpeg?auto=compress&cs=tinysrgb&w=150' }
+              ]).map((item: any, idx: number) => {
+                const discounted = getDiscounted(item.original);
+                return (
+                  <div
+                    key={item.id || item.name || idx}
+                    className="bg-white border border-slate-200 hover:border-orange-300 rounded-2xl p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all group"
+                  >
+                    <div>
+                      <div className="w-full h-24 rounded-xl overflow-hidden mb-2.5 bg-slate-100">
+                        <img
+                          src={item.img}
+                          alt={item.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/14460596/pexels-photo-14460596.jpeg?auto=compress&cs=tinysrgb&w=300';
+                          }}
+                        />
+                      </div>
+                      <h4 className="text-xs font-black text-slate-900 truncate mb-1" title={item.name}>
+                        {item.name}
+                      </h4>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-slate-400 line-through text-[11px]">₹{item.original}</span>
+                        <span className="text-xs font-black text-orange-600">₹{discounted}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleOpenInstantExtra(item)}
+                      className="mt-3 w-full py-1.5 bg-orange-50 hover:bg-orange-500 hover:text-white text-orange-600 font-black text-[11px] rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 shadow-2xs active:scale-95 border border-orange-200/80"
+                    >
+                      <Plus className="w-3 h-3" /> Add to Tiffin
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── 5. SKIP HISTORY & ATTENDANCE ── */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                  <span>⏭️</span> Skips &amp; Rollover Meal Balance
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Every meal skipped 2 hours prior to delivery automatically preserves your meal credits.
+                </p>
+              </div>
+              <button
+                onClick={handleOpenSkipModal}
+                className="px-3.5 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 font-extrabold text-xs rounded-xl transition cursor-pointer"
+              >
+                + Skip Another Meal
+              </button>
+            </div>
+
+            {Array.isArray(currentSub?.skipHistory) && currentSub.skipHistory.length > 0 ? (
+              <div className="divide-y divide-slate-100">
+                {currentSub.skipHistory.slice(0, 5).map((skip: any, idx: number) => (
+                  <div key={skip.id || idx} className="py-3 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 border border-orange-200/60 flex items-center justify-center font-bold text-sm">
+                        ⏭️
+                      </span>
+                      <div>
+                        <span className="font-extrabold text-slate-900 capitalize">
+                          {skip.mealType || 'Meal'} on {skip.date}
+                        </span>
+                        <span className="block text-[11px] text-slate-500">
+                          Reason: {skip.reason || 'Student preference / Out of campus'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-emerald-700 font-black text-xs block">
+                        +1 Meal Rollover Credit
+                      </span>
+                      <span className="text-[10px] text-slate-400">Approved by kitchen</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-5 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center">
+                <p className="text-xs font-bold text-slate-700">No skipped meals yet</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Heading home for the weekend or dining out? Skip upcoming meals anytime before the 2-hour cutoff!
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* ── 6. CAMPUS WARDEN & KITCHEN HELPLINE (WARM CULINARY PALETTE) ── */}
+          <div className="bg-gradient-to-r from-orange-50 via-amber-50/50 to-orange-50 rounded-3xl p-6 sm:p-7 border border-orange-200/70 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center text-2xl shrink-0 shadow-md shadow-orange-500/20">
+                👨‍🍳
+              </div>
+              <div>
+                <h4 className="text-base font-black text-slate-900">Need Special Dietary Care or Delivery Support?</h4>
+                <p className="text-xs text-slate-600 mt-0.5 font-medium">
+                  Our hostel dispatch coordinator is available on campus daily from 07:00 AM to 10:30 PM.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <button
+                onClick={() => navigate('/support')}
+                className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs rounded-xl shadow-xs transition cursor-pointer active:scale-95"
+              >
+                File Feedback / Help
+              </button>
+              <button
+                onClick={() => setShowPlansView(true)}
+                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl transition cursor-pointer shadow-2xs"
+              >
+                Browse All Plans
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Skip Meal Modal */}
+        <SkipMealModal
+          isOpen={skipModalOpen}
+          onClose={() => setSkipModalOpen(false)}
+          subscription={currentSub}
+          userWalletBalance={user?.walletBalance || 0}
+          onSuccess={handleSkipSuccess}
+        />
+
+      </div>
+    );
+  };
+
+  // Loading state while fetching user's mess subscription
+  if (user && subLoading) {
+    return (
+      <MealLoadingScreen
+        message="Loading Your Mess Dashboard..."
+        subMessage="Fetching active meal pass, daily tiffin balance & kitchen schedule"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
+
+      {/* ── BANNER WHEN SUBSCRIBER IS BROWSING MESS LANDING PAGE ── */}
+      {currentSub && (
+        <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 text-white px-4 py-3 shadow-lg sticky top-14 sm:top-20 z-40 border-b border-orange-400/40">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Active Student Mess Plan: <strong className="underline decoration-white/40">{currentSub?.planId?.name || 'Standard'} Plan</strong> ({currentSub?.remainingMeals ?? 0} meals remaining)</span>
+            </div>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-4 py-1.5 bg-white text-orange-600 hover:bg-orange-50 font-black text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <ArrowRight className="w-3.5 h-3.5 rotate-180" /> Go to My Mess Dashboard
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── ADMIN MANAGEMENT BANNER (Visible when logged in as Admin) ── */}
+      {user?.role === 'admin' && (
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white px-4 py-2.5 shadow-md sticky top-14 sm:top-20 z-40 border-b border-amber-500/30">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Admin Mess Control:</span>
+              <span className="text-slate-300 font-medium hidden sm:inline">Linked to Admin Operations Hub (Port 5000)</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => navigate('/admin', { state: { tab: 'plans' } })}
+                className="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="w-3 h-3" /> Edit Meal Plans ({dbPlans.length})
+              </button>
+              <button
+                onClick={() => navigate('/admin', { state: { tab: 'menu' } })}
+                className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1 cursor-pointer"
+              >
+                <Calendar className="w-3 h-3" /> Edit Timetable
+              </button>
+              <button
+                onClick={() => navigate('/admin', { state: { tab: 'subscribers' } })}
+                className="px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black rounded-lg shadow-xs transition flex items-center gap-1 cursor-pointer"
+              >
+                <Users className="w-3 h-3" /> Subscribers Hub
+              </button>
+              <button
+                onClick={() => navigate('/admin')}
+                className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 cursor-pointer"
+              >
+                Full Admin Hub →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── HERO SECTION - WARM CULINARY PALETTE ── */}
       <section className="relative overflow-hidden bg-gradient-to-b from-orange-50/50 via-amber-50/20 to-white pt-8 sm:pt-12 pb-12 sm:pb-16 text-slate-900 border-b border-orange-100/60">
@@ -778,166 +2045,258 @@ const Subscriptions = () => {
               Flexible meal passes for students &amp; working professionals. Pause, upgrade, or skip anytime.
             </p>
 
-            {/* Monthly vs Semester Switcher */}
-            <div className="inline-flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-xs">
-              <button
-                onClick={() => setBillingCycle('monthly')}
-                className={`px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer ${
-                  billingCycle === 'monthly'
-                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Monthly Plan
-              </button>
-              <button
-                onClick={() => setBillingCycle('semester')}
-                className={`px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer ${
-                  billingCycle === 'semester'
-                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <span>Semester Pass</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 font-extrabold uppercase tracking-wider">
-                  Save 15%
-                </span>
-              </button>
+            {/* Monthly vs Semester Switcher & Carousel Arrows */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-2">
+              <div className="inline-flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-xs">
+                <button
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer ${
+                    billingCycle === 'monthly'
+                      ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Monthly Plan
+                </button>
+                <button
+                  onClick={() => setBillingCycle('semester')}
+                  className={`px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                    billingCycle === 'semester'
+                      ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>Semester Pass</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 font-extrabold uppercase tracking-wider">
+                    Save 15%
+                  </span>
+                </button>
+              </div>
+
+              {/* Scroll Arrow Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => scrollSubPlans('left')}
+                  disabled={!canScrollSubLeft}
+                  aria-label="Scroll plans left"
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
+                    canScrollSubLeft
+                      ? 'bg-white border-slate-300 text-slate-800 shadow-xs hover:bg-orange-500 hover:text-white hover:border-orange-500'
+                      : 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scrollSubPlans('right')}
+                  disabled={!canScrollSubRight}
+                  aria-label="Scroll plans right"
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
+                    canScrollSubRight
+                      ? 'bg-white border-slate-300 text-slate-800 shadow-xs hover:bg-orange-500 hover:text-white hover:border-orange-500'
+                      : 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
+
+            {/* Mobile Swipe Hint */}
+            <p className="text-xs text-slate-400 font-semibold sm:hidden mt-3">
+              👈 Swipe left/right to view all meal passes 👉
+            </p>
           </div>
 
-          {/* Pricing Cards Grid */}
-          <div className="grid lg:grid-cols-3 gap-8 items-center max-w-6xl mx-auto mb-12">
-            
-            {/* 1. Basic Plan */}
-            <div className="bg-white border border-slate-200 hover:border-orange-500 shadow-sm hover:shadow-xl rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between h-full">
-              <div>
-                <h3 className="text-2xl font-extrabold text-slate-900 mb-1">Basic</h3>
-                <p className="text-orange-600 font-semibold text-sm mb-4">1 Meal / Day (Lunch or Dinner)</p>
-                
-                <div className="text-4xl font-extrabold text-slate-900 mb-1">
-                  ₹{getPrice(2499)}
-                  <span className="text-base font-normal text-slate-400">/mo</span>
+          {/* Pricing Cards Horizontal Scroll Carousel (Fetched live from Backend Database) */}
+          {plansLoading && dbPlans.length === 0 ? (
+            <div className="flex gap-6 overflow-x-auto pb-8 pt-4 px-2 max-w-7xl mx-auto scrollbar-hide">
+              {[1, 2, 3].map(sk => (
+                <div key={sk} className="w-[310px] shrink-0 bg-white border border-slate-200 rounded-3xl p-8 animate-pulse space-y-4">
+                  <div className="h-6 bg-slate-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                  <div className="h-10 bg-slate-200 rounded w-1/3"></div>
+                  <div className="h-32 bg-slate-100 rounded"></div>
+                  <div className="h-12 bg-slate-200 rounded"></div>
                 </div>
-                {billingCycle === 'semester' && (
-                  <p className="text-orange-600 text-xs font-bold mb-3">You save ₹{2499 - getPrice(2499)}/month!</p>
-                )}
-
-                <hr className="my-6 border-slate-100" />
-                
-                <ul className="space-y-3 mb-8">
-                  {[
-                    'Lunch or Dinner daily (you choose)',
-                    'Full Weekly Menu Access',
-                    '2 Skips / Month with 100% Refund',
-                    '5% OFF on Extra Instant Orders',
-                    'Standard Tiffin Packaging',
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start text-sm text-slate-600">
-                      <span className="w-5 h-5 bg-orange-50 border border-orange-100 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 text-xs text-orange-600 font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                onClick={() => setSelectedPlanModal({ name: 'Basic (1 Meal/day)', price: getPrice(2499), meals: '1 Meal/day (Lunch or Dinner)' })}
-                className="w-full py-3.5 rounded-2xl font-bold bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 hover:border-orange-500 transition-all cursor-pointer shadow-xs hover:shadow-md"
-              >
-                Get Basic Plan
-              </button>
+              ))}
             </div>
+          ) : (
+            <div
+              ref={subPlansScrollRef}
+              onScroll={handleSubPlansScroll}
+              className="flex gap-6 items-stretch overflow-x-auto pb-8 pt-5 px-2 max-w-7xl mx-auto mb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {dbPlans.map((plan, i) => {
+                const basePrice = Number(plan.monthlyPrice) || 2499;
+                const discountPct = Number(plan.semesterDiscount) || 15;
+                const semesterMonthly = Math.round(basePrice * (1 - discountPct / 100));
+                const currentPrice = billingCycle === 'semester' ? semesterMonthly : basePrice;
+                const savings = basePrice - semesterMonthly;
+                const isPopular = Boolean(plan.isPopular);
+                const mealsPerDay = plan.mealsPerDay || 2;
+                const perMeal = Math.max(5, Math.round(currentPrice / (mealsPerDay * 30)));
 
-            {/* 2. Standard Plan (Most Popular) */}
-            <div className="relative bg-white border-2 border-orange-500 shadow-2xl rounded-3xl p-9 lg:scale-105 z-10 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between h-full">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="bg-orange-500 text-white px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 fill-white text-white" /> Most Popular
-                </span>
-              </div>
+                const features = Array.isArray(plan.features)
+                  ? plan.features
+                  : typeof plan.features === 'string'
+                  ? plan.features.split('\n').filter(Boolean)
+                  : ['Full rotating homestyle menu access', 'Hot insulated tiffin packaging', 'Skip meal wallet credit protection'];
 
-              <div>
-                <h3 className="text-2xl font-extrabold text-slate-900 mt-2 mb-1">Standard</h3>
-                <p className="text-orange-600 font-bold text-sm mb-4">2 Meals / Day (Lunch + Dinner)</p>
-                
-                <div className="text-4xl sm:text-5xl font-extrabold text-orange-600 mb-1">
-                  ₹{getPrice(4299)}
-                  <span className="text-base font-normal text-slate-400">/mo</span>
-                </div>
-                {billingCycle === 'semester' && (
-                  <p className="text-orange-600 text-xs font-bold mb-3">You save ₹{4299 - getPrice(4299)}/month!</p>
-                )}
+                const planId = plan._id || plan.id;
+                const lowerName = (plan.name || '').toLowerCase();
+                const isTrial = lowerName.includes('trial');
+                const isPremium = lowerName.includes('premium');
 
-                <hr className="my-6 border-slate-100" />
-                
-                <ul className="space-y-3.5 mb-8">
-                  {[
-                    'Both Lunch & Dinner included daily',
-                    'Full Premium Rotating Menu',
-                    'Unlimited Skips with Wallet Refunds',
-                    'Sunday Special Feasts Included 🎉',
-                    '5% OFF on Extra Instant Orders',
-                    'Piping Hot Insulated Tiffin Box',
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start text-sm text-slate-700 font-medium">
-                      <span className="w-5 h-5 bg-orange-50 border border-orange-100 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 text-xs text-orange-600 font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                return (
+                  <div
+                    key={planId || i}
+                    className={`w-[295px] sm:w-[325px] lg:w-[340px] shrink-0 snap-start relative rounded-3xl p-7 transition-all duration-300 flex flex-col justify-between hover:-translate-y-2 ${
+                      isPopular
+                        ? 'bg-gradient-to-b from-orange-50/50 via-white to-white ring-2 ring-orange-500 shadow-2xl shadow-orange-500/15 border-orange-300 z-10'
+                        : isTrial
+                        ? 'bg-gradient-to-b from-emerald-50/40 via-white to-white border border-emerald-300 hover:border-emerald-500 shadow-md hover:shadow-xl'
+                        : isPremium
+                        ? 'bg-gradient-to-b from-purple-50/40 via-white to-white border border-purple-200 hover:border-purple-500 shadow-md hover:shadow-xl'
+                        : 'bg-white border border-slate-200 hover:border-orange-500 shadow-sm hover:shadow-xl'
+                    }`}
+                  >
+                    {/* Top Badge */}
+                    <div className="absolute -top-3.5 left-6">
+                      {isPopular ? (
+                        <span className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1">
+                          <Flame className="w-3.5 h-3.5 fill-white text-white" /> Most Popular
+                        </span>
+                      ) : isTrial ? (
+                        <span className="bg-emerald-600 text-white px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" /> 1-Day Trial Pass
+                        </span>
+                      ) : isPremium ? (
+                        <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+                          👑 VIP Feast Pass
+                        </span>
+                      ) : (
+                        <span className="bg-blue-600 text-white px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+                          🌱 Budget Friendly
+                        </span>
+                      )}
+                    </div>
 
-              <button
-                onClick={() => setSelectedPlanModal({ name: 'Standard (2 Meals/day)', price: getPrice(4299), meals: 'Lunch + Dinner Daily' })}
-                className="w-full py-4 rounded-2xl font-extrabold bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/25 transition-all cursor-pointer hover:scale-105 active:scale-95"
-              >
-                Subscribe Standard Plan 🔥
-              </button>
+                    <div>
+                      <div className="flex items-start justify-between mt-2 mb-2">
+                        <div>
+                          <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                            {plan.name}
+                          </h3>
+                          <p className="text-orange-600 font-bold text-xs mt-0.5">
+                            {plan.mealsPerDay ? `${plan.mealsPerDay} Meal${plan.mealsPerDay > 1 ? 's' : ''} / Day` : 'Wholesome Student Meal'}
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-lg">
+                          {isPopular ? '🍱' : isTrial ? '✨' : isPremium ? '👑' : '🥗'}
+                        </div>
+                      </div>
+
+                      {/* Pricing Block */}
+                      <div className="bg-slate-50/90 rounded-2xl p-4 border border-slate-100 my-4">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className={`text-3xl sm:text-4xl font-black tracking-tight ${isPopular ? 'text-orange-600' : 'text-slate-900'}`}>
+                            ₹{currentPrice}
+                          </span>
+                          <span className="text-xs font-bold text-slate-400">/mo</span>
+                        </div>
+
+                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
+                          <span className="text-[11px] font-semibold text-slate-500">Effective Cost:</span>
+                          <span className="text-xs font-black text-orange-600 bg-orange-100/70 px-2 py-0.5 rounded-md">
+                            ~₹{perMeal} / meal
+                          </span>
+                        </div>
+
+                        {billingCycle === 'semester' && savings > 0 && (
+                          <div className="mt-2 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-emerald-600" />
+                            <span>Save ₹{savings}/mo ({discountPct}% OFF applied)</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Features List */}
+                      <div className="mb-6">
+                        <p className="text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2.5">
+                          Plan Highlights:
+                        </p>
+                        <ul className="space-y-2.5">
+                          {features.map((f: string, j: number) => (
+                            <li key={j} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600 leading-snug">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                              <span>{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setSelectedPlanModal({
+                        name: plan.name,
+                        price: currentPrice,
+                        meals: plan.description || `${plan.mealsPerDay || 2} Meals / Day`,
+                        planId
+                      })}
+                      className={`w-full py-3.5 rounded-2xl font-bold transition-all cursor-pointer shadow-xs hover:shadow-md ${
+                        isPopular
+                          ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-xl shadow-orange-500/25 py-4 hover:scale-105 active:scale-95'
+                          : 'bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 hover:border-orange-500'
+                      }`}
+                    >
+                      {isPopular ? `Subscribe ${plan.name} Plan 🔥` : `Get ${plan.name} Plan`}
+                    </button>
+
+                    {user?.role === 'admin' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/admin', { state: { tab: 'plans' } });
+                        }}
+                        className="mt-2.5 w-full py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 border border-slate-200 cursor-pointer"
+                        title="Edit this plan in Admin Panel"
+                      >
+                        <Edit className="w-3.5 h-3.5 text-orange-500" />
+                        <span>Edit in Admin Hub</span>
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
+          )}
 
-            {/* 3. Premium Plan */}
-            <div className="bg-white border border-slate-200 hover:border-orange-500 shadow-sm hover:shadow-xl rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between h-full">
-              <div>
-                <h3 className="text-2xl font-extrabold text-slate-900 mb-1">Premium</h3>
-                <p className="text-orange-600 font-semibold text-sm mb-4">3 Meals / Day + Evening Snacks</p>
-                
-                <div className="text-4xl font-extrabold text-slate-900 mb-1">
-                  ₹{getPrice(5999)}
-                  <span className="text-base font-normal text-slate-400">/mo</span>
-                </div>
-                {billingCycle === 'semester' && (
-                  <p className="text-orange-600 text-xs font-bold mb-3">You save ₹{5999 - getPrice(5999)}/month!</p>
-                )}
-
-                <hr className="my-6 border-slate-100" />
-                
-                <ul className="space-y-3 mb-8">
-                  {[
-                    'Breakfast + Lunch + Dinner + Evening Snacks',
-                    'Priority Doorstep Express Delivery',
-                    'Free Weekly Desserts & Shakes',
-                    'Dedicated VIP Support Manager',
-                    'Unlimited Skips with Wallet Roll-Over',
-                    '10% OFF on Extra Instant Orders',
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start text-sm text-slate-600">
-                      <span className="w-5 h-5 bg-orange-50 border border-orange-100 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 text-xs text-orange-600 font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                onClick={() => setSelectedPlanModal({ name: 'Premium (3 Meals + Snacks)', price: getPrice(5999), meals: 'Breakfast + Lunch + Dinner + Snacks' })}
-                className="w-full py-3.5 rounded-2xl font-bold bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 hover:border-orange-500 transition-all cursor-pointer shadow-xs hover:shadow-md"
-              >
-                Get Premium Plan
-              </button>
+          {/* Dots Indicator for Subscriptions Plans */}
+          {dbPlans.length > 1 && (
+            <div className="flex justify-center items-center gap-2 mb-10">
+              {dbPlans.map((_, dotIdx) => (
+                <button
+                  key={dotIdx}
+                  onClick={() => {
+                    if (subPlansScrollRef.current) {
+                      subPlansScrollRef.current.scrollTo({
+                        left: dotIdx * 350,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  aria-label={`Go to plan ${dotIdx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    activeSubIndex === dotIdx
+                      ? 'w-7 bg-orange-500'
+                      : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  }`}
+                />
+              ))}
             </div>
-
-          </div>
+          )}
 
           {/* 3-Day Tasting Guarantee Banner */}
           <div className="max-w-2xl mx-auto text-center p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2.5 shadow-2xs">
@@ -966,75 +2325,136 @@ const Subscriptions = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-            {(showAllExtras ? allExtraItems : extraItems).map((item, i) => {
-              const discounted = getDiscounted(item.original);
-              const isAdded = !!addedItems[item.name];
+          {(() => {
+            const allExtrasList = dynamicExtras;
+            const initialExtrasList = allExtrasList.slice(0, 6);
+            const displayedExtras = showAllExtras ? allExtrasList : initialExtrasList;
+            const remainingCount = Math.max(0, allExtrasList.length - initialExtrasList.length);
 
-              return (
-                <div
-                  key={i}
-                  className="bg-white p-4 rounded-3xl border border-slate-200 hover:border-orange-500 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all text-center group relative overflow-hidden flex flex-col justify-between"
-                >
-                  <div className="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl-xl z-10">
-                    -5%
-                  </div>
+            return (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+                  {displayedExtras.map((item, i) => {
+                    const discounted = getDiscounted(item.original);
+                    const isAdded = !!addedItems[item.name];
 
-                  <div>
-                    <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-3 shadow-sm border-2 border-white group-hover:scale-105 transition-transform bg-slate-100">
-                      <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <h4 className="font-bold text-slate-900 text-sm leading-tight mb-2">
-                      {item.name}
-                    </h4>
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <span className="text-slate-400 text-xs line-through">₹{item.original}</span>
-                      <span className="bg-orange-50 text-orange-600 text-xs font-extrabold px-2 py-0.5 rounded-lg border border-orange-100">
-                        ₹{discounted}
-                      </span>
-                    </div>
-                  </div>
+                    return (
+                      <div
+                        key={i}
+                        className="bg-white p-4 rounded-3xl border border-slate-200 hover:border-orange-500 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all text-center group relative overflow-hidden flex flex-col justify-between"
+                      >
+                        <div className="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl-xl z-10">
+                          -5%
+                        </div>
 
-                  <button
-                    onClick={() => handleAddItem(item.name)}
-                    className={`w-full py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-                      isAdded
-                        ? 'bg-orange-500 text-white shadow-md'
-                        : 'bg-orange-50 hover:bg-orange-500 hover:text-white text-orange-600'
-                    }`}
-                  >
-                    {isAdded ? (
-                      <>
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Added!
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-3.5 h-3.5" /> Add
-                      </>
-                    )}
-                  </button>
+                        <div>
+                          <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-3 shadow-sm border-2 border-white group-hover:scale-105 transition-transform bg-slate-100">
+                            <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                          </div>
+                          <h4 className="font-bold text-slate-900 text-sm leading-tight mb-2">
+                            {item.name}
+                          </h4>
+                          <div className="flex items-center justify-center gap-2 mb-3">
+                            <span className="text-slate-400 text-xs line-through">₹{item.original}</span>
+                            <span className="bg-orange-50 text-orange-600 text-xs font-extrabold px-2 py-0.5 rounded-lg border border-orange-100">
+                              ₹{discounted}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1.5 w-full mt-1">
+                          <button
+                            onClick={() => handleAddItem(item)}
+                            className={`w-full py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                              isAdded
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200/60'
+                            }`}
+                            title="Add to food cart"
+                          >
+                            {isAdded ? (
+                              <>
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Added!
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="w-3.5 h-3.5" /> Add to Cart
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() => handleOpenInstantExtra(item)}
+                            className="w-full py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1 cursor-pointer"
+                            title="Direct 1-Tap order with your next tiffin"
+                          >
+                            <Sparkles className="w-3.5 h-3.5" /> ⚡ 1-Tap Order
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
 
-          {/* See More Toggle */}
-          <div className="text-center mt-10">
-            <button
-              onClick={() => setShowAllExtras(!showAllExtras)}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 font-bold rounded-2xl shadow-xs transition-all cursor-pointer"
-            >
-              {showAllExtras ? (
-                <>
-                  <ChevronUp className="w-4 h-4" /> Show Less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="w-4 h-4" /> View All Extra Items ({allExtraItems.length - extraItems.length} more)
-                </>
-              )}
-            </button>
-          </div>
+                {/* Extra Addon Notification Banner */}
+                {extraNotification && (
+                  <div className={`mt-6 p-4 rounded-2xl flex items-center justify-between gap-4 max-w-xl mx-auto shadow-md animate-fade-in ${
+                    extraNotification.type === 'success'
+                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
+                      : 'bg-orange-50 border border-orange-200 text-orange-900'
+                  }`}>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className={`w-5 h-5 shrink-0 ${extraNotification.type === 'success' ? 'text-emerald-600' : 'text-orange-600'}`} />
+                      <span className="text-xs font-bold">{extraNotification.msg}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {extraNotification.orderId ? (
+                        <button
+                          onClick={() => navigate(`/track/${extraNotification.orderId}`)}
+                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg cursor-pointer whitespace-nowrap shadow-2xs"
+                        >
+                          Track Order →
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => navigate('/cart')}
+                          className="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-lg cursor-pointer whitespace-nowrap shadow-2xs"
+                        >
+                          View Cart 🛒
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setExtraNotification(null)}
+                        className="p-1 hover:bg-black/5 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* See More Toggle */}
+                {remainingCount > 0 && (
+                  <div className="text-center mt-10">
+                    <button
+                      onClick={() => setShowAllExtras(!showAllExtras)}
+                      className="inline-flex items-center gap-2 px-8 py-3.5 bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 font-bold rounded-2xl shadow-xs transition-all cursor-pointer"
+                    >
+                      {showAllExtras ? (
+                        <>
+                          <ChevronUp className="w-4 h-4" /> Show Less
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-4 h-4" /> View All Extra Items ({remainingCount} more)
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
         </div>
       </section>
@@ -1063,7 +2483,7 @@ const Subscriptions = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
               </span>
-              <span>Daily Delivery Active: Lunch (12:00–1:30 PM) • Dinner (7:30–9:00 PM)</span>
+              <span>Daily Delivery Active: Breakfast (08:00–09:30 AM) • Lunch (12:00–1:30 PM) • Dinner (7:30–9:00 PM)</span>
             </div>
 
             {/* Active Delivery Clusters */}
@@ -1260,60 +2680,273 @@ const Subscriptions = () => {
 
       {/* ── 8. SELECTED PLAN CONFIRMATION MODAL ─────────────────── */}
       {selectedPlanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200 relative my-8">
             <button
-              onClick={() => setSelectedPlanModal(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+              onClick={() => {
+                setSelectedPlanModal(null);
+                setHasExistingSubError(false);
+              }}
+              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="text-center mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+            {/* Plan Header */}
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-2 text-2xl shadow-inner">
                 🍱
               </div>
-              <h3 className="text-2xl font-extrabold text-slate-900 mb-1">
+              <h3 className="text-2xl font-extrabold text-slate-900">
                 {selectedPlanModal.name}
               </h3>
-              <p className="text-xs font-semibold text-orange-600">
+              <p className="text-xs font-semibold text-orange-600 mt-0.5">
                 {selectedPlanModal.meals}
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 mb-6 space-y-2 text-sm">
-              <div className="flex justify-between text-slate-600">
+            {/* Price & Billing Summary */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 mb-5 space-y-2 text-sm">
+              <div className="flex justify-between items-center text-slate-600">
                 <span>Billing Frequency:</span>
-                <span className="font-bold text-slate-900 uppercase text-xs">{billingCycle}</span>
+                <span className="font-bold text-slate-900 uppercase text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-800">
+                  {billingCycle === 'semester' ? 'Semester Pass (15% OFF)' : 'Monthly Plan'}
+                </span>
               </div>
-              <div className="flex justify-between text-slate-600">
-                <span>Plan Price:</span>
-                <span className="font-extrabold text-slate-900 text-base">₹{selectedPlanModal.price}/mo</span>
+              <div className="flex justify-between items-center text-slate-600">
+                <span>Effective Total:</span>
+                <span className="font-extrabold text-slate-900 text-lg text-orange-600">
+                  ₹{billingCycle === 'semester' ? Math.round(selectedPlanModal.price * 6) : selectedPlanModal.price}
+                  <span className="text-xs font-normal text-slate-500 ml-1">
+                    {billingCycle === 'semester' ? '/ 6 months' : '/ month'}
+                  </span>
+                </span>
               </div>
-              <div className="flex justify-between text-slate-800 font-semibold text-xs pt-1 border-t border-slate-200">
-                <span>Trial Guarantee:</span>
-                <span className="text-orange-600">3-Day Tasting Refund Protection</span>
+              <div className="flex justify-between text-slate-800 font-semibold text-xs pt-2 border-t border-slate-200">
+                <span>Tasting Guarantee:</span>
+                <span className="text-emerald-700 flex items-center gap-1 font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5" /> 3-Day Tasting Refund Protection
+                </span>
               </div>
             </div>
 
-            <div className="space-y-3">
+            {/* Delivery Preferences Form */}
+            <div className="space-y-4 mb-5 text-left">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-orange-500" /> Hostel / Hall of Residence
+                </label>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  {['Tagore Hostel', 'Ramanujan Hostel', 'Kasturba Girls', 'Mukherjee PG'].map((h) => (
+                    <button
+                      key={h}
+                      type="button"
+                      onClick={() => setHostel(h)}
+                      className={`py-1.5 px-2.5 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
+                        hostel === h
+                          ? 'bg-orange-500 text-white border-orange-500 shadow-xs'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {h}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={hostel}
+                  onChange={(e) => setHostel(e.target.value)}
+                  placeholder="Or enter custom hostel / building"
+                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Room / Flat No.
+                  </label>
+                  <input
+                    type="text"
+                    value={room}
+                    onChange={(e) => setRoom(e.target.value)}
+                    placeholder="e.g. 204"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500 font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Campus Zone
+                  </label>
+                  <select
+                    value={zoneCode}
+                    onChange={(e) => setZoneCode(e.target.value)}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-orange-500 bg-white font-medium"
+                  >
+                    {deliveryZones.length > 0 ? (
+                      deliveryZones.map((z: any) => (
+                        <option key={z.id || z.code} value={z.code}>
+                          {z.code} ({z.name})
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="NC-01">NC-01 (North Campus)</option>
+                        <option value="SC-02">SC-02 (South Campus)</option>
+                        <option value="MN-03">MN-03 (Mukherjee Nagar)</option>
+                        <option value="GT-04">GT-04 (GTB Nagar)</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <UtensilsCrossed className="w-3.5 h-3.5 text-orange-500" /> Dietary Preference
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { key: 'Standard Homestyle', label: '🥦 Homestyle Veg' },
+                    { key: 'Pure Vegetarian', label: '🌱 Pure Vegetarian' },
+                    { key: 'Jain Food', label: '🥗 Jain (No Garlic)' },
+                    { key: 'High Protein', label: '💪 High Protein' }
+                  ].map((d) => (
+                    <button
+                      key={d.key}
+                      type="button"
+                      onClick={() => setDietPreference(d.key)}
+                      className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
+                        dietPreference === d.key
+                          ? 'bg-orange-500 text-white border-orange-500 shadow-xs'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <Wallet className="w-3.5 h-3.5 text-orange-500" /> Payment Method
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { key: 'Bitez Wallet', label: `Wallet (₹${user?.walletBalance ?? 0})` },
+                    { key: 'UPI / Online QR', label: 'UPI / Online' },
+                    { key: 'Cash on 1st Delivery', label: 'Pay on Delivery' }
+                  ].map((p) => (
+                    <button
+                      key={p.key}
+                      type="button"
+                      onClick={() => setPaymentMethod(p.key)}
+                      className={`py-1.5 px-1.5 rounded-xl text-[11px] font-bold transition-all border text-center cursor-pointer truncate ${
+                        paymentMethod === p.key
+                          ? 'bg-slate-900 text-white border-slate-900'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Active Subscription Conflict Warning & Upgrade Option */}
+            {(hasExistingSubError || user?.activeSubscription) && (
+              <div className="p-3.5 mb-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs text-left">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-extrabold mb-0.5">Active Mess Subscription Detected</p>
+                    <p className="text-amber-800 leading-snug">
+                      You already have an active subscription! Subscribing will switch and upgrade your daily deliveries to this plan.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {subSuccess && (
+              <div className="p-3.5 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold text-center">
+                {subSuccess}
+              </div>
+            )}
+
+            <div className="space-y-2.5">
+              {hasExistingSubError || user?.activeSubscription ? (
+                <button
+                  onClick={() => handleInstantSubscribe(true)}
+                  disabled={subscribing}
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm text-center block shadow-lg shadow-orange-500/25 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {subscribing ? 'Upgrading Plan...' : '⚡ Confirm & Upgrade to This Plan'}
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleInstantSubscribe(false)}
+                  disabled={subscribing}
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm text-center block shadow-lg shadow-orange-500/25 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {subscribing ? 'Activating Subscription...' : '⚡ Activate Mess Subscription Now'}
+                </button>
+              )}
+
               <a
-                href={`https://wa.me/919876543210?text=Hi%20Bitez%2C%20I%20want%20to%20subscribe%20to%20the%20${encodeURIComponent(selectedPlanModal.name)}%20at%20%E2%82%B9${selectedPlanModal.price}%2Fmo`}
+                href={`https://wa.me/919876543210?text=Hi%20Bitez%2C%20I%20want%20to%20subscribe%20to%20the%20${encodeURIComponent(selectedPlanModal.name)}%20at%20%E2%82%B9${selectedPlanModal.price}%2Fmo%20for%20${encodeURIComponent(hostel)}%20Room%20${encodeURIComponent(room)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-center block shadow-lg shadow-orange-500/25 transition-all cursor-pointer"
+                className="w-full py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs text-center block transition-all cursor-pointer border border-slate-200"
               >
-                Confirm on WhatsApp Booking 💬
+                Or Chat with Manager on WhatsApp 💬
               </a>
               <button
-                onClick={() => setSelectedPlanModal(null)}
-                className="w-full py-2.5 text-xs font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
+                onClick={() => {
+                  setSelectedPlanModal(null);
+                  setHasExistingSubError(false);
+                }}
+                className="w-full py-2 text-xs font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 Close &amp; Compare Other Plans
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── 1-TAP INSTANT EXTRA ADD-ON ORDER MODAL ── */}
+      {selectedExtraModal && (
+        <OrderExtraModal
+          isOpen={!!selectedExtraModal}
+          onClose={() => setSelectedExtraModal(null)}
+          item={selectedExtraModal}
+          subscription={currentSub}
+          user={user}
+          onSuccess={(newOrder) => {
+            const orderId = newOrder?.orderId || newOrder?._id || 'CONFIRMED';
+            setSelectedExtraModal(null);
+            setExtraNotification({
+              msg: `🎉 Extra Order #${orderId} confirmed! Dispatched with your meal.`,
+              type: 'success',
+              orderId
+            });
+            refreshUser();
+          }}
+        />
+      )}
+
+      {/* Skip Meal Modal (when browsing plans) */}
+      {currentSub && (
+        <SkipMealModal
+          isOpen={skipModalOpen}
+          onClose={() => setSkipModalOpen(false)}
+          subscription={currentSub}
+          userWalletBalance={user?.walletBalance || 0}
+          onSuccess={handleSkipSuccess}
+        />
       )}
 
     </div>

@@ -1,48 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Clock, Phone, CheckCircle, Package, Truck, Home } from 'lucide-react';
+import { ordersAPI } from '../services/api';
+import MealLoadingScreen from '../components/MealLoadingScreen';
 
 const OrderTracking: React.FC = () => {
   const { orderId } = useParams();
-  const [orderStatus, setOrderStatus] = useState('confirmed');
-  const [estimatedTime, setEstimatedTime] = useState(35);
+  const [orderStatus, setOrderStatus] = useState<string>('confirmed');
+  const [estimatedTime, setEstimatedTime] = useState<number>(30);
+  const [liveOrder, setLiveOrder] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulate order status progression
-  useEffect(() => {
-    const statusProgression = ['confirmed', 'preparing', 'on-the-way', 'delivered'];
-    let currentIndex = 0;
-
-    const interval = setInterval(() => {
-      if (currentIndex < statusProgression.length - 1) {
-        currentIndex++;
-        setOrderStatus(statusProgression[currentIndex]);
-        setEstimatedTime(prev => Math.max(0, prev - 10));
+  const fetchLiveOrder = async () => {
+    if (!orderId) return;
+    try {
+      const res = await ordersAPI.getById(orderId);
+      if (res?.order) {
+        setLiveOrder(res.order);
+        if (res.order.status) setOrderStatus(res.order.status);
+        if (res.order.estimatedMinutes !== undefined) setEstimatedTime(res.order.estimatedMinutes);
+        setError(null);
       } else {
-        clearInterval(interval);
+        setError('Order not found');
       }
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const orderDetails = {
-    id: orderId || 'ORD123456',
-    restaurant: 'Healthy Mess Co.',
-    items: [
-      { name: 'Dal Rice Combo', quantity: 2, price: 240 },
-      { name: 'Paneer Curry', quantity: 1, price: 150 }
-    ],
-    total: 420,
-    address: '123 Main Street, Delhi - 110001',
-    phone: '+91 98765 43210',
-    paymentMethod: 'Wallet',
-    orderTime: '12:30 PM'
+    } catch (err: any) {
+      setError(err.message || 'Failed to load order');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deliveryPartner = {
-    name: 'Rahul Kumar',
-    phone: '+91 87654 32109',
-    vehicle: 'Motorcycle - DL 12 AB 3456'
+  useEffect(() => {
+    fetchLiveOrder();
+    // Live polling every 6 seconds while order is active
+    const pollInterval = setInterval(() => {
+      if (orderStatus !== 'delivered' && orderStatus !== 'cancelled') {
+        fetchLiveOrder();
+      }
+    }, 6000);
+    return () => clearInterval(pollInterval);
+  }, [orderId, orderStatus]);
+
+  if (loading) {
+    return (
+      <MealLoadingScreen
+        message="Tracking Your Food Delivery..."
+        subMessage={`Connecting to delivery runner & kitchen for Order #${orderId}`}
+      />
+    );
+  }
+
+  if (error || !liveOrder) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm p-8 text-center border border-gray-200">
+          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Not Found</h2>
+          <p className="text-gray-600 mb-6 text-sm">We could not find any active order with ID "{orderId}".</p>
+          <Link
+            to="/orders"
+            className="inline-block bg-orange-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-orange-600 transition"
+          >
+            Go to My Orders
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const orderDetails = {
+    id: liveOrder.orderId || liveOrder._id || orderId,
+    restaurant: liveOrder.restaurant || 'Bitez Campus Kitchen',
+    items: Array.isArray(liveOrder.items) ? liveOrder.items : [],
+    total: liveOrder.totalAmount || 0,
+    address: liveOrder.deliveryAddress || 'Campus Hostel / Room Delivery',
+    phone: liveOrder.customerPhone || 'N/A',
+    paymentMethod: liveOrder.paymentMethod || 'Cash on Delivery',
+    paymentStatus: liveOrder.paymentStatus || (liveOrder.paymentMethod === 'Cash on Delivery' ? (orderStatus === 'delivered' ? 'paid' : 'pending') : 'paid'),
+    orderTime: liveOrder.createdAt ? new Date(liveOrder.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent'
+  };
+
+  const deliveryPartner = liveOrder.deliveryPartner || {
+    name: 'Assigned Campus Rider',
+    phone: '+91 99999 99999',
+    vehicle: 'Campus Electric Delivery'
   };
 
   const statusSteps = [
@@ -50,29 +92,29 @@ const OrderTracking: React.FC = () => {
       key: 'confirmed', 
       title: 'Order Confirmed', 
       icon: CheckCircle, 
-      time: '12:30 PM',
-      description: 'Your order has been confirmed'
+      time: orderDetails.orderTime,
+      description: 'Your order has been confirmed by kitchen'
     },
     { 
       key: 'preparing', 
       title: 'Food Being Prepared', 
       icon: Package, 
-      time: '12:45 PM',
-      description: 'Restaurant is preparing your food'
+      time: orderStatus === 'preparing' || orderStatus === 'on-the-way' || orderStatus === 'delivered' ? 'In Kitchen' : null,
+      description: 'Chefs are preparing your meal fresh'
     },
     { 
       key: 'on-the-way', 
       title: 'Out for Delivery', 
       icon: Truck, 
-      time: estimatedTime > 0 ? `${Math.ceil(estimatedTime)} mins` : '1:15 PM',
-      description: 'Your order is on the way'
+      time: estimatedTime > 0 ? `${Math.ceil(estimatedTime)} mins` : 'Dispatched',
+      description: 'Rider is on the way to your doorstep'
     },
     { 
       key: 'delivered', 
       title: 'Delivered', 
       icon: Home, 
-      time: orderStatus === 'delivered' ? '1:25 PM' : null,
-      description: 'Order has been delivered'
+      time: orderStatus === 'delivered' ? 'Delivered' : null,
+      description: 'Order successfully delivered'
     }
   ];
 
@@ -94,8 +136,24 @@ const OrderTracking: React.FC = () => {
               <p className="text-sm text-gray-500">Placed at {orderDetails.orderTime}</p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-orange-500">₹{orderDetails.total}</p>
-              <p className="text-sm text-gray-600">{orderDetails.paymentMethod}</p>
+              <p className="text-2xl font-black text-orange-600">₹{orderDetails.total}</p>
+              <div className="flex flex-col items-end gap-1 mt-1">
+                {orderDetails.paymentMethod === 'Cash on Delivery' ? (
+                  orderDetails.paymentStatus === 'paid' ? (
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                      ✓ Cash Collected on Delivery
+                    </span>
+                  ) : (
+                    <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                      💵 Cash on Delivery (Pay ₹{orderDetails.total})
+                    </span>
+                  )
+                ) : (
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                    ✓ Paid ({orderDetails.paymentMethod})
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -104,6 +162,40 @@ const OrderTracking: React.FC = () => {
           {/* Order Progress */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              {/* Delivery OTP Card */}
+              {orderStatus !== 'delivered' && orderStatus !== 'cancelled' && (
+                <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-2 border-orange-200 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-black uppercase text-orange-600 tracking-wider block">
+                      Delivery Verification OTP
+                    </span>
+                    <p className="text-xs text-gray-600 mt-0.5">
+                      Share this 4-digit code with your delivery rider upon doorstep arrival.
+                    </p>
+                  </div>
+                  <div className="bg-white px-4 py-2 rounded-xl border border-orange-300 shadow-xs text-center shrink-0 ml-3">
+                    <span className="text-2xl font-black font-mono tracking-widest text-orange-600">
+                      {liveOrder.otp || '4821'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Order Delivered Banner */}
+              {orderStatus === 'delivered' && (
+                <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-800 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shrink-0">
+                    ✓
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm">Order Delivered Successfully!</h3>
+                    <p className="text-xs text-emerald-700 mt-0.5">
+                      Delivered at {liveOrder.deliveredAt || 'Doorstep'}. Enjoy your meal!
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <h2 className="text-lg font-semibold mb-6">Order Status</h2>
               
               <div className="relative">

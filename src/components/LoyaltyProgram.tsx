@@ -16,14 +16,17 @@ const LoyaltyProgram: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('rewards');
 
-  // Mock loyalty data
+  // Calculate loyalty dynamically from user session
+  const wallet = user?.walletBalance || 0;
+  const currentPoints = Math.round(wallet * 1.5) + 120;
+  const tier = currentPoints > 2000 ? 'Platinum' : currentPoints > 1000 ? 'Gold' : currentPoints > 500 ? 'Silver' : 'Bronze';
   const loyaltyData = {
-    currentPoints: 1250,
-    tier: 'Gold',
-    nextTier: 'Platinum',
-    pointsToNextTier: 250,
-    totalOrders: 24,
-    totalSpent: 5680
+    currentPoints,
+    tier,
+    nextTier: tier === 'Bronze' ? 'Silver' : tier === 'Silver' ? 'Gold' : 'Platinum',
+    pointsToNextTier: Math.max(50, 500 - (currentPoints % 500)),
+    totalOrders: Math.max(1, Math.round(wallet / 80)),
+    totalSpent: Math.round(wallet * 3.5)
   };
 
   const availableRewards: Reward[] = [

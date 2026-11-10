@@ -29,6 +29,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { dishesAPI } from '../services/api';
+import MealLoadingScreen from '../components/MealLoadingScreen';
 
 // Dish interface definition
 interface MenuItem {
@@ -40,6 +42,7 @@ interface MenuItem {
   originalPrice: number;
   image: string;
   isVeg: boolean;
+  isAvailable?: boolean;
   rating: number;
   reviews: number;
   tag?: string;
@@ -133,6 +136,7 @@ const Menu: React.FC = () => {
   // Categories list matching user design with 3D food illustration assets
   const categories = [
     { id: 'all', name: 'All Dishes', icon: '✨', image: '/categories/all.png' },
+    { id: 'breakfast', name: 'Morning Breakfast', icon: '🌅', image: '/categories/thali.png' },
     { id: 'thali', name: 'Thalis & Combos', icon: '🍱', image: '/categories/thali.png' },
     { id: 'biryani', name: 'Biryani & Rice', icon: '🥘', image: '/categories/biryani.png' },
     { id: 'curries', name: 'Curries & Breads', icon: '🍲', image: '/categories/curries.png' },
@@ -148,526 +152,47 @@ const Menu: React.FC = () => {
     { id: 'pizza', name: 'Pizza & Bakes', icon: '🍕', image: '/categories/pizza.png' }
   ];
 
-  // Comprehensive Menu Items dataset
-  const menuItems: MenuItem[] = [
-    {
-      id: 'm1',
-      name: 'Special Shahi Paneer Thali',
-      category: 'thali',
-      description: 'Velvety Shahi Paneer, Dal Makhani, Jeera Rice, 4 Butter Tawa Rotis, Fresh Salad, Mint Chutney & Gulab Jamun.',
-      price: 160,
-      originalPrice: 200,
-      image: 'https://images.pexels.com/photos/12737656/pexels-photo-12737656.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.8,
-      reviews: 580,
-      tag: 'Bestseller 🔥',
-      prepTime: '20-25 mins',
-      calories: 680,
-      protein: '24g',
-      spiceLevel: 'Mild',
-      serves: '1-2 Persons',
-      ingredients: ['Fresh Paneer', 'Desi Ghee', 'Basmati Rice', 'Butter Roti', 'Dal Makhani', 'Gulab Jamun']
-    },
-    {
-      id: 'm2',
-      name: 'Hyderabadi Dum Chicken Biryani',
-      category: 'biryani',
-      description: 'Slow-cooked aromatic basmati rice with succulent chicken marinated in royal spices, accompanied by Mirchi Ka Salan and creamy Raita.',
-      price: 199,
-      originalPrice: 249,
-      image: 'https://images.pexels.com/photos/7394819/pexels-photo-7394819.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.9,
-      reviews: 820,
-      tag: 'Chef Special 👑',
-      prepTime: '20-25 mins',
-      calories: 720,
-      protein: '36g',
-      spiceLevel: 'Spicy',
-      serves: '1 Person',
-      ingredients: ['Tender Chicken', 'Long-grain Basmati Rice', 'Saffron', 'Brown Onions', 'Mint', 'Kewra Water']
-    },
-    {
-      id: 'm3',
-      name: 'Homestyle Veg Thali',
-      category: 'thali',
-      description: 'Simple and comforting home meal: Yellow Dal Tadka, Aloo Gobhi Matar, Steamed Rice, 4 Phulkas, Pickle & Crunchy Papad.',
-      price: 110,
-      originalPrice: 140,
-      image: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.7,
-      reviews: 490,
-      tag: 'Homestyle ❤️',
-      prepTime: '15-20 mins',
-      calories: 520,
-      protein: '16g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Yellow Dal', 'Seasonal Veggies', 'Steamed Rice', 'Soft Phulkas', 'Papad', 'Homemade Pickle']
-    },
-    {
-      id: 'm4',
-      name: 'Butter Chicken with 2 Butter Naan',
-      category: 'curries',
-      description: 'Tender roasted chicken tikka submerged in a silky, buttery tomato-cashew gravy served hot with 2 soft tandoori butter naans.',
-      price: 220,
-      originalPrice: 280,
-      image: 'https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.8,
-      reviews: 640,
-      tag: 'Top Rated ⭐',
-      prepTime: '20-25 mins',
-      calories: 780,
-      protein: '38g',
-      spiceLevel: 'Medium',
-      serves: '1-2 Persons',
-      ingredients: ['Boneless Chicken', 'Cashew Paste', 'Fresh Cream', 'Amul Butter', 'Kasuri Methi', 'Tandoori Naan']
-    },
-    {
-      id: 'm5',
-      name: 'Dal Makhani & Jeera Rice Bowl',
-      category: 'curries',
-      description: 'Slow-simmered black lentils cooked overnight with cream and butter, paired with fragrant cumin basmati rice and onion rings.',
-      price: 130,
-      originalPrice: 160,
-      image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.6,
-      reviews: 320,
-      tag: 'Comfort Food 🍲',
-      prepTime: '15-20 mins',
-      calories: 560,
-      protein: '19g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Urad Dal', 'Rajma', 'Makhan Butter', 'Cumin Rice', 'Garlic Tadka']
-    },
-    {
-      id: 'm6',
-      name: 'Paneer Butter Masala (500ml)',
-      category: 'curries',
-      description: 'Diced cottage cheese simmered in a luscious makhani gravy enriched with butter, honey and aromatic whole spices.',
-      price: 150,
-      originalPrice: 190,
-      image: 'https://images.pexels.com/photos/9738981/pexels-photo-9738981.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.7,
-      reviews: 410,
-      tag: 'Must Try 🧀',
-      prepTime: '15-20 mins',
-      calories: 490,
-      protein: '22g',
-      spiceLevel: 'Medium',
-      serves: '2 Persons',
-      ingredients: ['Malai Paneer', 'Fresh Cream', 'Tomato Purée', 'Whole Spices', 'Coriander Garnish']
-    },
-    {
-      id: 'm7',
-      name: 'Double Patty Crispy Chicken Burger',
-      category: 'burgers',
-      description: 'Two golden fried crispy chicken patties, melted cheese slice, crisp iceberg lettuce and smoky chipotle mayo in toasted brioche buns.',
-      price: 140,
-      originalPrice: 175,
-      image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.6,
-      reviews: 340,
-      tag: 'Bestseller 🔥',
-      prepTime: '15-20 mins',
-      calories: 610,
-      protein: '28g',
-      spiceLevel: 'Medium',
-      serves: '1 Person',
-      ingredients: ['Crispy Chicken Fillet', 'Cheese Slice', 'Smoky Chipotle Mayo', 'Brioche Bun', 'Jalapeños']
-    },
-    {
-      id: 'm8',
-      name: 'Crispy Veggie Crunch Burger',
-      category: 'burgers',
-      description: 'Herb-crusted golden vegetable patty loaded with fresh cucumber, ripe tomatoes, sliced onions and secret tangy burger sauce.',
-      price: 85,
-      originalPrice: 110,
-      image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.3,
-      reviews: 210,
-      tag: 'Under ₹99 ⚡',
-      prepTime: '10-15 mins',
-      calories: 420,
-      protein: '11g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Aloo Corn Patty', 'Iceberg Lettuce', 'Signature Sauce', 'Sesame Bun']
-    },
-    {
-      id: 'm9',
-      name: 'Paneer Tikka Kathi Roll',
-      category: 'rolls',
-      description: 'Char-grilled cottage cheese cubes tossed in spicy tandoori masala, wrapped in a flaky paratha with mint mayonnaise and crunchy onions.',
-      price: 90,
-      originalPrice: 115,
-      image: 'https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.5,
-      reviews: 290,
-      tag: 'Popular 🌯',
-      prepTime: '12-15 mins',
-      calories: 460,
-      protein: '17g',
-      spiceLevel: 'Medium',
-      serves: '1 Person',
-      ingredients: ['Paneer Tikka', 'Flaky Paratha', 'Mint Chutney', 'Lachha Onion', 'Chaat Masala']
-    },
-    {
-      id: 'm10',
-      name: 'Double Egg Chicken Kathi Roll',
-      category: 'rolls',
-      description: 'Warm laccha paratha layered with double eggs, filled with tender shredded roasted chicken, capsicum and zesty green chutney.',
-      price: 110,
-      originalPrice: 140,
-      image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.7,
-      reviews: 430,
-      tag: 'High Protein 💪',
-      prepTime: '15-20 mins',
-      calories: 540,
-      protein: '31g',
-      spiceLevel: 'Spicy',
-      serves: '1 Person',
-      ingredients: ['Double Eggs', 'Spiced Chicken', 'Crispy Laccha Paratha', 'Chutney', 'Lemon Spritz']
-    },
-    {
-      id: 'm11',
-      name: 'Kurkure Paneer Steamed Momos (8 Pcs)',
-      category: 'momos',
-      description: 'Delicate dumplings stuffed with seasoned paneer & scallions, served with spicy red schezwan dip and garlic mayo.',
-      price: 90,
-      originalPrice: 120,
-      image: 'https://images.pexels.com/photos/5560763/pexels-photo-5560763.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.6,
-      reviews: 380,
-      tag: 'Street Favourite 🥟',
-      prepTime: '12-15 mins',
-      calories: 340,
-      protein: '14g',
-      spiceLevel: 'Spicy',
-      serves: '1 Person',
-      ingredients: ['Paneer filling', 'Scallions', 'Ginger garlic', 'Schezwan Dip', 'Creamy Mayo']
-    },
-    {
-      id: 'm12',
-      name: 'Spicy Chicken Fried Momos (8 Pcs)',
-      category: 'momos',
-      description: 'Crispy golden fried momos filled with minced chicken and black pepper, dusted with peri-peri seasoning.',
-      price: 110,
-      originalPrice: 140,
-      image: 'https://images.pexels.com/photos/4518843/pexels-photo-4518843.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.7,
-      reviews: 510,
-      tag: 'Hot & Crispy 🌶️',
-      prepTime: '15-18 mins',
-      calories: 450,
-      protein: '22g',
-      spiceLevel: 'Spicy',
-      serves: '1 Person',
-      ingredients: ['Minced Chicken', 'Crispy Coating', 'Peri Peri Dust', 'Fiery Dip']
-    },
-    {
-      id: 'm13',
-      name: 'Desi Street Style Veg Chowmein',
-      category: 'chinese',
-      description: 'Wok-tossed noodles with shredded cabbage, carrots, bell peppers, dark soy sauce, chilli vinegar and fragrant spring onions.',
-      price: 80,
-      originalPrice: 100,
-      image: 'https://images.pexels.com/photos/4518843/pexels-photo-4518843.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.4,
-      reviews: 260,
-      tag: 'Under ₹99 ⚡',
-      prepTime: '12-15 mins',
-      calories: 390,
-      protein: '9g',
-      spiceLevel: 'Medium',
-      serves: '1 Person',
-      ingredients: ['Hakka Noodles', 'Crisp Veggies', 'Dark Soya Sauce', 'Chilli Vinegar', 'Garlic']
-    },
-    {
-      id: 'm14',
-      name: 'Chilli Chicken Gravy with Fried Rice Combo',
-      category: 'chinese',
-      description: 'Crispy chicken chunks tossed with capsicum, onion and soya chilli sauce, accompanied by wok-tossed egg fried rice.',
-      price: 180,
-      originalPrice: 220,
-      image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.7,
-      reviews: 390,
-      tag: 'Combo Deal 🍱',
-      prepTime: '18-22 mins',
-      calories: 670,
-      protein: '33g',
-      spiceLevel: 'Spicy',
-      serves: '1 Person',
-      ingredients: ['Chicken Breast', 'Egg Fried Rice', 'Green Peppers', 'Soya Chilli Sauce']
-    },
-    {
-      id: 'm15',
-      name: 'Crispy Butter Masala Dosa',
-      category: 'south-indian',
-      description: 'Golden fermented rice crepe smeared with Amul butter and spiced potato masala, served with piping hot Sambar and 2 fresh chutneys.',
-      price: 95,
-      originalPrice: 120,
-      image: 'https://images.pexels.com/photos/5560763/pexels-photo-5560763.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.6,
-      reviews: 440,
-      tag: 'South Classic 🫔',
-      prepTime: '15-20 mins',
-      calories: 410,
-      protein: '11g',
-      spiceLevel: 'Medium',
-      serves: '1 Person',
-      ingredients: ['Dosa Batter', 'Spiced Aloo Masala', 'Butter', 'Toor Dal Sambar', 'Coconut Chutney']
-    },
-    {
-      id: 'm16',
-      name: 'Steamed Idli Sambar (4 Pcs)',
-      category: 'south-indian',
-      description: 'Fluffy, cloud-soft steamed rice cakes served submerged in rich vegetable sambar with fresh coconut and tomato chutney.',
-      price: 70,
-      originalPrice: 90,
-      image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.5,
-      reviews: 230,
-      tag: 'Under ₹99 ⚡',
-      prepTime: '10-12 mins',
-      calories: 280,
-      protein: '9g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Urad Dal', 'Steamed Rice', 'Lentil Sambar', 'Fresh Coconut Chutney']
-    },
-    {
-      id: 'm17',
-      name: 'High-Protein Paneer Sprouts Salad Bowl',
-      category: 'healthy',
-      description: 'Grilled low-fat paneer cubes, sprouted moong, boiled chickpeas, cucumber, cherry tomatoes and tangy lemon-herb olive dressing.',
-      price: 130,
-      originalPrice: 160,
-      image: 'https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.8,
-      reviews: 310,
-      tag: 'Fitness Choice 🥗',
-      prepTime: '10-12 mins',
-      calories: 320,
-      protein: '26g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Low-Fat Paneer', 'Moong Sprouts', 'Chickpeas', 'Olive Oil Dressing', 'Flax Seeds']
-    },
-    {
-      id: 'm18',
-      name: 'Grilled Herb Chicken Protein Bowl',
-      category: 'healthy',
-      description: 'Juicy herb-marinated grilled chicken breast, steamed brown rice, sautéed broccoli, bell peppers and garlic yoghurt sauce.',
-      price: 190,
-      originalPrice: 230,
-      image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.9,
-      reviews: 270,
-      tag: 'Gym Pro 💪',
-      prepTime: '15-20 mins',
-      calories: 440,
-      protein: '42g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Chicken Breast', 'Broccoli', 'Brown Rice', 'Greek Yoghurt Dip', 'Herbs']
-    },
-    {
-      id: 'm19',
-      name: 'Warm Gulab Jamun in Sugar Syrup (2 Pcs)',
-      category: 'desserts',
-      description: 'Melt-in-mouth traditional khoya dumplings fried golden brown and soaked in aromatic cardamom and saffron sugar syrup.',
-      price: 50,
-      originalPrice: 70,
-      image: 'https://images.pexels.com/photos/14463038/pexels-photo-14463038.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.9,
-      reviews: 670,
-      tag: 'Sweet Delight 🍨',
-      prepTime: '5-8 mins',
-      calories: 290,
-      protein: '6g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Pure Khoya', 'Elaichi', 'Kesar Syrup', 'Rose Water', 'Pistachio Garnish']
-    },
-    {
-      id: 'm20',
-      name: 'Kolkata Rasgulla (2 Pcs)',
-      category: 'desserts',
-      description: 'Spongy and juicy cottage cheese spheres simmered in light sugar syrup, served chilled or warm.',
-      price: 50,
-      originalPrice: 65,
-      image: 'https://images.pexels.com/photos/4110256/pexels-photo-4110256.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.6,
-      reviews: 180,
-      tag: 'Under ₹99 ⚡',
-      prepTime: '5 mins',
-      calories: 220,
-      protein: '7g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Fresh Chhena', 'Light Sugar Syrup', 'Cardamom']
-    },
-    {
-      id: 'm21',
-      name: 'Thick Alphonso Mango Shake (350ml)',
-      category: 'beverages',
-      description: 'Creamy blend of real Alphonso mango pulp, chilled rich milk and a scoop of vanilla ice cream, topped with almond slivers.',
-      price: 70,
-      originalPrice: 90,
-      image: 'https://images.pexels.com/photos/3625372/pexels-photo-3625372.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.8,
-      reviews: 350,
-      tag: 'Best Chiller 🥭',
-      prepTime: '5-8 mins',
-      calories: 280,
-      protein: '6g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Alphonso Mango Pulp', 'Full Cream Milk', 'Vanilla Ice Cream', 'Almonds']
-    },
-    {
-      id: 'm22',
-      name: 'Traditional Masala Chai Flask (500ml)',
-      category: 'beverages',
-      description: 'Authentic Indian spiced tea brewed with fresh ginger, green cardamom, cloves and crushed tulsi leaves. Serves 3 cups.',
-      price: 60,
-      originalPrice: 80,
-      image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.7,
-      reviews: 480,
-      tag: 'Desi Chai ☕',
-      prepTime: '8-10 mins',
-      calories: 140,
-      protein: '4g',
-      spiceLevel: 'Mild',
-      serves: '2-3 Persons',
-      ingredients: ['Assam Tea Leaves', 'Fresh Adrak', 'Green Cardamom', 'Farm Fresh Milk']
-    },
-    {
-      id: 'm23',
-      name: 'Punjabi Sweet Lassi with Malai (350ml)',
-      category: 'beverages',
-      description: 'Thick, churned yogurt sweetened with rose essence and topped with a thick dollop of fresh clotted cream and crushed pistachios.',
-      price: 55,
-      originalPrice: 75,
-      image: 'https://images.pexels.com/photos/10153303/pexels-photo-10153303.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.7,
-      reviews: 310,
-      tag: 'Refreshing 🥛',
-      prepTime: '5 mins',
-      calories: 250,
-      protein: '7g',
-      spiceLevel: 'Mild',
-      serves: '1 Person',
-      ingredients: ['Fresh Dahi', 'Kewra Essence', 'Thick Malai', 'Pistachios']
-    },
-    {
-      id: 'm24',
-      name: 'Peri Peri Masala French Fries',
-      category: 'fries',
-      description: 'Crisp salted golden potato fries tossed heavily in spicy tangy African peri-peri spice dust. Served with garlic dip.',
-      price: 65,
-      originalPrice: 85,
-      image: 'https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.4,
-      reviews: 290,
-      tag: 'Snack Attack 🍟',
-      prepTime: '10-12 mins',
-      calories: 330,
-      protein: '4g',
-      spiceLevel: 'Spicy',
-      serves: '1-2 Persons',
-      ingredients: ['Idaho Potatoes', 'Peri Peri Seasoning', 'Garlic Mayo Dip']
-    },
-    {
-      id: 'm27',
-      name: 'Cheesy Loaded Golden Fries',
-      category: 'fries',
-      description: 'Crisp hot french fries smothered in creamy melted cheddar cheese sauce, jalapeños and herb seasoning.',
-      price: 95,
-      originalPrice: 125,
-      image: 'https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.7,
-      reviews: 380,
-      tag: 'Cheesy Treat 🧀',
-      prepTime: '10-15 mins',
-      calories: 410,
-      protein: '7g',
-      spiceLevel: 'Mild',
-      serves: '1-2 Persons',
-      ingredients: ['Potatoes', 'Cheddar Cheese Sauce', 'Pickled Jalapeños', 'Paprika']
-    },
-    {
-      id: 'm25',
-      name: 'Farmhouse Veggie Supreme Pizza (8")',
-      category: 'pizza',
-      description: 'Hand-stretched crust loaded with paneer cubes, crisp capsicum, sweet corn, black olives and melted 100% mozzarella.',
-      price: 169,
-      originalPrice: 219,
-      image: 'https://images.pexels.com/photos/1146760/pexels-photo-1146760.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: true,
-      rating: 4.8,
-      reviews: 410,
-      tag: 'Chef Special 🍕',
-      prepTime: '15-20 mins',
-      calories: 620,
-      protein: '22g',
-      spiceLevel: 'Medium',
-      serves: '1-2 Persons',
-      ingredients: ['Fresh Mozzarella', 'Diced Paneer', 'Crisp Bell Pepper', 'Sweet Corn', 'Black Olives', 'Italian Herbs']
-    },
-    {
-      id: 'm26',
-      name: 'Smoky Tandoori Chicken Pizza (8")',
-      category: 'pizza',
-      description: 'Loaded with succulent smoky tandoori chicken tikka, red onion rings, green chillies and melted double mozzarella.',
-      price: 199,
-      originalPrice: 249,
-      image: 'https://images.pexels.com/photos/2619967/pexels-photo-2619967.jpeg?auto=compress&cs=tinysrgb&w=600',
-      isVeg: false,
-      rating: 4.9,
-      reviews: 530,
-      tag: 'Bestseller 🔥',
-      prepTime: '18-20 mins',
-      calories: 710,
-      protein: '34g',
-      spiceLevel: 'Spicy',
-      serves: '1-2 Persons',
-      ingredients: ['Tandoori Chicken Tikka', 'Double Mozzarella', 'Red Onion', 'Green Chillies', 'Marinara Sauce']
-    }
-  ];
+  // Real Live Menu Items state fetched dynamically from Backend API
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Quick filter definitions
+  // Fetch real dishes from backend API
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    dishesAPI.getAll()
+      .then((data: any) => {
+        if (isMounted && data?.dishes) {
+          const mapped = data.dishes.map((d: any) => ({
+            ...d,
+            id: d.id || d._id,
+            isAvailable: d.isAvailable !== false,
+            originalPrice: d.originalPrice || Math.round(d.price * 1.25),
+            reviews: d.reviews || 120,
+            prepTime: d.prepTime || '20 mins',
+            calories: d.calories || 450,
+            protein: d.protein || '18g',
+            spiceLevel: d.spiceLevel || 'Mild',
+            serves: d.serves || '1 Person',
+            ingredients: Array.isArray(d.ingredients) && d.ingredients.length > 0 ? d.ingredients : ['Fresh Spices', 'Home Style Gravy']
+          }));
+          setMenuItems(mapped);
+        }
+      })
+      .catch((err: any) => {
+        console.error('Error fetching dishes:', err);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, []);
+
+    // Quick filter definitions
   const quickFilters = [
     { id: 'all', label: 'All Items' },
+    { id: 'inStock', label: '🟢 Available Now' },
     { id: 'bestseller', label: '🔥 Bestsellers' },
     { id: 'under99', label: '⚡ Under ₹99' },
     { id: 'rating45', label: '⭐ 4.5+ Rating' },
@@ -701,7 +226,9 @@ const Menu: React.FC = () => {
 
         // Quick filter pills check
         let matchesQuick = true;
-        if (selectedQuickFilter === 'bestseller') {
+        if (selectedQuickFilter === 'inStock') {
+          matchesQuick = item.isAvailable !== false;
+        } else if (selectedQuickFilter === 'bestseller') {
           matchesQuick = Boolean(item.tag?.toLowerCase().includes('bestseller') || item.rating >= 4.8);
         } else if (selectedQuickFilter === 'under99') {
           matchesQuick = item.price <= 99;
@@ -727,7 +254,7 @@ const Menu: React.FC = () => {
         // default popular
         return b.reviews - a.reviews;
       });
-  }, [activeCategory, searchQuery, dietaryFilter, selectedQuickFilter, sortBy]);
+  }, [menuItems, activeCategory, searchQuery, dietaryFilter, selectedQuickFilter, sortBy]);
 
   // Helper for item quantity in cart
   const getItemQuantity = (id: string) => {
@@ -1136,7 +663,13 @@ const Menu: React.FC = () => {
 
       {/* Food Cards Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-7">
-        {filteredItems.length === 0 ? (
+        {loading ? (
+          <MealLoadingScreen
+            fullScreen={false}
+            message="Cooking Fresh Menu Dishes..."
+            subMessage="Fetching live kitchen items, combos and daily chef specials"
+          />
+        ) : filteredItems.length === 0 ? (
           /* Empty state */
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm max-w-lg mx-auto">
             <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
@@ -1163,135 +696,150 @@ const Menu: React.FC = () => {
                   key={item.id}
                   className="group bg-white rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-slate-200 hover:border-orange-500 shadow-2xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full"
                 >
-                  {/* Top Image & Badges */}
-                  <div
-                    className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100 cursor-pointer"
-                    onClick={() => setActiveModalItem(item)}
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-
-                    {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                    {/* Tag badge (Bestseller, Chef Special, etc.) */}
-                    {item.tag && (
-                      <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[9px] sm:text-[11px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-md flex items-center gap-1 border border-white/20">
-                        {item.tag}
-                      </div>
-                    )}
-
-                    {/* Veg / Non-Veg Indian FSSAI symbol */}
-                    <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 bg-white/95 backdrop-blur-md p-0.5 sm:p-1 rounded-sm sm:rounded-md shadow-xs">
-                      <div
-                        className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-xs border-[1.5px] sm:border-2 flex items-center justify-center ${
-                          item.isVeg ? 'border-emerald-600' : 'border-rose-600'
+                    {/* Top Image & Badges */}
+                    <div
+                      className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100 cursor-pointer"
+                      onClick={() => setActiveModalItem(item)}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${
+                          item.isAvailable === false ? 'grayscale-[45%] opacity-85' : ''
                         }`}
-                      >
+                        loading="lazy"
+                      />
+
+                      {/* Sold Out Overlay if unavailable */}
+                      {item.isAvailable === false && (
+                        <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px] flex items-center justify-center pointer-events-none z-10">
+                          <span className="bg-rose-600 text-white text-[10px] sm:text-xs font-black uppercase px-2.5 py-1 rounded-full shadow-lg border border-white/30 tracking-wider">
+                            🔴 Sold Out
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Gradient overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                      {/* Tag badge (Bestseller, Chef Special, etc.) */}
+                      {item.tag && (
+                        <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[9px] sm:text-[11px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-md flex items-center gap-1 border border-white/20">
+                          {item.tag}
+                        </div>
+                      )}
+
+                      {/* Veg / Non-Veg Indian FSSAI symbol */}
+                      <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 bg-white/95 backdrop-blur-md p-0.5 sm:p-1 rounded-sm sm:rounded-md shadow-xs">
                         <div
-                          className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
-                            item.isVeg ? 'bg-emerald-600' : 'bg-rose-600'
+                          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-xs border-[1.5px] sm:border-2 flex items-center justify-center ${
+                            item.isVeg ? 'border-emerald-600' : 'border-rose-600'
                           }`}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Prep time badge bottom-left */}
-                    <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-md text-slate-800 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded shadow-xs border border-orange-200/80 flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-500" />
-                      <span>{item.prepTime}</span>
-                    </div>
-
-                    {/* Quick view hint on desktop */}
-                    <div className="absolute bottom-2 right-2 hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
-                      Quick View 👁️
-                    </div>
-                  </div>
-
-                  {/* Details Section */}
-                  <div className="p-2.5 sm:p-3.5 md:p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      {/* Name & Rating */}
-                      <div className="flex items-start justify-between gap-1 mb-1">
-                        <h3
-                          onClick={() => setActiveModalItem(item)}
-                          className="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-tight group-hover:text-orange-600 transition-colors line-clamp-1 cursor-pointer"
-                          title={item.name}
                         >
-                          {item.name}
-                        </h3>
-                        <div className="flex items-center gap-0.5 bg-orange-50 px-1 py-0.5 rounded text-orange-700 text-[10px] sm:text-xs font-bold flex-shrink-0 border border-orange-100">
-                          <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
-                          <span>{item.rating}</span>
+                          <div
+                            className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
+                              item.isVeg ? 'bg-emerald-600' : 'bg-rose-600'
+                            }`}
+                          />
                         </div>
                       </div>
 
-                      {/* Description */}
-                      <p className="text-slate-500 text-[11px] sm:text-xs line-clamp-1 sm:line-clamp-2 mb-2 leading-tight sm:leading-relaxed">
-                        {item.description}
-                      </p>
+                      {/* Prep time badge bottom-left */}
+                      <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-md text-slate-800 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded shadow-xs border border-orange-200/80 flex items-center gap-1">
+                        <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-500" />
+                        <span>{item.prepTime}</span>
+                      </div>
 
-                      {/* Nutritional snippet */}
-                      <div className="flex items-center gap-1 text-[9px] sm:text-[10px] md:text-[11px] text-slate-500 font-medium mb-2.5">
-                        <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm">🔥 {item.calories} kcal</span>
-                        <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm hidden xs:inline-block">💪 {item.protein}</span>
+                      {/* Quick view hint on desktop */}
+                      <div className="absolute bottom-2 right-2 hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                        Quick View 👁️
                       </div>
                     </div>
 
-                    {/* Price and Add button bar */}
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-auto gap-1">
-                      <div className="flex flex-col">
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-sm sm:text-base md:text-lg font-black text-slate-900">₹{item.price}</span>
+                    {/* Details Section */}
+                    <div className="p-2.5 sm:p-3.5 md:p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        {/* Name & Rating */}
+                        <div className="flex items-start justify-between gap-1 mb-1">
+                          <h3
+                            onClick={() => setActiveModalItem(item)}
+                            className="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-tight group-hover:text-orange-600 transition-colors line-clamp-1 cursor-pointer"
+                            title={item.name}
+                          >
+                            {item.name}
+                          </h3>
+                          <div className="flex items-center gap-0.5 bg-orange-50 px-1 py-0.5 rounded text-orange-700 text-[10px] sm:text-xs font-bold flex-shrink-0 border border-orange-100">
+                            <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-500" />
+                            <span>{item.rating}</span>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-slate-500 text-[11px] sm:text-xs line-clamp-1 sm:line-clamp-2 mb-2 leading-tight sm:leading-relaxed">
+                          {item.description}
+                        </p>
+
+                        {/* Nutritional snippet */}
+                        <div className="flex items-center gap-1 text-[9px] sm:text-[10px] md:text-[11px] text-slate-500 font-medium mb-2.5">
+                          <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm">🔥 {item.calories} kcal</span>
+                          <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm hidden xs:inline-block">💪 {item.protein}</span>
+                        </div>
+                      </div>
+
+                      {/* Price and Add button bar */}
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-auto gap-1">
+                        <div className="flex flex-col">
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-sm sm:text-base md:text-lg font-black text-slate-900">₹{item.price}</span>
+                            {item.originalPrice > item.price && (
+                              <span className="text-[10px] sm:text-xs text-slate-400 line-through">₹{item.originalPrice}</span>
+                            )}
+                          </div>
                           {item.originalPrice > item.price && (
-                            <span className="text-[10px] sm:text-xs text-slate-400 line-through">₹{item.originalPrice}</span>
+                            <span className="text-[9px] sm:text-[10px] text-orange-600 font-extrabold uppercase">
+                              {Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF
+                            </span>
                           )}
                         </div>
-                        {item.originalPrice > item.price && (
-                          <span className="text-[9px] sm:text-[10px] text-orange-600 font-extrabold uppercase">
-                            {Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF
-                          </span>
-                        )}
+
+                        {/* ADD or Counter Button */}
+                        <div>
+                          {item.isAvailable === false ? (
+                            <span className="inline-block bg-slate-100 text-slate-400 font-bold text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 cursor-not-allowed select-none">
+                              Sold Out
+                            </span>
+                          ) : qty === 0 ? (
+                            <button
+                              id={`add-btn-${item.id}`}
+                              onClick={() => handleAdd(item)}
+                              className="bg-orange-500 hover:bg-orange-600 text-white text-[11px] sm:text-xs font-black px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl shadow-xs hover:shadow-md active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                            >
+                              <Plus className="w-3 h-3 stroke-[3]" />
+                              <span>ADD</span>
+                            </button>
+                          ) : (
+                            <div className="flex items-center bg-orange-50 border border-orange-200 rounded-lg sm:rounded-xl px-1.5 py-0.5 sm:px-2 sm:py-1 gap-1 sm:gap-1.5 shadow-xs">
+                              <button
+                                id={`minus-btn-${item.id}`}
+                                onClick={() => updateQuantity(item.id, qty - 1)}
+                                className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
+                              >
+                                <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
+                              </button>
+                              <span className="text-[11px] sm:text-xs font-black text-slate-900 w-3 sm:w-4 text-center">{qty}</span>
+                              <button
+                                id={`plus-btn-${item.id}`}
+                                onClick={() => updateQuantity(item.id, qty + 1)}
+                                className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
+                              >
+                                <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
-                      {/* ADD or Counter Button */}
-                      <div>
-                        {qty === 0 ? (
-                          <button
-                            id={`add-btn-${item.id}`}
-                            onClick={() => handleAdd(item)}
-                            className="bg-orange-500 hover:bg-orange-600 text-white text-[11px] sm:text-xs font-black px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl shadow-xs hover:shadow-md active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
-                          >
-                            <Plus className="w-3 h-3 stroke-[3]" />
-                            <span>ADD</span>
-                          </button>
-                        ) : (
-                          <div className="flex items-center bg-orange-50 border border-orange-200 rounded-lg sm:rounded-xl px-1.5 py-0.5 sm:px-2 sm:py-1 gap-1 sm:gap-1.5 shadow-xs">
-                            <button
-                              id={`minus-btn-${item.id}`}
-                              onClick={() => updateQuantity(item.id, qty - 1)}
-                              className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
-                            >
-                              <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
-                            </button>
-                            <span className="text-[11px] sm:text-xs font-black text-slate-900 w-3 sm:w-4 text-center">{qty}</span>
-                            <button
-                              id={`plus-btn-${item.id}`}
-                              onClick={() => updateQuantity(item.id, qty + 1)}
-                              className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors"
-                            >
-                              <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
                     </div>
-
-                  </div>
                 </div>
               );
             })}
@@ -1356,8 +904,6 @@ const Menu: React.FC = () => {
                       <span>⏱️ {item.prepTime}</span>
                       <span>•</span>
                       <span>🔥 {item.calories} kcal</span>
-                      <span>•</span>
-                      <span>💪 {item.protein}</span>
                     </div>
                   </div>
 
@@ -1366,14 +912,29 @@ const Menu: React.FC = () => {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer ${
+                        item.isAvailable === false ? 'grayscale-[45%] opacity-85' : ''
+                      }`}
                       onClick={() => setActiveModalItem(item)}
                       loading="lazy"
                     />
 
+                    {/* Sold out overlay for list item */}
+                    {item.isAvailable === false && (
+                      <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px] flex items-center justify-center pointer-events-none z-10">
+                        <span className="bg-rose-600 text-white text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-lg border border-white/30 tracking-wider">
+                          Sold Out
+                        </span>
+                      </div>
+                    )}
+
                     {/* Floating ADD or Stepper Button */}
-                    <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 shadow-md">
-                      {qty === 0 ? (
+                    <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 shadow-md z-20">
+                      {item.isAvailable === false ? (
+                        <span className="bg-slate-900/90 text-white font-extrabold text-[10px] sm:text-xs px-2.5 py-1 rounded-lg shadow-sm whitespace-nowrap cursor-not-allowed select-none">
+                          Sold Out
+                        </span>
+                      ) : qty === 0 ? (
                         <button
                           id={`add-btn-list-${item.id}`}
                           onClick={() => handleAdd(item)}
@@ -1421,7 +982,7 @@ const Menu: React.FC = () => {
               <img
                 src={activeModalItem.image}
                 alt={activeModalItem.name}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover ${activeModalItem.isAvailable === false ? 'grayscale-[35%]' : ''}`}
               />
               <button
                 onClick={() => setActiveModalItem(null)}
@@ -1439,6 +1000,18 @@ const Menu: React.FC = () => {
                 </span>
               </div>
             </div>
+
+            {/* Sold Out Banner in Modal */}
+            {activeModalItem.isAvailable === false && (
+              <div className="bg-rose-50 border-l-4 border-rose-500 p-2.5 sm:p-3 mx-4 sm:mx-6 mt-4 rounded-r-lg flex items-center justify-between text-rose-700 text-xs sm:text-sm font-bold">
+                <span className="flex items-center gap-1.5">
+                  <span>⚠️</span> Currently Sold Out for Today
+                </span>
+                <span className="text-[10px] sm:text-xs uppercase bg-rose-200/80 text-rose-800 px-2 py-0.5 rounded font-extrabold">
+                  Unavailable
+                </span>
+              </div>
+            )}
 
             {/* Modal Content */}
             <div className="p-4 sm:p-6">
@@ -1495,16 +1068,26 @@ const Menu: React.FC = () => {
 
               {/* Action Button */}
               <div className="flex items-center gap-2 sm:gap-3">
-                <button
-                  onClick={() => {
-                    handleAdd(activeModalItem);
-                    setActiveModalItem(null);
-                  }}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 text-xs sm:text-sm transition-all hover:-translate-y-0.5 cursor-pointer"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Add to Cart • ₹{activeModalItem.price}</span>
-                </button>
+                {activeModalItem.isAvailable === false ? (
+                  <button
+                    disabled
+                    className="flex-1 bg-slate-200 text-slate-400 font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 text-xs sm:text-sm cursor-not-allowed select-none"
+                  >
+                    <ShoppingBag className="w-4 h-4 opacity-50" />
+                    <span>Sold Out (Currently Unavailable)</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      handleAdd(activeModalItem);
+                      setActiveModalItem(null);
+                    }}
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 text-xs sm:text-sm transition-all hover:-translate-y-0.5 cursor-pointer"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>Add to Cart • ₹{activeModalItem.price}</span>
+                  </button>
+                )}
                 <button
                   onClick={() => setActiveModalItem(null)}
                   className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl sm:rounded-2xl text-xs sm:text-sm transition-colors cursor-pointer"

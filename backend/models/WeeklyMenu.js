@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { getModel } = require('../config/adapter');
 
 const WeeklyMenuSchema = new mongoose.Schema({
   day: {
@@ -12,4 +13,6 @@ const WeeklyMenuSchema = new mongoose.Schema({
   dinner: { type: String, required: true }
 }, { timestamps: true });
 
-module.exports = mongoose.model('WeeklyMenu', WeeklyMenuSchema);
+const MongooseWeeklyMenu = mongoose.models.WeeklyMenu || mongoose.model('WeeklyMenu', WeeklyMenuSchema);
+
+module.exports = getModel('weeklyMenu', MongooseWeeklyMenu);

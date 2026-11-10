@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, UtensilsCrossed, ShoppingBag, Wallet, User } from 'lucide-react';
+import { Home, LayoutDashboard, ShoppingBag, Wallet, User } from 'lucide-react';
 
 const FloatingDock = () => {
   const location = useLocation();
@@ -8,10 +8,10 @@ const FloatingDock = () => {
 
   const navItems = [
     { id: 'home', path: '/', label: 'Home', icon: Home },
-    { id: 'mess', path: '/mess', label: 'Mess', icon: UtensilsCrossed },
+    { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'orders', path: '/orders', label: 'Orders', icon: ShoppingBag },
-    { id: 'wallet', path: '/dashboard', label: 'Dashboard', icon: Wallet },
-    { id: 'profile', path: '/dashboard', label: 'Profile', icon: User } // We can link this to dashboard for now or a separate profile route
+    { id: 'wallet', path: '/dashboard', label: 'Wallet', icon: Wallet },
+    { id: 'profile', path: '/dashboard', label: 'Profile', icon: User }
   ];
 
   // Helper to determine if a tab is active

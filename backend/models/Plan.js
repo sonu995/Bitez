@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { getModel } = require('../config/adapter');
 
 const PlanSchema = new mongoose.Schema({
   name: {
@@ -20,7 +21,7 @@ const PlanSchema = new mongoose.Schema({
   },
   semesterDiscount: {
     type: Number,
-    default: 15  // 15% off for semester
+    default: 15
   },
   features: {
     type: [String],
@@ -40,4 +41,6 @@ const PlanSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Plan', PlanSchema);
+const MongoosePlan = mongoose.models.Plan || mongoose.model('Plan', PlanSchema);
+
+module.exports = getModel('plans', MongoosePlan);

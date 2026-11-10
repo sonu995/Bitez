@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { getModel } = require('../config/adapter');
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
@@ -16,7 +17,12 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Subscription',
     default: null
-  }
+  },
+  deliveryAddress: { type: String, default: '' },
+  hostel: { type: String, default: '' },
+  room: { type: String, default: '' },
+  dietPreference: { type: String, default: 'Standard Homestyle' },
+  walletTransactions: { type: Array, default: [] }
 }, { timestamps: true });
 
 // Hash password before saving
@@ -32,4 +38,6 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+const MongooseUser = mongoose.models.User || mongoose.model('User', UserSchema);
+
+module.exports = getModel('users', MongooseUser);

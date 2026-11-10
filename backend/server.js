@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load env vars
+dotenv.config({ path: path.join(__dirname, '.env') });
 dotenv.config();
 
 // Connect to MongoDB
@@ -13,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
@@ -25,6 +27,11 @@ app.use('/api/plans', require('./routes/plans'));
 app.use('/api/menu', require('./routes/menu'));
 app.use('/api/extras', require('./routes/extras'));
 app.use('/api/subscriptions', require('./routes/subscriptions'));
+app.use('/api/orders', require('./routes/orders'));
+app.use('/api/complaints', require('./routes/complaints'));
+app.use('/api/dishes', require('./routes/dishes'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/rider', require('./routes/rider'));
 
 // Health check
 app.get('/api/health', (req, res) => {

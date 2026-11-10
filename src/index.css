@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --brand-primary: #FF5200;
+    --brand-primary-hover: #E04B00;
+    --brand-accent: #F59E0B;
+    --brand-surface: #FFFFFF;
+    --brand-bg: #FAFBFC;
+    --brand-border: #E5E7EB;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+  }
+
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
@@ -10,20 +22,24 @@
   }
 
   body {
-    @apply bg-[#FAFAF8] text-slate-900;
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    @apply bg-[#FAFBFC] text-slate-900 antialiased;
+    font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     overflow-x: hidden;
     max-width: 100vw;
     -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Professional warm food scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-orange-50/50;
+    @apply bg-slate-100/80;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -36,70 +52,87 @@
 }
 
 @layer components {
-  /* Hero background - Appetizing Warm Sunset Brand Gradient */
+  /* Premium Hero Gradient */
   .hero-gradient {
-    background: linear-gradient(135deg, #FF5200 0%, #FA5A1E 45%, #F59E0B 100%);
+    background: linear-gradient(135deg, #FF5200 0%, #FA5A1E 40%, #F59E0B 100%);
     background-size: 200% 200%;
-    animation: gradientShift 6s ease infinite;
+    animation: gradientShift 8s ease infinite;
   }
 
-  /* Primary Action Button - Radiant Orange CTA */
+  /* Primary CTA Button - Clean & Premium */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 
+           text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 
+           transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
   .btn-neon {
-    @apply bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold py-3.5 px-8 rounded-2xl
-           shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/35 transition-all duration-300 transform hover:scale-[1.02];
+    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 
+           text-white font-semibold py-3.5 px-8 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 
+           transition-all duration-200 transform hover:-translate-y-0.5 active:scale-[0.98];
   }
 
-  /* Outline Button - Warm Brand Orange */
+  /* Secondary Button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-900 font-semibold py-3 px-6 
+           rounded-xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md 
+           transition-all duration-200 active:scale-[0.98];
+  }
+
+  /* Ghost Button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 text-slate-700 hover:text-orange-600 hover:bg-orange-50 
+           font-semibold py-2.5 px-4 rounded-lg transition-all duration-200;
+  }
+
+  /* Outline Button - Brand */
   .btn-fun-outline {
-    @apply border-2 border-orange-500 text-orange-600 font-bold py-3.5 px-8 rounded-2xl
-           hover:bg-gradient-to-r hover:from-orange-500 hover:to-amber-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-xs hover:shadow-md;
+    @apply inline-flex items-center justify-center gap-2 border-2 border-orange-500 text-orange-600 font-semibold py-3.5 px-8 rounded-xl
+           hover:bg-gradient-to-r hover:from-orange-500 hover:to-amber-500 hover:text-white hover:border-transparent 
+           transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98];
   }
 
-  /* Clean Surface Card - Soft Warm Porcelain with subtle glow border */
+  /* Premium Card */
+  .card-premium {
+    @apply bg-white rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-lg hover:border-orange-200/80 
+           transition-all duration-300 overflow-hidden;
+  }
+
+  /* Clean Surface Card */
   .pastel-card {
-    @apply bg-white rounded-3xl shadow-sm border border-orange-100/60
-           hover:shadow-md hover:border-orange-300/80 transition-all duration-300;
+    @apply bg-white rounded-2xl shadow-sm border border-slate-200/60 hover:shadow-md hover:border-orange-200/70 
+           transition-all duration-300;
   }
 
   /* Glassmorphism Card */
-  .glass-purple,
   .glass-warm {
-    @apply bg-white/95 backdrop-blur-xl rounded-3xl border border-orange-100/70 shadow-sm;
+    @apply bg-white/95 backdrop-blur-xl rounded-2xl border border-white/60 shadow-lg shadow-slate-900/5;
   }
 
-  /* Category Chip */
+  /* Category Chip - Modern */
   .category-chip {
-    @apply flex items-center space-x-2 px-5 py-2.5 rounded-full cursor-pointer
-           bg-white border border-slate-200/90 shadow-2xs
-           hover:bg-orange-50/80 hover:border-orange-300 hover:text-orange-600
-           transition-all duration-300 text-slate-700 font-medium whitespace-nowrap;
+    @apply flex items-center gap-2 px-4 py-2.5 rounded-full cursor-pointer bg-white border border-slate-200 shadow-sm
+           hover:bg-orange-50 hover:border-orange-300 hover:text-orange-700 hover:shadow-md
+           transition-all duration-200 text-slate-700 font-medium whitespace-nowrap active:scale-95;
   }
 
   .category-chip.active {
-    @apply bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-md shadow-orange-500/30 font-bold;
-  }
-
-  /* Brand accent border card */
-  .neon-card {
-    @apply bg-gradient-to-r from-orange-500 to-amber-500 rounded-3xl p-[2px];
-  }
-
-  .neon-card-inner {
-    @apply bg-gradient-to-br from-orange-600 to-amber-600 rounded-3xl p-6 text-white;
+    @apply bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-md shadow-orange-500/25 font-semibold;
   }
 
   /* Section Headings */
   .section-heading {
-    @apply text-3xl md:text-4xl font-extrabold text-slate-900 mb-2;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight mb-3;
   }
 
   .section-subheading {
-    @apply text-slate-600 text-lg mb-10;
+    @apply text-slate-600 text-base md:text-lg mb-8 md:mb-12 max-w-2xl;
   }
 
-  /* Stats Brand Gradient */
-  .stats-gradient {
-    background: linear-gradient(135deg, #FF5200 0%, #FA5A1E 50%, #F59E0B 100%);
+  /* Input Styles */
+  .input-premium {
+    @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400
+           focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200;
   }
 }
 
@@ -114,21 +147,26 @@
     display: none;
   }
 
-  /* Brand Text Gradients - rich culinary palette */
-  .text-gradient-purple,
-  .text-gradient-orange,
+  /* Brand Text Gradients */
+  .text-gradient-orange {
+    @apply bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 bg-clip-text text-transparent;
+  }
+
   .text-gradient-fun {
     @apply bg-gradient-to-r from-orange-600 via-amber-500 to-orange-500 bg-clip-text text-transparent;
   }
 
-  .text-gradient-rainbow {
-    background: linear-gradient(90deg, #FF5200, #F59E0B);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .font-handwritten {
+    font-family: 'Caveat', 'Patrick Hand', cursive;
   }
 
-  .font-handwritten {
-    font-family: 'Caveat', cursive;
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Card hover lift */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
   }
 }

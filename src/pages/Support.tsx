@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, Phone, Mail, Clock, Search, Plus, FileText, AlertCircle, CheckCircle, Star, Send, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { complaintsAPI } from '../services/api';
 
 const Support: React.FC = () => {
   const { user } = useAuth();
@@ -10,6 +11,32 @@ const Support: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showComplaintForm, setShowComplaintForm] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [complaints, setComplaints] = useState<any[]>([]);
+  const [loadingComplaints, setLoadingComplaints] = useState(false);
+
+  const fetchComplaints = async () => {
+    if (!user) return;
+    setLoadingComplaints(true);
+    try {
+      const res = await complaintsAPI.getMy();
+      if (res?.complaints) {
+        setComplaints(res.complaints.map((c: any) => ({
+          id: c.ticketId || c._id,
+          title: c.subject,
+          description: c.message,
+          category: c.category,
+          status: c.status,
+          date: new Date(c.createdAt).toLocaleDateString('en-IN'),
+          response: c.adminNotes || null,
+          orderId: c.orderId || 'N/A'
+        })));
+      }
+    } catch {
+      // Handled cleanly
+    } finally {
+      setLoadingComplaints(false);
+    }
+  };
 
   const faqCategories = [
     { id: 'orders', name: 'Orders & Delivery', count: 12 },
@@ -55,29 +82,6 @@ const Support: React.FC = () => {
       category: 'payment',
       question: 'Are there any transaction charges?',
       answer: 'No, we do not charge any additional fees for wallet transactions or payments.'
-    }
-  ];
-
-  const complaints = [
-    {
-      id: 'CMP001',
-      title: 'Food Quality Issue',
-      description: 'The dal was too salty and rice was undercooked',
-      category: 'Food Quality',
-      status: 'resolved',
-      date: '2024-01-15',
-      response: 'We apologize for the inconvenience. Your feedback has been shared with the kitchen team and a refund has been processed.',
-      orderId: 'ORD001'
-    },
-    {
-      id: 'CMP002',
-      title: 'Late Delivery',
-      description: 'Order was delivered 45 minutes late without any notification',
-      category: 'Delivery',
-      status: 'in-progress',
-      date: '2024-01-14',
-      response: null,
-      orderId: 'ORD002'
     }
   ];
 
@@ -397,6 +401,7 @@ const Support: React.FC = () => {
           <ComplaintForm 
             onClose={() => setShowComplaintForm(false)} 
             user={user}
+            onSuccess={fetchComplaints}
           />
         )}
 
@@ -413,7 +418,7 @@ const Support: React.FC = () => {
 };
 
 // Complaint Form Component
-const ComplaintForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, user }) => {
+const ComplaintForm: React.FC<{ onClose: () => void; user: any; onSuccess: () => void }> = ({ onClose, user, onSuccess }) => {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -421,6 +426,7 @@ const ComplaintForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, 
     description: '',
     priority: 'medium'
   });
+  const [submitting, setSubmitting] = useState(false);
 
   const categories = [
     'Food Quality',
@@ -432,14 +438,29 @@ const ComplaintForm: React.FC<{ onClose: () => void; user: any }> = ({ onClose, 
     'Other'
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       alert('Please login to file a complaint');
       return;
     }
-    alert('Complaint submitted successfully! You will receive updates via email and SMS.');
-    onClose();
+    setSubmitting(true);
+    try {
+      await complaintsAPI.create({
+        category: formData.category,
+        subject: formData.title,
+        message: formData.description,
+        orderId: formData.orderId || undefined,
+        priority: formData.priority
+      });
+      alert('Complaint submitted successfully! We will address your concern shortly.');
+      onSuccess();
+      onClose();
+    } catch (err: any) {
+      alert(err.message || 'Failed to submit complaint');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

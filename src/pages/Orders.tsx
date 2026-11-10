@@ -1,69 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Package, Star, Clock, MapPin, Phone, Repeat, MessageCircle } from 'lucide-react';
+import { Calendar, Package, Star, Clock, MapPin, Phone, Repeat, MessageCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import FeedbackModal from '../components/FeedbackModal';
+import { ordersAPI } from '../services/api';
 
 const Orders: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('all');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const orders = [
-    {
-      id: 'ORD001',
-      restaurant: 'Healthy Mess Co.',
-      items: ['Dal Rice Combo', 'Paneer Curry', 'Roti x2'],
-      amount: 240,
-      status: 'delivered',
-      date: '2024-01-15',
-      time: '1:30 PM',
-      deliveryTime: '35 mins',
-      rating: 4.5,
-      image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=300',
-      deliveryAddress: '123 Main Street, Delhi - 110001'
-    },
-    {
-      id: 'ORD002',
-      restaurant: 'Student Tiffin Service',
-      items: ['Rajma Chawal', 'Mixed Vegetables', 'Pickle'],
-      amount: 180,
-      status: 'delivered',
-      date: '2024-01-14',
-      time: '12:45 PM',
-      deliveryTime: '28 mins',
-      rating: 4.2,
-      image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=300',
-      deliveryAddress: '123 Main Street, Delhi - 110001'
-    },
-    {
-      id: 'ORD003',
-      restaurant: 'Quick Bites Express',
-      items: ['Chicken Biryani', 'Raita', 'Boiled Egg'],
-      amount: 220,
-      status: 'on-the-way',
-      date: '2024-01-16',
-      time: '12:30 PM',
-      deliveryTime: 'Expected in 15 mins',
-      rating: null,
-      image: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=300',
-      deliveryAddress: '123 Main Street, Delhi - 110001'
-    },
-    {
-      id: 'ORD004',
-      restaurant: 'Premium Meal Plans',
-      items: ['Chole Bhature', 'Lassi', 'Pickle', 'Onions'],
-      amount: 160,
-      status: 'preparing',
-      date: '2024-01-16',
-      time: '12:15 PM',
-      deliveryTime: 'Expected in 25 mins',
-      rating: null,
-      image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=300',
-      deliveryAddress: '123 Main Street, Delhi - 110001'
+  const fetchUserOrders = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const data = await ordersAPI.getMyOrders();
+      if (data?.orders) {
+        const formatted = data.orders.map((o: any) => {
+          const itemNames = Array.isArray(o.items)
+            ? o.items.map((i: any) => typeof i === 'string' ? i : `${i.name || 'Item'} x${i.quantity || 1}`)
+            : ['Special Meal'];
+          const orderDate = o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-IN') : 'Recent';
+          const orderTime = o.createdAt ? new Date(o.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '12:30 PM';
+
+          return {
+            id: o.orderId || o._id || o.id,
+            restaurant: o.restaurant || 'Healthy Mess & Kitchen',
+            items: itemNames,
+            amount: o.totalAmount,
+            status: o.status,
+            date: orderDate,
+            time: orderTime,
+            deliveryTime: o.status === 'delivered' ? '30 mins' : `${o.estimatedMinutes || 35} mins`,
+            rating: o.rating || null,
+            image: o.items?.[0]?.image || 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=300',
+            deliveryAddress: o.deliveryAddress || '123 Main Street, Delhi',
+            paymentMethod: o.paymentMethod || 'Cash on Delivery',
+            paymentStatus: o.paymentStatus || (o.paymentMethod === 'Cash on Delivery' ? (o.status === 'delivered' ? 'paid' : 'pending') : 'paid'),
+            deliverWithMeal: o.deliverWithMeal,
+            attachedMealSlot: o.attachedMealSlot || o.mealSlot,
+            isExtraOrder: o.isExtraOrder
+          };
+        });
+        setOrders(formatted);
+      }
+    } catch {
+      // Offline or network error
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchUserOrders();
+  }, [user]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -179,14 +172,42 @@ const Orders: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{order.restaurant}</h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-lg font-semibold text-gray-900">{order.restaurant}</h3>
+                          {(order.deliverWithMeal || order.isExtraOrder) && (
+                            <span className="text-[10px] font-black uppercase text-orange-800 bg-orange-100 border border-orange-300 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                              🍱 With {order.attachedMealSlot || 'Meal'} Tiffin
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-gray-600">{order.items.join(', ')}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-gray-900">₹{order.amount}</p>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                          {getStatusText(order.status)}
-                        </span>
+                        <div className="flex flex-col items-end gap-1 mt-1">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                            {getStatusText(order.status)}
+                          </span>
+                          {order.paymentMethod === 'Cash on Delivery' ? (
+                            order.paymentStatus === 'paid' ? (
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                ✓ Cash Collected
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                💵 Pay ₹{order.amount} on Arrival
+                              </span>
+                            )
+                          ) : order.paymentMethod?.includes('Wallet') ? (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                              ✓ Paid via Wallet
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                              ✓ Paid Online (UPI)
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -285,11 +306,11 @@ const Orders: React.FC = () => {
               <span className="font-bold text-slate-900">Explore Instant Order</span>
             </Link>
             <Link 
-              to="/mess" 
+              to="/dashboard" 
               className="flex items-center space-x-3 p-4 bg-slate-100 border border-slate-200 rounded-xl hover:bg-slate-200/80 transition duration-200"
             >
               <Calendar className="w-6 h-6 text-slate-800" />
-              <span className="font-bold text-slate-900">View Mess Plans</span>
+              <span className="font-bold text-slate-900">User Dashboard</span>
             </Link>
             <Link 
               to="/support" 

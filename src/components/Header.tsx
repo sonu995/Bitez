@@ -10,7 +10,6 @@ import {
   ArrowRight,
   LogOut,
   LayoutDashboard,
-  ShieldCheck,
   Package,
   HelpCircle
 } from 'lucide-react';
@@ -20,7 +19,7 @@ import NotificationSystem from './NotificationSystem';
 import TiffinMateLogo from './TiffinMateLogo';
 
 const Header: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, hasActiveSub } = useAuth();
   const { totalItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,59 +60,84 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className="bg-white/95 backdrop-blur-xl border-b border-orange-100/80 sticky top-0 z-50 transition-all shadow-2xs">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-20">
+    <header className="bg-white/98 backdrop-blur-xl border-b border-slate-200/80 sticky top-0 z-50 transition-all shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-18">
           
-          {/* Logo with Chef Hat Icon */}
+          {/* Logo */}
           <Link to="/" className="flex items-center group shrink-0">
             <TiffinMateLogo size="sm" showSubtitle={false} className="sm:hidden" />
             <TiffinMateLogo size="md" className="hidden sm:flex" />
           </Link>
 
-          {/* Center Navigation Links (Hidden on mobile, visible on tablet & desktop >= sm) */}
-          <nav className="hidden sm:flex items-center space-x-2.5 md:space-x-5 lg:space-x-8 text-xs sm:text-[13px] lg:text-[15px] font-bold text-slate-700">
+          {/* Center Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1">
             <Link
               to="/"
-              className={`relative py-1.5 transition-colors hover:text-orange-600 ${
-                location.pathname === '/' ? 'text-slate-900 font-extrabold' : 'text-slate-700'
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                location.pathname === '/' 
+                  ? 'text-orange-600 bg-orange-50' 
+                  : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
               }`}
             >
               Home
-              {location.pathname === '/' && (
-                <span className="absolute -bottom-1 left-0 w-full h-[3px] bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></span>
-              )}
             </Link>
 
-            <Link
-              to="/mess"
-              className={`relative py-1.5 transition-colors hover:text-orange-600 ${
-                location.pathname === '/mess' ? 'text-orange-600 font-extrabold' : 'text-slate-700'
-              }`}
-            >
-              Mess
-              {location.pathname === '/mess' && (
-                <span className="absolute -bottom-1 left-0 w-full h-[3px] bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></span>
-              )}
-            </Link>
+            {hasActiveSub ? (
+              <Link
+                to="/dashboard"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  location.pathname === '/dashboard' 
+                    ? 'text-orange-600 bg-orange-50' 
+                    : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+                }`}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/mess"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  location.pathname === '/mess' || location.pathname === '/subscriptions' || location.pathname === '/plans'
+                    ? 'text-orange-600 bg-orange-50' 
+                    : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+                }`}
+              >
+                Mess Plans
+              </Link>
+            )}
 
             <Link
               to="/menu"
-              className={`relative py-1.5 transition-colors hover:text-orange-600 ${
-                location.pathname === '/menu' ? 'text-orange-600 font-extrabold' : 'text-slate-700'
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                location.pathname === '/menu' 
+                  ? 'text-orange-600 bg-orange-50' 
+                  : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
               }`}
             >
-              Instant Order
-              {location.pathname === '/menu' && (
-                <span className="absolute -bottom-1 left-0 w-full h-[3px] bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></span>
-              )}
+              Food Delivery
             </Link>
 
             <Link
-              to="/support"
-              className="py-1.5 text-slate-700 hover:text-orange-600 transition-colors"
+              to="/timetable"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                location.pathname === '/timetable' 
+                  ? 'text-orange-600 bg-orange-50' 
+                  : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+              }`}
             >
-              Contact
+              Weekly Menu
+            </Link>
+
+            <Link
+              to="/orders"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                location.pathname === '/orders' 
+                  ? 'text-orange-600 bg-orange-50' 
+                  : 'text-slate-700 hover:text-orange-600 hover:bg-slate-50'
+              }`}
+            >
+              My Orders
             </Link>
           </nav>
 
@@ -144,10 +168,11 @@ const Header: React.FC = () => {
               <Search className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             </Link>
 
-            {/* Cart Icon (Desktop/Tablet only - hidden on mobile since MobileBottomNav has cart) */}
+
+            {/* Cart Icon (Visible on all screens) */}
             <Link
               to="/cart"
-              className="hidden sm:flex p-2 text-slate-700 hover:text-orange-600 hover:bg-orange-50 rounded-full relative transition-all"
+              className="flex items-center p-1.5 sm:p-2 text-slate-700 hover:text-orange-600 hover:bg-orange-50 rounded-full relative transition-all"
               title="View Cart"
             >
               <ShoppingCart className="w-5 h-5" />
@@ -158,7 +183,7 @@ const Header: React.FC = () => {
               )}
             </Link>
 
-            {/* User Profile / Login (Now fully functional on mobile and desktop without hamburger menu!) */}
+            {/* User Profile / Login */}
             <div className="flex items-center space-x-1 sm:space-x-2">
               {user ? (
                 <>
@@ -181,15 +206,54 @@ const Header: React.FC = () => {
                           <p className="text-xs font-black text-slate-900 truncate">{user.name}</p>
                           <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
                         </div>
-                        <Link to="/dashboard" className="block px-4 py-2.5 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>📊 Dashboard</Link>
-                        <Link to="/orders" className="block px-4 py-2.5 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>📦 My Orders</Link>
-                        <Link to="/mess" className="block px-4 py-2.5 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>⭐ Subscriptions</Link>
-                        <Link to="/support" className="block px-4 py-2.5 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>💬 Support</Link>
-                        {user.role === 'admin' && (
-                          <Link to="/admin" className="block px-4 py-2.5 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>⚙️ Admin Panel</Link>
+                        {/* Only show Admin Console & Rider App to users with admin role */}
+                        {user?.role === 'admin' && (
+                          <div className="bg-amber-50/70 border-b border-amber-100/80">
+                            <Link
+                              to="/admin"
+                              className="block px-4 py-2 text-xs text-amber-900 hover:bg-amber-100/70 transition-colors font-bold flex items-center justify-between"
+                              onClick={() => setShowUserMenu(false)}
+                            >
+                              <span className="flex items-center gap-1.5">
+                                <span>🍱 Mess Admin Console</span>
+                              </span>
+                              <span className="text-[9px] bg-amber-500 text-white px-1.5 py-0.5 rounded font-black">MESS</span>
+                            </Link>
+                            <Link
+                              to="/admin/instant"
+                              className="block px-4 py-2 text-xs text-orange-950 hover:bg-orange-100/70 transition-colors font-bold flex items-center justify-between border-t border-amber-100/60"
+                              onClick={() => setShowUserMenu(false)}
+                            >
+                              <span className="flex items-center gap-1.5">
+                                <span>⚡ Instant Orders Kitchen</span>
+                              </span>
+                              <span className="text-[9px] bg-orange-500 text-white px-1.5 py-0.5 rounded font-black">FAST</span>
+                            </Link>
+                            <Link
+                              to="/rider"
+                              className="block px-4 py-2 text-xs text-emerald-950 hover:bg-emerald-100/70 transition-colors font-bold flex items-center justify-between border-t border-amber-100/60"
+                              onClick={() => setShowUserMenu(false)}
+                            >
+                              <span className="flex items-center gap-1.5">
+                                <span>🛵 Delivery Rider App</span>
+                              </span>
+                              <span className="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-black">RIDER</span>
+                            </Link>
+                          </div>
                         )}
+                        {hasActiveSub ? (
+                          <>
+                            <Link to="/dashboard" className="block px-4 py-2 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>📊 Mess Dashboard</Link>
+                            <Link to="/plans" className="block px-4 py-2 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>⭐ Change / Upgrade Plan</Link>
+                          </>
+                        ) : (
+                          <Link to="/mess" className="block px-4 py-2 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>🍱 Mess Plans &amp; Pricing</Link>
+                        )}
+                        <Link to="/timetable" className="block px-4 py-2 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>📅 Weekly Timetable</Link>
+                        <Link to="/orders" className="block px-4 py-2 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>📦 My Orders</Link>
+                        <Link to="/support" className="block px-4 py-2 text-xs sm:text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium" onClick={() => setShowUserMenu(false)}>💬 Support</Link>
                         <div className="border-t border-slate-100 mt-1 pt-1">
-                          <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 text-xs sm:text-sm text-red-500 hover:bg-red-50 transition-colors font-medium cursor-pointer">🚪 Logout</button>
+                          <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-xs sm:text-sm text-red-500 hover:bg-red-50 transition-colors font-medium cursor-pointer">🚪 Logout</button>
                         </div>
                       </div>
                     )}

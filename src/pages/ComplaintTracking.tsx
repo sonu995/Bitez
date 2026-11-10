@@ -1,86 +1,133 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Clock, AlertCircle, MessageCircle, Phone, Mail, FileText, Send } from 'lucide-react';
+import { complaintsAPI } from '../services/api';
 
 const ComplaintTracking: React.FC = () => {
   const { complaintId } = useParams();
   const [newMessage, setNewMessage] = useState('');
+  const [liveTicket, setLiveTicket] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchLiveTicket = async () => {
+    if (!complaintId) return;
+    try {
+      const res = await complaintsAPI.getById(complaintId);
+      if (res?.complaint) {
+        setLiveTicket(res.complaint);
+        setError(null);
+      } else {
+        setError('Complaint ticket not found');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch ticket');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveTicket();
+  }, [complaintId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-slate-800">Loading complaint ticket...</h2>
+          <p className="text-xs text-slate-400 mt-1">Ticket #{complaintId}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !liveTicket) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm p-8 text-center border border-slate-200">
+          <AlertCircle className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Ticket Not Found</h2>
+          <p className="text-slate-600 mb-6 text-sm">We could not locate ticket #{complaintId}.</p>
+          <Link
+            to="/support"
+            className="inline-block bg-orange-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-orange-600 transition"
+          >
+            Back to Support
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const complaintDetails = {
-    id: complaintId || 'CMP001',
-    title: 'Food Quality Issue',
-    category: 'Food Quality',
-    priority: 'high',
-    status: 'in-progress',
-    createdDate: '2024-01-15',
-    orderId: 'ORD001',
-    description: 'The dal was too salty and rice was undercooked. This has happened twice in the last week.',
-    customerName: 'John Doe',
-    customerEmail: 'john@example.com',
-    customerPhone: '+91 9876543210'
+    id: liveTicket.ticketId || liveTicket._id || complaintId,
+    title: liveTicket.subject || 'Support Ticket',
+    category: liveTicket.category || 'General',
+    priority: liveTicket.priority || 'medium',
+    status: liveTicket.status || 'open',
+    createdDate: liveTicket.createdAt ? new Date(liveTicket.createdAt).toLocaleDateString('en-IN') : 'Recent',
+    createdTime: liveTicket.createdAt ? new Date(liveTicket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent',
+    orderId: liveTicket.orderId || 'N/A',
+    description: liveTicket.message || 'No description provided.',
+    customerName: liveTicket.userName || 'Student',
+    customerEmail: liveTicket.userEmail || 'N/A',
+    customerPhone: liveTicket.userPhone || 'N/A',
+    adminNotes: liveTicket.adminNotes || liveTicket.resolution || null
   };
 
   const timeline = [
     {
       id: 1,
       type: 'created',
-      title: 'Complaint Filed',
-      description: 'Complaint has been submitted and assigned ticket number',
-      timestamp: '2024-01-15 02:30 PM',
-      user: 'Customer',
+      title: 'Complaint Registered',
+      description: `Ticket #${complaintDetails.id} created and routed to mess quality manager.`,
+      timestamp: `${complaintDetails.createdDate} ${complaintDetails.createdTime}`,
+      user: complaintDetails.customerName,
       icon: <FileText className="w-5 h-5 text-blue-500" />
     },
-    {
+    ...(complaintDetails.status !== 'open' ? [{
       id: 2,
-      type: 'acknowledged',
-      title: 'Complaint Acknowledged',
-      description: 'Our support team has received your complaint and started investigation',
-      timestamp: '2024-01-15 02:45 PM',
-      user: 'Support Team',
-      icon: <AlertCircle className="w-5 h-5 text-amber-500" />
-    },
-    {
-      id: 3,
       type: 'investigating',
       title: 'Under Investigation',
-      description: 'We are reviewing your order details and coordinating with the kitchen team',
-      timestamp: '2024-01-15 03:15 PM',
-      user: 'Quality Team',
+      description: 'Kitchen management is reviewing order details and coordinating corrective actions.',
+      timestamp: liveTicket.updatedAt ? new Date(liveTicket.updatedAt).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'In Progress',
+      user: 'Support Team',
       icon: <Clock className="w-5 h-5 text-indigo-500" />
-    },
-    {
-      id: 4,
+    }] : []),
+    ...(complaintDetails.status === 'resolved' ? [{
+      id: 3,
       type: 'response',
-      title: 'Response from Kitchen Team',
-      description: 'Kitchen team has acknowledged the issue and implemented corrective measures. A refund of ₹120 has been processed to your wallet.',
-      timestamp: '2024-01-15 04:30 PM',
-      user: 'Kitchen Manager',
+      title: 'Resolved by Management',
+      description: complaintDetails.adminNotes || 'Issue has been addressed and resolved.',
+      timestamp: liveTicket.resolvedAt ? new Date(liveTicket.resolvedAt).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'Resolved',
+      user: 'Mess Manager',
       icon: <MessageCircle className="w-5 h-5 text-emerald-500" />
-    }
+    }] : [])
   ];
 
   const messages = [
     {
       id: 1,
-      sender: 'Support Team',
-      message: 'Thank you for bringing this to our attention. We are investigating the issue with your recent order.',
-      timestamp: '2024-01-15 03:00 PM',
-      isCustomer: false
-    },
-    {
-      id: 2,
-      sender: 'John Doe',
-      message: 'This is the second time this week. Please ensure better quality control.',
-      timestamp: '2024-01-15 03:30 PM',
+      sender: complaintDetails.customerName,
+      message: complaintDetails.description,
+      timestamp: `${complaintDetails.createdDate} ${complaintDetails.createdTime}`,
       isCustomer: true
     },
-    {
-      id: 3,
+    ...(complaintDetails.adminNotes ? [{
+      id: 2,
       sender: 'Kitchen Manager',
-      message: 'We sincerely apologize for the inconvenience. We have retrained our cooking staff and implemented additional quality checks. A full refund has been processed.',
-      timestamp: '2024-01-15 04:30 PM',
+      message: complaintDetails.adminNotes,
+      timestamp: liveTicket.updatedAt ? new Date(liveTicket.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent',
       isCustomer: false
-    }
+    }] : [{
+      id: 2,
+      sender: 'Bitez Support Team',
+      message: 'Hello! We have received your feedback. Our head chef and support supervisor are looking into this.',
+      timestamp: 'Auto-acknowledged',
+      isCustomer: false
+    }])
   ];
 
   const getStatusColor = (status: string) => {

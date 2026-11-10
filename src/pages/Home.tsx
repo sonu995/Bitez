@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, Plus, Minus, ChevronDown, ChevronUp, Sparkles, CheckCircle2, Clock, ArrowRight, ShieldCheck, Utensils, Leaf, MapPin, Zap, HelpCircle, MessageCircle, Search, Phone, SlidersHorizontal, Grid, Flame, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, Plus, Minus, ChevronDown, ChevronUp, Sparkles, CheckCircle2, Clock, ArrowRight, ShieldCheck, Utensils, Leaf, MapPin, Zap, HelpCircle, MessageCircle, Search, Phone, SlidersHorizontal, Grid, Flame, ChevronLeft, ChevronRight, UtensilsCrossed } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
+import { plansAPI, menuAPI, dishesAPI } from '../services/api';
 
 // Animated counter hook
 const useCountUp = (end: number, duration: number = 2000) => {
@@ -35,6 +37,7 @@ const useCountUp = (end: number, duration: number = 2000) => {
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { hasActiveSub } = useAuth();
   const { addToCart, items: cartItems, updateQuantity } = useCart();
   const [selectedCategory, setSelectedCategory] = useState('');
   const [vegOnly, setVegOnly] = useState(false);
@@ -71,42 +74,157 @@ const Home: React.FC = () => {
     { name: 'Shakes & Coolers', icon: '🥤', image: '/categories/beverages.png', cat: 'beverages' },
   ];
 
-  const messPlans = [
-    { name: 'Basic', meals: '1 Meal/Day', duration: 'Monthly', price: 1200, features: ['Choose Lunch or Dinner', 'Skip up to 3 meals/month', 'Pause anytime', 'Delivery 12–1 PM or 7–8 PM'] },
-    { name: 'Standard', meals: '2 Meals/Day', duration: 'Monthly', price: 2200, popular: true, features: ['Lunch + Dinner included', 'Skip up to 5 meals/month', 'Pause anytime', 'Priority delivery'] },
-    { name: 'Premium', meals: '3 Meals/Day', duration: 'Monthly', price: 3000, features: ['Breakfast + Lunch + Dinner', 'Unlimited skips', 'Pause & resume anytime', 'Priority delivery + Weekend specials'] },
-  ];
+  // ── DYNAMIC LIVE STATE FROM BACKEND API ──────────────────
+  const [messPlans, setMessPlans] = useState<any[]>([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+  const [todaysMenu, setTodaysMenu] = useState<any>({
+    breakfast: { emoji: '🥪', items: 'Loading today\'s breakfast...' },
+    lunch: { emoji: '🍚', items: 'Loading today\'s lunch...' },
+    dinner: { emoji: '🍲', items: 'Loading today\'s dinner...' }
+  });
+  const [foodItems, setFoodItems] = useState<any[]>([]);
+  const [loadingDishes, setLoadingDishes] = useState(true);
+  const [weeklyTimetable, setWeeklyTimetable] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
+  const [selectedTimetableDay, setSelectedTimetableDay] = useState<string>('Today');
 
-  const todaysMenu = {
-    breakfast: { emoji: '🥪', items: 'Grilled Sandwich + Hot Masala Chai' },
-    lunch: { emoji: '🍚', items: 'Basmati Rice + Dal Tadka + Seasonal Sabji + 4 Butter Rotis' },
-    dinner: { emoji: '🍲', items: 'Jeera Rice + Dal Fry + Shahi Paneer + 4 Soft Rotis' },
+  // Mess Plans Carousel / Slider State
+  const messPlansRef = useRef<HTMLDivElement>(null);
+  const [canScrollPlansLeft, setCanScrollPlansLeft] = useState(false);
+  const [canScrollPlansRight, setCanScrollPlansRight] = useState(true);
+  const [activePlanIndex, setActivePlanIndex] = useState(0);
+
+  const scrollMessPlans = (direction: 'left' | 'right') => {
+    if (messPlansRef.current) {
+      const scrollAmount = 350;
+      messPlansRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
   };
 
-  const foodItems = [
-    { id: '1', name: 'Crispy Chicken Burger', price: 120, originalPrice: 150, rating: 4.5, reviewsCount: '340+', image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'burgers', isVeg: false, restaurant: 'Quick Bites', prepTime: '20-25 mins', tag: 'Bestseller 🔥' },
-    { id: '2', name: 'Aloo Tikki Veg Burger', price: 90, originalPrice: 110, rating: 4.3, reviewsCount: '210+', image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'burgers', isVeg: true, restaurant: 'Quick Bites', prepTime: '15-20 mins', tag: 'Must Try ⭐' },
-    { id: '3', name: 'Paneer Tikka Roll', price: 80, originalPrice: 100, rating: 4.4, reviewsCount: '180+', image: 'https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'rolls', isVeg: true, restaurant: 'Roll Corner', prepTime: '15-20 mins', tag: 'Popular 🌯' },
-    { id: '4', name: 'Double Egg Chicken Roll', price: 100, originalPrice: 130, rating: 4.6, reviewsCount: '420+', image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'rolls', isVeg: false, restaurant: 'Roll Corner', prepTime: '20-25 mins', tag: 'Chef Special 👨‍🍳' },
-    { id: '5', name: 'Street Style Veg Chowmein', price: 70, originalPrice: 90, rating: 4.2, reviewsCount: '150+', image: 'https://images.pexels.com/photos/4518843/pexels-photo-4518843.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'chowmein', isVeg: true, restaurant: 'Chinese Corner', prepTime: '15-20 mins', tag: 'Budget Pick 💰' },
-    { id: '6', name: 'Steamed Chicken Momos', price: 80, originalPrice: 100, rating: 4.5, reviewsCount: '390+', image: 'https://images.pexels.com/photos/5560763/pexels-photo-5560763.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'momos', isVeg: false, restaurant: 'Momo Hub', prepTime: '15-20 mins', tag: 'Hot & Spicy 🌶️' },
-    { id: '7', name: 'Peri Peri Masala Fries', price: 60, originalPrice: 75, rating: 4.1, reviewsCount: '120+', image: 'https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'fries', isVeg: true, restaurant: 'Quick Bites', prepTime: '10-15 mins', tag: 'Crispy Snack 🍟' },
-    { id: '8', name: 'Student Combo Meal', price: 150, originalPrice: 199, rating: 4.7, reviewsCount: '510+', image: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'combos', isVeg: false, restaurant: 'Quick Bites', prepTime: '25-30 mins', tag: 'Value Combo 🍱' },
-    { id: '9', name: 'Hyderabadi Dum Biryani', price: 180, originalPrice: 220, rating: 4.8, reviewsCount: '620+', image: 'https://images.pexels.com/photos/7394819/pexels-photo-7394819.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'biryani', isVeg: false, restaurant: 'Biryani Express', prepTime: '25-30 mins', tag: 'Top Rated 👑' },
-    { id: '10', name: 'Farmhouse Cheesy Pizza', price: 199, originalPrice: 249, rating: 4.6, reviewsCount: '280+', image: 'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'pizza', isVeg: true, restaurant: 'Pizza Italia', prepTime: '20-25 mins', tag: 'Cheesy Delight 🍕' },
-    { id: '11', name: 'Shahi Special Veg Thali', price: 140, originalPrice: 170, rating: 4.7, reviewsCount: '740+', image: 'https://images.pexels.com/photos/12737656/pexels-photo-12737656.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'thali', isVeg: true, restaurant: 'Homestyle Kitchen', prepTime: '20-25 mins', tag: 'Homestyle 🍛' },
-    { id: '12', name: 'Crispy Butter Masala Dosa', price: 90, originalPrice: 115, rating: 4.5, reviewsCount: '310+', image: 'https://images.pexels.com/photos/5560763/pexels-photo-5560763.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'south_indian', isVeg: true, restaurant: 'South Junction', prepTime: '15-20 mins', tag: 'South Classic 🫔' },
-    { id: '13', name: 'Butter Chicken with 2 Naan', price: 220, originalPrice: 280, rating: 4.8, reviewsCount: '640+', image: 'https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'curries', isVeg: false, restaurant: 'Bitez Kitchen', prepTime: '20-25 mins', tag: 'Top Rated ⭐' },
-    { id: '14', name: 'Dal Makhani & Jeera Rice Bowl', price: 130, originalPrice: 160, rating: 4.6, reviewsCount: '320+', image: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'curries', isVeg: true, restaurant: 'Bitez Kitchen', prepTime: '15-20 mins', tag: 'Comfort Food 🍲' },
-    { id: '15', name: 'Steamed Idli Sambar (4 Pcs)', price: 70, originalPrice: 90, rating: 4.5, reviewsCount: '230+', image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'south_indian', isVeg: true, restaurant: 'South Junction', prepTime: '10-12 mins', tag: 'Under ₹99 ⚡' },
-    { id: '16', name: 'High-Protein Paneer Salad Bowl', price: 130, originalPrice: 160, rating: 4.8, reviewsCount: '310+', image: 'https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'healthy', isVeg: true, restaurant: 'Green Fit Kitchen', prepTime: '10-12 mins', tag: 'Fitness Choice 🥗' },
-    { id: '17', name: 'Grilled Herb Chicken Bowl', price: 190, originalPrice: 230, rating: 4.9, reviewsCount: '270+', image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'healthy', isVeg: false, restaurant: 'Green Fit Kitchen', prepTime: '15-20 mins', tag: 'Gym Pro 💪' },
-    { id: '18', name: 'Warm Gulab Jamun (2 Pcs)', price: 50, originalPrice: 70, rating: 4.9, reviewsCount: '670+', image: 'https://images.pexels.com/photos/13435133/pexels-photo-13435133.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'desserts', isVeg: true, restaurant: 'Sweet Treats', prepTime: '5 mins', tag: 'Sweet Delight 🍨' },
-    { id: '19', name: 'Thick Alphonso Mango Shake', price: 70, originalPrice: 90, rating: 4.8, reviewsCount: '350+', image: 'https://images.pexels.com/photos/3625372/pexels-photo-3625372.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'beverages', isVeg: true, restaurant: 'Coolers & Shakes', prepTime: '5-8 mins', tag: 'Best Chiller 🥭' },
-    { id: '20', name: 'Punjabi Sweet Lassi with Malai', price: 55, originalPrice: 75, rating: 4.7, reviewsCount: '310+', image: 'https://images.pexels.com/photos/10153303/pexels-photo-10153303.jpeg?auto=compress&cs=tinysrgb&w=500', category: 'beverages', isVeg: true, restaurant: 'Coolers & Shakes', prepTime: '5 mins', tag: 'Refreshing 🥛' }
-  ];
+  const handleMessPlansScroll = () => {
+    if (messPlansRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = messPlansRef.current;
+      setCanScrollPlansLeft(scrollLeft > 15);
+      setCanScrollPlansRight(scrollLeft < scrollWidth - clientWidth - 15);
+      const cardWidth = 330;
+      const index = Math.round(scrollLeft / cardWidth);
+      setActivePlanIndex(Math.min(Math.max(index, 0), messPlans.length - 1));
+    }
+  };
 
-  const reviews = [
+  const getPlanVisuals = (name: string, isPopular: boolean) => {
+    const lower = (name || '').toLowerCase();
+    if (isPopular) {
+      return {
+        badge: '🔥 MOST POPULAR',
+        badgeBg: 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30',
+        cardBorder: 'ring-2 ring-orange-500 shadow-2xl shadow-orange-500/15 border-orange-300',
+        cardBg: 'bg-gradient-to-b from-orange-50/50 via-white to-white',
+        emoji: '🍱',
+        gradientHeader: 'from-orange-500 to-amber-500',
+        accentColor: 'text-orange-600',
+        btnBg: 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/30',
+        perks: 'Best value for 2 full meals everyday'
+      };
+    }
+    if (lower.includes('trial')) {
+      return {
+        badge: '⚡ 1-DAY TRIAL PASS',
+        badgeBg: 'bg-emerald-600 text-white shadow-emerald-600/20',
+        cardBorder: 'border-emerald-300 hover:border-emerald-500 shadow-md hover:shadow-xl',
+        cardBg: 'bg-gradient-to-b from-emerald-50/40 via-white to-white',
+        emoji: '✨',
+        gradientHeader: 'from-emerald-500 to-teal-500',
+        accentColor: 'text-emerald-600',
+        btnBg: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20',
+        perks: 'Try taste before monthly plan'
+      };
+    }
+    if (lower.includes('premium')) {
+      return {
+        badge: '👑 VIP ALL-ACCESS',
+        badgeBg: 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-purple-600/20',
+        cardBorder: 'border-purple-200 hover:border-purple-500 shadow-md hover:shadow-xl',
+        cardBg: 'bg-gradient-to-b from-purple-50/40 via-white to-white',
+        emoji: '👑',
+        gradientHeader: 'from-purple-600 to-indigo-600',
+        accentColor: 'text-purple-600',
+        btnBg: 'bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20',
+        perks: 'All 3 meals + desserts & VIP support'
+      };
+    }
+    return {
+      badge: '🌱 BUDGET FRIENDLY',
+      badgeBg: 'bg-blue-600 text-white shadow-blue-600/20',
+      cardBorder: 'border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-xl',
+      cardBg: 'bg-white',
+      emoji: '🥗',
+      gradientHeader: 'from-blue-500 to-cyan-500',
+      accentColor: 'text-blue-600',
+      btnBg: 'bg-slate-900 hover:bg-orange-500 text-white shadow-sm hover:shadow-md',
+      perks: '1 nutritious meal daily'
+    };
+  };
+
+  const getPerMealPrice = (monthlyPrice: number, mealsStr: string) => {
+    const mealsPerDay = parseInt(mealsStr) || 2;
+    const totalMeals = mealsPerDay * 30;
+    return Math.max(5, Math.round(monthlyPrice / totalMeals));
+  };
+
+  useEffect(() => {
+    // 1. Fetch live plans
+    plansAPI.getAll().then((data: any) => {
+      if (data?.plans && data.plans.length > 0) {
+        const activePlans = data.plans.filter((p: any) => p.isActive !== false);
+        const formatted = activePlans.map((p: any) => ({
+          id: p._id || p.id,
+          name: p.name,
+          meals: `${p.mealsPerDay || 1} Meal${(p.mealsPerDay || 1) > 1 ? 's' : ''}/Day`,
+          duration: 'Monthly',
+          price: p.monthlyPrice,
+          popular: !!p.isPopular,
+          features: (p.features && p.features.length > 0) ? p.features : [
+            `${p.mealsPerDay || 1} Daily Meal${(p.mealsPerDay || 1) > 1 ? 's' : ''}`,
+            'Fresh Homestyle Food',
+            'Doorstep Campus Delivery',
+            'Pause & Skip Facility'
+          ]
+        }));
+        setMessPlans(formatted);
+      }
+    }).catch((e: any) => console.error('Error fetching plans:', e))
+    .finally(() => setLoadingPlans(false));
+
+    // 2. Fetch live today's rotating menu & weekly timetable
+    menuAPI.getToday().then((data: any) => {
+      if (data?.breakfast && data?.lunch && data?.dinner) {
+        setTodaysMenu({
+          breakfast: data.breakfast,
+          lunch: data.lunch,
+          dinner: data.dinner
+        });
+      }
+    }).catch((e: any) => console.error('Error fetching today menu:', e));
+
+    menuAPI.getAll().then((data: any) => {
+      if (data?.menu) {
+        setWeeklyTimetable(data.menu);
+      }
+    }).catch(() => {});
+
+    // 3. Fetch live dishes
+    dishesAPI.getAll().then((data: any) => {
+      if (data?.dishes && data.dishes.length > 0) {
+        setFoodItems(data.dishes);
+      }
+    }).catch((e: any) => console.error('Error fetching food items:', e))
+    .finally(() => setLoadingDishes(false));
+  }, []);
+
+    const reviews = [
     { name: 'Rahul S.', rating: 5, text: 'Food quality is consistently great and delivery is always on time. The mess plan saves me so much money and hassle! 🔥', avatar: '👨‍🎓' },
     { name: 'Priya M.', rating: 5, text: 'Best tiffin service in the city! I love the daily menu variety and the app makes it super easy to skip and pause meals. ⭐', avatar: '👩‍💼' },
     { name: 'Amit K.', rating: 4, text: 'Affordable and delicious food. The skip-meal feature is very convenient during exam weeks. Highly recommended! 🍕', avatar: '👨‍💻' },
@@ -267,7 +385,9 @@ const Home: React.FC = () => {
                         <span>Daily Mess</span>
                         <ArrowRight className="w-3 h-3 text-white/80" />
                       </div>
-                      <div className="text-[10px] text-orange-100 font-medium truncate">From ₹40/meal</div>
+                      <div className="text-[10px] text-orange-100 font-medium truncate">
+                        From ₹40/meal
+                      </div>
                     </div>
                   </button>
 
@@ -305,7 +425,7 @@ const Home: React.FC = () => {
 
               {/* ── DESKTOP/TABLET TWO MAIN ACTION CARDS (hidden on small mobile screens) ── */}
               <div className="hidden sm:grid sm:grid-cols-2 gap-3.5 max-w-lg mx-auto md:mx-0 mb-6">
-                {/* 1. Explore Mess */}
+                {/* 1. Explore Mess (Mess Landing Page) */}
                 <button
                   id="hero-explore-mess"
                   onClick={() => navigate('/mess')}
@@ -319,7 +439,9 @@ const Home: React.FC = () => {
                       <span>Mess</span>
                       <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </div>
-                    <p className="text-[11px] text-white/90 font-medium truncate">Daily Home Thalis @ ₹40</p>
+                    <p className="text-[11px] text-white/90 font-medium truncate">
+                      Daily Home Thalis @ ₹40
+                    </p>
                   </div>
                 </button>
 
@@ -463,58 +585,346 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* MESS PLANS - 3-COLOR THEME */}
-      <section id="mess-plans" className="py-14 sm:py-20 bg-white">
+      {/* MESS PLANS - CAROUSEL / SCROLL SECTION */}
+      <section id="mess-plans" className="py-16 sm:py-24 bg-gradient-to-b from-[#FDFBF7] via-white to-[#FDFBF7] border-y border-orange-100/60 relative overflow-hidden">
+        {/* Decorative background glows */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-orange-400/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-14">
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2 sm:mb-3">Choose Your Mess Plan 🍱</h2>
-            <p className="text-slate-500 text-sm sm:text-lg">Fresh, hygienic home-style thalis delivered daily to your doorstep</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8 max-w-7xl mx-auto items-stretch">
-            {messPlans.map((plan, i) => (
-              <div key={i} className={`relative bg-white rounded-3xl p-6 sm:p-7 lg:p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 border border-slate-200 flex flex-col justify-between ${plan.popular ? 'ring-2 ring-orange-500 md:scale-105 shadow-xl shadow-orange-500/10 z-10' : 'hover:shadow-lg hover:border-orange-200'}`}>
-                {plan.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2"><span className="bg-orange-500 text-white px-5 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-md shadow-orange-500/25 whitespace-nowrap">🔥 Most Popular</span></div>}
-                <div className="text-center">
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-1">{plan.name}</h3>
-                  <p className="text-orange-600 font-bold mb-1 text-sm sm:text-base">{plan.meals}</p>
-                  <p className="text-slate-400 text-xs sm:text-sm mb-4">{plan.duration}</p>
-                  <div className="text-3xl sm:text-4xl font-extrabold text-orange-600 mb-6">₹{plan.price}<span className="text-base font-normal text-slate-400">/mo</span></div>
-                  <ul className="space-y-2.5 sm:space-y-3 mb-8 text-left">
-                    {plan.features.map((f, j) => (
-                      <li key={j} className="flex items-start text-xs sm:text-sm text-slate-600">
-                        <span className="w-5 h-5 bg-orange-50 rounded-full flex items-center justify-center mr-2.5 mt-0.5 flex-shrink-0 text-xs text-orange-600 font-bold">✓</span>{f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <button onClick={() => navigate('/mess')} className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base transition-all cursor-pointer ${plan.popular ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-lg shadow-orange-500/25' : 'bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 hover:border-orange-500 shadow-xs hover:shadow-md'}`}>Subscribe Now</button>
+          
+          {/* Section Header with Left/Right Arrows */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-5">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 border border-orange-200 text-orange-700 text-xs font-black uppercase tracking-wider mb-3 shadow-xs">
+                <Sparkles className="w-3.5 h-3.5 text-orange-600" />
+                <span>STUDENT MEAL PASSES • 100% HOMESTYLE</span>
               </div>
-            ))}
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-3">
+                Choose Your Mess <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-600">Plan 🍱</span>
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base max-w-2xl leading-relaxed">
+                Hygienic, wholesome thalis prepared twice daily and delivered directly to your hostel room. Pause, skip, or swap meals anytime with zero penalty.
+              </p>
+            </div>
+
+            {/* Slider Controls */}
+            <div className="flex items-center gap-3 self-start md:self-auto shrink-0">
+              <span className="text-xs font-bold text-slate-400 hidden sm:inline-flex items-center gap-1.5 mr-1">
+                Scroll plans
+              </span>
+              <button
+                onClick={() => scrollMessPlans('left')}
+                disabled={!canScrollPlansLeft}
+                aria-label="Scroll plans left"
+                className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
+                  canScrollPlansLeft
+                    ? 'bg-white border-slate-300 text-slate-800 shadow-sm hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:scale-105 active:scale-95'
+                    : 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed'
+                }`}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => scrollMessPlans('right')}
+                disabled={!canScrollPlansRight}
+                aria-label="Scroll plans right"
+                className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
+                  canScrollPlansRight
+                    ? 'bg-white border-slate-300 text-slate-800 shadow-sm hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:scale-105 active:scale-95'
+                    : 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed'
+                }`}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
+
+          {/* Swipe hint on small screens */}
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-3 px-1 sm:hidden">
+            <span>👈 Swipe horizontally to view all plans</span>
+            <span>{activePlanIndex + 1} / {messPlans.length}</span>
+          </div>
+
+          {/* Horizontal Scroll Track */}
+          <div
+            ref={messPlansRef}
+            onScroll={handleMessPlansScroll}
+            className="flex gap-5 sm:gap-6 overflow-x-auto pb-6 pt-3 px-1 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {loadingPlans && messPlans.length === 0 ? (
+              Array(3).fill(0).map((_, idx) => (
+                <div key={idx} className="w-[290px] sm:w-[320px] lg:w-[330px] shrink-0 rounded-3xl p-6 bg-slate-50 border border-slate-200 animate-pulse h-96 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="h-6 w-24 bg-slate-200 rounded-full" />
+                    <div className="h-8 w-40 bg-slate-200 rounded-lg" />
+                    <div className="h-10 w-28 bg-slate-200 rounded-lg" />
+                    <div className="space-y-2 pt-4">
+                      <div className="h-4 w-full bg-slate-200 rounded" />
+                      <div className="h-4 w-5/6 bg-slate-200 rounded" />
+                      <div className="h-4 w-4/6 bg-slate-200 rounded" />
+                    </div>
+                  </div>
+                  <div className="h-12 w-full bg-slate-200 rounded-2xl" />
+                </div>
+              ))
+            ) : messPlans.map((plan, i) => {
+              const visuals = getPlanVisuals(plan.name, plan.popular);
+              const perMeal = getPerMealPrice(plan.price, plan.meals);
+
+              return (
+                <div
+                  key={plan.id || i}
+                  className={`w-[290px] sm:w-[320px] lg:w-[330px] shrink-0 snap-start relative rounded-3xl p-6 sm:p-7 transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between ${visuals.cardBg} ${visuals.cardBorder}`}
+                >
+                  {/* Top Badge */}
+                  <div className="absolute -top-3.5 left-6">
+                    <span className={`text-[11px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1 ${visuals.badgeBg}`}>
+                      {visuals.badge}
+                    </span>
+                  </div>
+
+                  <div>
+                    {/* Header info */}
+                    <div className="flex items-start justify-between mt-2 mb-3">
+                      <div>
+                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                          {plan.name}
+                        </h3>
+                        <p className="text-xs font-bold text-slate-500 mt-0.5">
+                          {plan.meals}
+                        </p>
+                      </div>
+                      <div className="w-11 h-11 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-xl shadow-xs">
+                        {visuals.emoji}
+                      </div>
+                    </div>
+
+                    {/* Price Block with Per-Meal Breakdown */}
+                    <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-5">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                          ₹{plan.price}
+                        </span>
+                        <span className="text-xs font-bold text-slate-400">/month</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
+                        <span className="text-[11px] font-semibold text-slate-500">Effective Cost:</span>
+                        <span className="text-xs font-black text-orange-600 bg-orange-100/70 px-2 py-0.5 rounded-md">
+                          ~₹{perMeal} / meal
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Features List */}
+                    <div className="mb-6">
+                      <p className="text-[11px] font-black uppercase tracking-wider text-slate-400 mb-3">
+                        What's Included:
+                      </p>
+                      <ul className="space-y-2.5">
+                        {plan.features.map((f: string, j: number) => (
+                          <li key={j} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600 leading-snug">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Action CTA */}
+                  <div className="mt-4 pt-4 border-t border-slate-100">
+                    <button
+                      onClick={() => navigate('/plans', { state: { selectedPlan: plan.name, planId: plan.id } })}
+                      className={`w-full py-3.5 px-4 rounded-2xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${visuals.btnBg}`}
+                    >
+                      <span>Subscribe Now</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <p className="text-[10px] text-center text-slate-400 font-semibold mt-2.5">
+                      ✓ Instant activation • Doorstep delivery
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Dots Indicator */}
+          {messPlans.length > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-4">
+              {messPlans.map((_, dotIdx) => (
+                <button
+                  key={dotIdx}
+                  onClick={() => {
+                    if (messPlansRef.current) {
+                      messPlansRef.current.scrollTo({
+                        left: dotIdx * 340,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  aria-label={`Go to plan ${dotIdx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    activePlanIndex === dotIdx
+                      ? 'w-7 bg-orange-500'
+                      : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Guarantee / Trust Badge Footer */}
+          <div className="mt-12 p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900">3-Day Tasting Guarantee</h4>
+                <p className="text-[11px] sm:text-xs text-slate-500">Not 100% satisfied with the food? Get a direct refund on unconsumed meals.</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/timetable')}
+              className="text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 px-4 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+            >
+              <span>Compare Full Menu</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
         </div>
       </section>
 
-      {/* TODAY'S MENU - WARM SURFACE */}
-      <section id="todays-menu" className="py-12 sm:py-16 bg-[#FBF9F5] border-y border-orange-100/60">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-10">
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2 sm:mb-3">Today's Mess Menu 🍱</h2>
-            <p className="text-slate-500 text-xs sm:text-base">See what is cooking fresh today before you subscribe</p>
+      {/* WEEKLY TIMETABLE & LIVE KITCHEN MENU */}
+      <section id="todays-menu" className="py-14 sm:py-20 bg-[#FBF9F5] border-y border-orange-100/60 relative">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-8 sm:mb-10 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 border border-orange-200 text-orange-700 text-xs font-black uppercase tracking-wider mb-3 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-orange-600" />
+              <span>FRESH ROTATING HOMESTYLE TIMETABLE</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mb-2 sm:mb-3">
+              Weekly Mess <span className="text-orange-600">Timetable 🍱</span>
+            </h2>
+            <p className="text-slate-500 text-xs sm:text-base">
+              Check what's cooking fresh today or browse what's planned for any day of the week
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-            {Object.entries(todaysMenu).map(([meal, data]) => (
-              <div key={meal} className="bg-white rounded-3xl p-6 sm:p-7 text-center hover:-translate-y-1 transition-all duration-300 border border-slate-200 shadow-xs hover:shadow-md hover:border-orange-200">
-                <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">{data.emoji}</div>
-                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 capitalize mb-1.5">{meal}</h3>
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{data.items}</p>
+
+          {/* Interactive Day Switcher Tabs */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex bg-white p-1.5 rounded-2xl border border-slate-200/90 shadow-sm overflow-x-auto max-w-full scrollbar-hide gap-1">
+              {['Today', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => {
+                const isActive = selectedTimetableDay === day;
+                return (
+                  <button
+                    key={day}
+                    onClick={() => setSelectedTimetableDay(day)}
+                    className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                      isActive
+                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 scale-105'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>{day === 'Today' ? '⚡ Today' : day}</span>
+                    {day === 'Sun' && <span>🎉</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3 Meal Cards */}
+          {(() => {
+            const currentSchedule = selectedTimetableDay === 'Today'
+              ? {
+                  breakfast: typeof todaysMenu.breakfast === 'string' ? todaysMenu.breakfast : todaysMenu.breakfast?.items || 'Aloo Paratha + Curd + Chai',
+                  lunch: typeof todaysMenu.lunch === 'string' ? todaysMenu.lunch : todaysMenu.lunch?.items || 'Dal Makhani + Jeera Rice + 3 Roti + Salad',
+                  dinner: typeof todaysMenu.dinner === 'string' ? todaysMenu.dinner : todaysMenu.dinner?.items || 'Paneer Butter Masala + Rice + 3 Roti'
+                }
+              : weeklyTimetable[selectedTimetableDay] || {
+                  breakfast: 'Poha + Boiled Eggs + Chai',
+                  lunch: 'Dal Tadka + Jeera Rice + 3 Roti + Salad',
+                  dinner: 'Kadhai Paneer + 3 Phulka Roti + Rice'
+                };
+
+            const mealsData = [
+              {
+                title: 'Breakfast',
+                emoji: '☀️',
+                time: '8:00 AM – 10:00 AM',
+                items: currentSchedule.breakfast,
+                tag: 'Morning Energy'
+              },
+              {
+                title: 'Lunch Thali',
+                emoji: '🌤️',
+                time: '12:30 PM – 2:30 PM',
+                items: currentSchedule.lunch,
+                tag: 'Balanced Homestyle'
+              },
+              {
+                title: 'Dinner',
+                emoji: '🌙',
+                time: '7:30 PM – 9:30 PM',
+                items: currentSchedule.dinner,
+                tag: 'Warm Comfort'
+              }
+            ];
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+                {mealsData.map(m => (
+                  <div
+                    key={m.title}
+                    className="bg-white rounded-3xl p-6 sm:p-7 text-center hover:-translate-y-1 transition-all duration-300 border border-slate-200 shadow-xs hover:shadow-lg hover:border-orange-200 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-0.5 rounded-full mb-3 border border-orange-100">
+                        <Clock className="w-3 h-3" />
+                        <span>{m.time}</span>
+                      </div>
+                      <div className="text-4xl sm:text-5xl mb-2">{m.emoji}</div>
+                      <h3 className="text-base sm:text-lg font-black text-slate-900 mb-2">{m.title}</h3>
+                      <div className="bg-slate-50 rounded-2xl p-3.5 border border-slate-100/80 mb-3">
+                        <p className="text-slate-800 text-xs sm:text-sm font-bold leading-relaxed">{m.items}</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 text-xs text-slate-400 font-semibold flex items-center justify-between">
+                      <span>{m.tag}</span>
+                      <span className="text-emerald-600 font-bold">✓ Pure Veg</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="text-center mt-7 sm:mt-8">
-            <Link to="/mess" className="inline-flex items-center space-x-2 text-orange-600 font-bold hover:text-orange-700 transition-colors text-sm sm:text-base">
-              <span>View Full Weekly Mess Schedule</span><span>→</span>
+            );
+          })()}
+
+          {/* Action Links */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-8 pt-4">
+            <Link
+              to="/timetable"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl transition-all shadow-md shadow-orange-500/20 text-xs sm:text-sm cursor-pointer"
+            >
+              <span>View Full 7-Day Timetable 📅</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/mess"
+              className="inline-flex items-center gap-1.5 text-slate-700 font-bold hover:text-orange-600 text-xs sm:text-sm transition-colors py-2.5 px-4 rounded-2xl hover:bg-white"
+            >
+              <span>Subscribe Mess Plan</span>
+              <span>→</span>
             </Link>
           </div>
+
         </div>
       </section>
 
@@ -843,7 +1253,9 @@ const Home: React.FC = () => {
                 <p className="text-orange-100 text-xs sm:text-sm mb-6 leading-relaxed">Subscribe this month and get free express delivery + weekend dessert specials included.</p>
               </div>
               <div>
-                <Link to="/mess" className="inline-block bg-white text-orange-600 hover:bg-slate-50 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-md active:scale-95">Subscribe to Mess →</Link>
+                <Link to="/mess" className="inline-block bg-white text-orange-600 hover:bg-slate-50 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-md active:scale-95">
+                  Explore Mess Plans →
+                </Link>
               </div>
             </div>
           </div>

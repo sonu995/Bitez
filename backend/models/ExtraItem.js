@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { getModel } = require('../config/adapter');
 
 const ExtraItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -12,4 +13,6 @@ const ExtraItemSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('ExtraItem', ExtraItemSchema);
+const MongooseExtraItem = mongoose.models.ExtraItem || mongoose.model('ExtraItem', ExtraItemSchema);
+
+module.exports = getModel('extraItems', MongooseExtraItem);
