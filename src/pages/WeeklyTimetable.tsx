@@ -67,29 +67,44 @@ export default function WeeklyTimetable() {
   const [activeDay, setActiveDay] = useState<string>(todayKey);
   const [viewMode, setViewMode] = useState<'single' | 'all'>('single');
   const [timetable, setTimetable] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
+  const [mealTimings, setMealTimings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [todayLive, setTodayLive] = useState<any>(null);
 
   useEffect(() => {
-    // 1. Fetch full weekly menu from backend
-    menuAPI.getAll()
-      .then((res: any) => {
-        if (res?.menu && Object.keys(res.menu).length > 0) {
-          setTimetable(res.menu);
+    // 1. Fetch full weekly menu & live admin meal timings from backend
+    Promise.allSettled([
+      menuAPI.getAll(),
+      menuAPI.getMealTimings?.() || Promise.resolve(null)
+    ])
+      .then(([menuRes, timingsRes]: any[]) => {
+        if (menuRes.status === 'fulfilled' && menuRes.value?.menu && Object.keys(menuRes.value.menu).length > 0) {
+          setTimetable(menuRes.value.menu);
+        }
+        if (timingsRes.status === 'fulfilled' && timingsRes.value?.timings) {
+          setMealTimings(timingsRes.value.timings);
         }
       })
       .catch((err: any) => console.error('Error fetching weekly timetable:', err))
       .finally(() => setLoading(false));
-
-    // 2. Fetch today's live menu
-    menuAPI.getToday()
-      .then((res: any) => {
-        if (res?.menu) {
-          setTodayLive(res);
-        }
-      })
-      .catch(() => {});
   }, []);
+
+  const dynamicMealTimes = {
+    breakfast: {
+      ...MEAL_TIMES.breakfast,
+      label: mealTimings?.breakfast?.label || MEAL_TIMES.breakfast.label,
+      time: mealTimings?.breakfast?.deliveryTimeStr || '08:00 AM – 09:30 AM'
+    },
+    lunch: {
+      ...MEAL_TIMES.lunch,
+      label: mealTimings?.lunch?.label || MEAL_TIMES.lunch.label,
+      time: mealTimings?.lunch?.deliveryTimeStr || '12:30 PM – 02:00 PM'
+    },
+    dinner: {
+      ...MEAL_TIMES.dinner,
+      label: mealTimings?.dinner?.label || MEAL_TIMES.dinner.label,
+      time: mealTimings?.dinner?.deliveryTimeStr || '07:30 PM – 09:00 PM'
+    }
+  };
 
   const activeMenu = timetable[activeDay] || { breakfast: '', lunch: '', dinner: '' };
 
@@ -116,14 +131,14 @@ export default function WeeklyTimetable() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-orange-100 text-sm sm:text-lg leading-relaxed mb-6 font-medium">
-            100% Fresh, hygienic homestyle meals prepared twice daily with pure love. 
+            100% Fresh, hygienic homestyle meals prepared fresh daily for Breakfast, Lunch &amp; Dinner. 
             Rotates daily so you never get bored of hostel food!
           </p>
 
           {/* Quick CTA Actions */}
           <div className="flex flex-wrap items-center justify-center gap-3">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/mess')}
               className="px-6 py-3 bg-white text-orange-600 hover:bg-orange-50 font-black rounded-2xl text-xs sm:text-sm shadow-xl shadow-black/10 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
               <span>Subscribe Mess Plan</span>
@@ -168,11 +183,14 @@ export default function WeeklyTimetable() {
                   Today ({DAY_FULL_NAMES[todayKey]}) Live Cooking
                 </span>
               </div>
-              <p className="text-sm sm:text-base font-extrabold text-slate-800 mt-0.5">
-                {timetable[todayKey]?.lunch || 'Wholesome Special Thali'}
+              <p className="text-xs sm:text-sm font-bold text-slate-800 mt-1">
+                <span className="text-amber-600 font-black">Breakfast:</span> {timetable[todayKey]?.breakfast || 'Stuffed Paratha + Curd + Chai'}
               </p>
-              <p className="text-xs text-slate-500">
-                Dinner: {timetable[todayKey]?.dinner || 'Warm Comfort Rice & Roti'}
+              <p className="text-xs sm:text-sm font-extrabold text-slate-900 mt-0.5">
+                <span className="text-orange-600 font-black">Lunch:</span> {timetable[todayKey]?.lunch || 'Wholesome Special Thali'}
+              </p>
+              <p className="text-xs sm:text-sm font-bold text-slate-700 mt-0.5">
+                <span className="text-indigo-600 font-black">Dinner:</span> {timetable[todayKey]?.dinner || 'Warm Comfort Rice & Roti'}
               </p>
             </div>
           </div>
@@ -185,7 +203,7 @@ export default function WeeklyTimetable() {
               View Today's Meals
             </button>
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/mess')}
               className="flex-1 md:flex-initial px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"
             >
               Get Tiffin Pass →
@@ -291,7 +309,7 @@ export default function WeeklyTimetable() {
               {[
                 {
                   key: 'breakfast',
-                  info: MEAL_TIMES.breakfast,
+                  info: dynamicMealTimes.breakfast,
                   value: activeMenu.breakfast,
                   img: activeDay === 'Sun'
                     ? 'https://images.pexels.com/photos/103124/pexels-photo-103124.jpeg?auto=compress&cs=tinysrgb&w=600'
@@ -299,7 +317,7 @@ export default function WeeklyTimetable() {
                 },
                 {
                   key: 'lunch',
-                  info: MEAL_TIMES.lunch,
+                  info: dynamicMealTimes.lunch,
                   value: activeMenu.lunch,
                   img: activeDay === 'Wed' || activeDay === 'Thu'
                     ? 'https://images.pexels.com/photos/2098085/pexels-photo-2098085.jpeg?auto=compress&cs=tinysrgb&w=600'
@@ -307,7 +325,7 @@ export default function WeeklyTimetable() {
                 },
                 {
                   key: 'dinner',
-                  info: MEAL_TIMES.dinner,
+                  info: dynamicMealTimes.dinner,
                   value: activeMenu.dinner,
                   img: activeDay === 'Sun'
                     ? 'https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=600'
@@ -385,7 +403,7 @@ export default function WeeklyTimetable() {
                   </div>
                 </div>
                 <button
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/mess')}
                   className="px-5 py-2.5 bg-white text-orange-600 hover:bg-amber-50 font-black rounded-xl text-xs transition shadow-md whitespace-nowrap cursor-pointer"
                 >
                   Get Student Pass

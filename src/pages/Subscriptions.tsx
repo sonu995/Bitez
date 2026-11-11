@@ -46,7 +46,6 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useCart } from '../contexts/CartContext';
 import { subscriptionsAPI, plansAPI, menuAPI, ordersAPI, extrasAPI, adminAPI } from '../services/api';
 import SkipMealModal from '../components/SkipMealModal';
 import OrderExtraModal from '../components/OrderExtraModal';
@@ -59,18 +58,11 @@ const Subscriptions = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'semester'>('monthly');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  const getTodayDayName = () => {
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return dayNames[new Date().getDay()];
-  };
-
-  const [activeDay, setActiveDay] = useState(getTodayDayName());
   const [showAllExtras, setShowAllExtras] = useState(false);
-  const [addedItems, setAddedItems] = useState<Record<string, boolean>>({});
   const [dbPlans, setDbPlans] = useState<any[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
-  const [dynamicWeeklyMenu, setDynamicWeeklyMenu] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
   const [dynamicExtras, setDynamicExtras] = useState<any[]>([]);
+  const [mealTimings, setMealTimings] = useState<any>(null);
 
   // User Mess Subscription & Dashboard State
   const [currentSub, setCurrentSub] = useState<any>(null);
@@ -122,7 +114,6 @@ const Subscriptions = () => {
     planId?: string;
   } | null>(null);
   const { user, refreshUser } = useAuth();
-  const { addToCart } = useCart();
   const [subscribing, setSubscribing] = useState(false);
   const [subSuccess, setSubSuccess] = useState<string | null>(null);
 
@@ -276,12 +267,18 @@ const Subscriptions = () => {
       })
       .catch(() => {});
 
-    // 2. Fetch live rotating weekly menu from backend
-    menuAPI.getAll()
+    // 2. Fetch live today's menu & admin meal timings from backend
+    menuAPI.getToday()
       .then(res => {
-        if (res?.menu) {
-          setDynamicWeeklyMenu(res.menu);
+        if (res?.menu || res?.lunch) {
+          setTodayMenuData(res.menu || res);
         }
+      })
+      .catch(() => {});
+
+    menuAPI.getMealTimings?.()
+      .then(res => {
+        if (res?.timings) setMealTimings(res.timings);
       })
       .catch(() => {});
 
@@ -401,26 +398,6 @@ const Subscriptions = () => {
   const getPrice = (base: number) => billingCycle === 'semester' ? Math.round(base * 0.85) : base;
   const getDiscounted = (price: number) => Math.round(price * 0.95);
 
-  const handleAddItem = (item: { name: string; original: number; img: string }) => {
-    const discounted = getDiscounted(item.original);
-    addToCart({
-      id: 'extra-' + item.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-      name: item.name,
-      price: discounted,
-      image: item.img,
-      restaurant: 'Bitez Campus Mess',
-      isVeg: true
-    });
-    setAddedItems(prev => ({ ...prev, [item.name]: true }));
-    setTimeout(() => {
-      setAddedItems(prev => ({ ...prev, [item.name]: false }));
-    }, 2000);
-    setExtraNotification({
-      msg: `Added "${item.name}" (₹${discounted}) to your meal order!`,
-      type: 'info'
-    });
-  };
-
   const handleOpenInstantExtra = (item: any) => {
     if (!user) {
       navigate('/login?redirect=/mess');
@@ -525,19 +502,6 @@ const Subscriptions = () => {
     },
   ];
 
-  const [liveWeeklyMenu, setLiveWeeklyMenu] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
-
-  useEffect(() => {
-    menuAPI.getAll()
-      .then(res => {
-        if (res?.menu) setLiveWeeklyMenu(res.menu);
-      })
-      .catch(() => {});
-  }, []);
-
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const menu = liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay] || { breakfast: '', lunch: '', dinner: '' };
-
   // ── MESS STUDENT DASHBOARD (Shown when student has active/paused subscription) ──
   const renderMessDashboard = () => {
     const remaining = currentSub?.remainingMeals ?? 30;
@@ -583,10 +547,9 @@ const Subscriptions = () => {
     }
 
     // Dish descriptions for today
-    const currentDayMenu = liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay] || {};
-    const lunchDishes = todayMenuData?.lunch || currentDayMenu.lunch || 'Paneer Butter Masala, Dal Tadka, 4 Butter Phulkas, Jeera Rice, Salad, Gulab Jamun';
-    const dinnerDishes = todayMenuData?.dinner || currentDayMenu.dinner || 'Seasonal Mix Veg, Dal Makhani, 4 Butter Rotis, Steamed Rice, Boondi Raita';
-    const breakfastDishes = todayMenuData?.breakfast || currentDayMenu.breakfast || 'Poha / Aloo Paratha, Fresh Curd, Masala Chai';
+    const lunchDishes = typeof todayMenuData?.lunch === 'string' ? todayMenuData.lunch : todayMenuData?.lunch?.items || 'Paneer Butter Masala, Dal Tadka, 4 Butter Phulkas, Jeera Rice, Salad, Gulab Jamun';
+    const dinnerDishes = typeof todayMenuData?.dinner === 'string' ? todayMenuData.dinner : todayMenuData?.dinner?.items || 'Seasonal Mix Veg, Dal Makhani, 4 Butter Rotis, Steamed Rice, Boondi Raita';
+    const breakfastDishes = typeof todayMenuData?.breakfast === 'string' ? todayMenuData.breakfast : todayMenuData?.breakfast?.items || 'Poha / Aloo Paratha, Fresh Curd, Masala Chai';
 
     const greetingTime = ist.getHours() < 12 ? 'Good morning' : ist.getHours() < 17 ? 'Good afternoon' : 'Good evening';
 
@@ -1055,82 +1018,75 @@ const Subscriptions = () => {
             </div>
           </div>
 
-          {/* ── 3. WEEKLY ROTATING TIMETABLE (7-DAY SCHEDULE) ── */}
+          {/* ── 3. TODAY'S KITCHEN SUMMARY WITH IMAGES + LINK TO WEEKLY TIMETABLE ── */}
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-2xs space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-orange-500" /> Weekly Mess Menu Timetable
+                  <Calendar className="w-5 h-5 text-orange-500" /> Today&apos;s Kitchen Schedule
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Select any day to preview what's cooking this week and plan your meals or skips.
+                  Fresh homestyle meals cooking today — open the Weekly Mess Timetable for the full 7-day schedule.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/timetable')}
-                className="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black text-xs rounded-2xl shadow-sm transition flex items-center gap-1.5 shrink-0 self-start md:self-auto cursor-pointer"
               >
-                <span>Full Timetable Page</span>
+                <span>Open Weekly Mess Timetable 🍱</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {/* Day Pills */}
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-              {days.map((day) => {
-                const isSelected = activeDay === day;
-                const isToday = getTodayDayName() === day;
-                return (
-                  <button
-                    key={day}
-                    onClick={() => setActiveDay(day)}
-                    className={`px-4 py-2 rounded-2xl font-black text-xs transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                      isSelected
-                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs'
-                        : 'bg-white text-slate-700 border border-slate-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200'
-                    }`}
-                  >
-                    <span>{day}</span>
-                    {isToday && (
-                      <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase ${
-                        isSelected ? 'bg-white text-orange-600' : 'bg-orange-500 text-white'
-                      }`}>
-                        Today
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Selected Day Food Schedule Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-1">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 hover:border-orange-200 transition-all">
-                <div className="flex items-center gap-2 text-xs font-black text-slate-900 mb-1.5">
-                  <span>🌅</span> Breakfast (07:30 AM)
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                {
+                  slot: 'Breakfast',
+                  emoji: '☀️',
+                  time: mealTimings?.breakfast?.deliveryTimeStr || '08:00 AM – 09:30 AM',
+                  dishes: breakfastDishes,
+                  img: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=400',
+                  fallback: '/categories/south-indian.png'
+                },
+                {
+                  slot: 'Lunch Thali',
+                  emoji: '🌤️',
+                  time: mealTimings?.lunch?.deliveryTimeStr || '12:30 PM – 02:00 PM',
+                  dishes: lunchDishes,
+                  img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=400',
+                  fallback: '/categories/thali.png'
+                },
+                {
+                  slot: 'Dinner Feast',
+                  emoji: '🌙',
+                  time: mealTimings?.dinner?.deliveryTimeStr || '07:30 PM – 09:00 PM',
+                  dishes: dinnerDishes,
+                  img: 'https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=400',
+                  fallback: '/categories/curries.png'
+                }
+              ].map((m) => (
+                <div key={m.slot} className="flex items-center gap-3.5 p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70 hover:border-orange-300 transition">
+                  <img
+                    src={m.img}
+                    alt={m.slot}
+                    onError={(e) => {
+                      if (!e.currentTarget.dataset.fallbackApplied) {
+                        e.currentTarget.dataset.fallbackApplied = '1';
+                        e.currentTarget.src = m.fallback;
+                      }
+                    }}
+                    className="w-16 h-16 rounded-xl object-cover shrink-0 shadow-xs bg-slate-200"
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 text-xs font-black text-slate-900">
+                      <span>{m.emoji}</span>
+                      <span>{m.slot}</span>
+                    </div>
+                    <p className="text-[10px] font-bold text-orange-600">{m.time}</p>
+                    <p className="text-xs text-slate-700 font-semibold line-clamp-2 mt-0.5">{m.dishes}</p>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-700 font-semibold leading-relaxed">
-                  {(liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay])?.breakfast || 'Poha, Boiled Sprouts, Masala Chai'}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 hover:border-orange-200 transition-all">
-                <div className="flex items-center gap-2 text-xs font-black text-slate-900 mb-1.5">
-                  <span>☀️</span> Lunch (12:30 PM)
-                </div>
-                <p className="text-xs text-slate-700 font-semibold leading-relaxed">
-                  {(liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay])?.lunch || 'Paneer Butter Masala, Dal Tadka, 4 Butter Phulkas, Jeera Rice, Salad, Gulab Jamun'}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 hover:border-orange-200 transition-all">
-                <div className="flex items-center gap-2 text-xs font-black text-slate-900 mb-1.5">
-                  <span>🌙</span> Dinner (07:30 PM)
-                </div>
-                <p className="text-xs text-slate-700 font-semibold leading-relaxed">
-                  {(liveWeeklyMenu[activeDay] || dynamicWeeklyMenu[activeDay])?.dinner || 'Seasonal Mix Veg, Dal Makhani, 4 Butter Rotis, Steamed Rice, Boondi Raita'}
-                </p>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -1815,147 +1771,99 @@ const Subscriptions = () => {
         </div>
       </section>
 
-      {/* ── 1. WEEKLY MENU PREVIEW ───────────────────────────── */}
-      <section id="menu" className="py-20 lg:py-24 bg-white border-t border-slate-200">
+      {/* ── 1. TODAY'S KITCHEN HIGHLIGHT & WEEKLY TIMETABLE CTA ── */}
+      <section id="menu" className="py-16 lg:py-20 bg-white border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-12">
+
+          <div className="text-center max-w-2xl mx-auto mb-10">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200 text-orange-600 text-xs font-bold uppercase tracking-wider mb-3.5">
-              <span>🍳 FRESH ROTATING DAILY MENU</span>
+              <span>🍳 TODAY&apos;S FRESH HOMESTYLE KITCHEN</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">
-              Weekly Menu <span className="text-orange-600">Preview 🍱</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
+              Cooking Today <span className="text-orange-600">in Our Kitchen 🍳</span>
             </h2>
-            <p className="text-slate-600 text-base sm:text-lg">
-              Check out what’s cooking before you subscribe. Prepared fresh twice daily with pure homestyle love.
+            <p className="text-slate-600 text-sm sm:text-base">
+              Freshly prepared for Breakfast, Lunch &amp; Dinner. Browse the full 7-day rotating schedule in our Weekly Mess Timetable.
             </p>
           </div>
 
-          {/* Day Selector Tabs */}
-          <div className="flex justify-center mb-10">
-            <div className="inline-flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-xs overflow-x-auto max-w-full scrollbar-hide gap-1.5">
-              {days.map(day => {
-                const isActive = activeDay === day;
-                return (
-                  <button
-                    key={day}
-                    onClick={() => setActiveDay(day)}
-                    className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-bold text-sm transition-all duration-300 whitespace-nowrap cursor-pointer ${
-                      isActive
-                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20 scale-105'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-                    }`}
-                  >
-                    {day}
-                    {day === 'Sun' && <span className="ml-1.5">🎉</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 3 Meal Cards (Breakfast, Lunch, Dinner) */}
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                label: 'Breakfast',
-                time: '8:00 AM – 10:00 AM',
+                label: mealTimings?.breakfast?.label || 'Breakfast',
+                time: mealTimings?.breakfast?.deliveryTimeStr || '08:00 AM – 09:30 AM',
                 emoji: '☀️',
                 tag: 'Morning Fuel',
-                diet: 'Pure Veg',
-                nutrition: '~420 kcal • 14g Protein',
-                border: 'border-slate-200',
-                badge: 'bg-orange-50 text-orange-600 border border-orange-100',
-                value: menu.breakfast,
-                img: activeDay === 'Sun' ? 'https://images.pexels.com/photos/103124/pexels-photo-103124.jpeg?auto=compress&cs=tinysrgb&w=600'
-                  : activeDay === 'Sat' ? 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600'
-                  : 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=600',
+                img: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=600',
+                fallback: '/categories/south-indian.png',
+                value: typeof todayMenuData?.breakfast === 'string' ? todayMenuData.breakfast : todayMenuData?.breakfast?.items || 'Aloo Paratha + Fresh Curd + Masala Chai'
               },
               {
-                label: 'Lunch',
-                time: '12:30 PM – 2:30 PM',
+                label: mealTimings?.lunch?.label || 'Lunch Thali',
+                time: mealTimings?.lunch?.deliveryTimeStr || '12:30 PM – 02:00 PM',
                 emoji: '🌤️',
                 tag: 'Wholesome Thali',
-                diet: 'Pure Veg / Chef Choice',
-                nutrition: '~650 kcal • 24g Protein',
-                border: 'border-slate-200',
-                badge: 'bg-orange-50 text-orange-600 border border-orange-100',
-                value: menu.lunch,
-                img: activeDay === 'Wed' || activeDay === 'Thu'
-                  ? 'https://images.pexels.com/photos/2098085/pexels-photo-2098085.jpeg?auto=compress&cs=tinysrgb&w=600'
-                  : 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=600',
+                img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=600',
+                fallback: '/categories/thali.png',
+                value: typeof todayMenuData?.lunch === 'string' ? todayMenuData.lunch : todayMenuData?.lunch?.items || 'Paneer Butter Masala, Dal Tadka, 4 Butter Phulkas, Jeera Rice, Salad'
               },
               {
-                label: 'Dinner',
-                time: '7:30 PM – 9:30 PM',
+                label: mealTimings?.dinner?.label || 'Dinner',
+                time: mealTimings?.dinner?.deliveryTimeStr || '07:30 PM – 09:00 PM',
                 emoji: '🌙',
                 tag: 'Warm Comfort',
-                diet: 'Balanced & Light',
-                nutrition: '~580 kcal • 26g Protein',
-                border: 'border-slate-200',
-                badge: 'bg-orange-50 text-orange-600 border border-orange-100',
-                value: menu.dinner,
-                img: activeDay === 'Wed'
-                  ? 'https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=600'
-                  : 'https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=600',
-              },
+                img: 'https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=600',
+                fallback: '/categories/curries.png',
+                value: typeof todayMenuData?.dinner === 'string' ? todayMenuData.dinner : todayMenuData?.dinner?.items || 'Seasonal Mix Veg, Dal Makhani, 4 Butter Rotis, Steamed Rice, Boondi Raita'
+              }
             ].map((meal, i) => (
               <div
                 key={i}
-                className="bg-white rounded-3xl border border-slate-200 hover:border-orange-500 overflow-hidden hover:-translate-y-1.5 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between group"
+                className="bg-white rounded-3xl border border-slate-200 hover:border-orange-400 overflow-hidden transition-all duration-300 shadow-2xs hover:shadow-xl flex flex-col justify-between group"
               >
                 <div>
-                  {/* Food Image with time pill */}
-                  <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100">
+                  <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
                     <img
                       src={meal.img}
                       alt={meal.label}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      onError={(e) => {
+                        if (!e.currentTarget.dataset.fallbackApplied) {
+                          e.currentTarget.dataset.fallbackApplied = '1';
+                          e.currentTarget.src = meal.fallback;
+                        }
+                      }}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                    
-                    <span className="absolute top-3 right-3 bg-white text-slate-900 text-[11px] font-bold px-3 py-1 rounded-full shadow-xs">
-                      {meal.diet}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+                    <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-orange-600 text-[11px] font-black px-3 py-1 rounded-full shadow-xs">
+                      {meal.tag}
                     </span>
-
-                    <span className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md text-slate-800 text-xs font-bold px-3 py-1 rounded-full border border-orange-200/80 shadow-xs">
+                    <span className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full">
                       ⏱️ {meal.time}
                     </span>
                   </div>
-
-                  {/* Content */}
                   <div className="p-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-extrabold uppercase tracking-wider text-orange-600">
-                        {meal.tag}
-                      </span>
-                      <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full">
-                        {meal.nutrition}
-                      </span>
-                    </div>
-
-                    <h3 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2 mb-3">
+                    <h3 className="text-xl font-extrabold text-slate-900 flex items-center gap-2 mb-2.5">
                       <span>{meal.emoji}</span> {meal.label}
                     </h3>
-                    <p className="text-slate-700 font-medium leading-relaxed text-sm">
+                    <p className="text-slate-700 font-medium leading-relaxed text-sm bg-orange-50/50 p-3.5 rounded-2xl border border-orange-100/80">
                       {meal.value}
                     </p>
                   </div>
-                </div>
-
-                <div className="px-6 pb-6 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                  <span className="flex items-center gap-1.5 text-slate-800 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> Insulated Tiffin Box
-                  </span>
-                  <span>100% Home Taste</span>
                 </div>
               </div>
             ))}
           </div>
 
-          <p className="text-center text-slate-400 text-xs sm:text-sm mt-8 font-medium">
-            * Daily menus are curated each week by experienced home chefs. Special Sunday festive thalis included with standard &amp; premium plans!
-          </p>
+          <div className="text-center mt-8">
+            <button
+              onClick={() => navigate('/timetable')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-2xl shadow-md shadow-orange-500/20 transition cursor-pointer"
+            >
+              <span>Open Weekly Mess Timetable 🍱</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </section>
 
@@ -2336,7 +2244,6 @@ const Subscriptions = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
                   {displayedExtras.map((item, i) => {
                     const discounted = getDiscounted(item.original);
-                    const isAdded = !!addedItems[item.name];
 
                     return (
                       <div
@@ -2364,28 +2271,8 @@ const Subscriptions = () => {
 
                         <div className="flex flex-col gap-1.5 w-full mt-1">
                           <button
-                            onClick={() => handleAddItem(item)}
-                            className={`w-full py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-                              isAdded
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200/60'
-                            }`}
-                            title="Add to food cart"
-                          >
-                            {isAdded ? (
-                              <>
-                                <CheckCircle2 className="w-3.5 h-3.5" /> Added!
-                              </>
-                            ) : (
-                              <>
-                                <Plus className="w-3.5 h-3.5" /> Add to Cart
-                              </>
-                            )}
-                          </button>
-
-                          <button
                             onClick={() => handleOpenInstantExtra(item)}
-                            className="w-full py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1 cursor-pointer"
+                            className="w-full py-2 rounded-xl text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1 cursor-pointer"
                             title="Direct 1-Tap order with your next tiffin"
                           >
                             <Sparkles className="w-3.5 h-3.5" /> ⚡ 1-Tap Order
@@ -2623,55 +2510,133 @@ const Subscriptions = () => {
         </div>
       </section>
 
-      {/* ── 7. APP DOWNLOAD BANNER - Sunset Orange Brand Theme ── */}
-      <section className="py-20 bg-white">
+      {/* ── 7. MANAGE EVERYTHING FROM THE APP - INTERACTIVE PHONE & BENTO SHOWCASE ── */}
+      <section className="py-12 sm:py-16 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-600 rounded-3xl p-10 md:p-16 overflow-hidden relative shadow-2xl shadow-orange-500/25 border border-orange-400/30 text-white">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-[80px] pointer-events-none" />
-            
-            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
-              <div className="flex-1 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 text-white text-sm font-bold mb-6 border border-white/30 backdrop-blur-md">
-                  📱 Available on iOS &amp; Android
+          <div className="relative rounded-[2.25rem] p-6 sm:p-10 lg:p-12 bg-gradient-to-br from-orange-50/90 via-white to-amber-50/80 border-2 border-orange-200/80 shadow-xl shadow-orange-500/5 overflow-hidden">
+            {/* Subtle Decorative Orbs */}
+            <div className="absolute -top-24 -right-24 w-80 h-80 bg-orange-200/35 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-emerald-200/25 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* LEFT: Headline, Colorful Bento Grid & Action Buttons */}
+              <div className="lg:col-span-7 text-center lg:text-left space-y-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-white border border-orange-200 text-orange-700 rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-wider mb-4 shadow-2xs">
+                    <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                    <span>All-in-One Student Mess App • Web &amp; Mobile</span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.12] mb-3">
+                    Manage Everything{' '}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-rose-500 to-amber-500">
+                      From the App
+                    </span>
+                  </h2>
+                  <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                    Skip upcoming meals for +1 rollover balance, inspect daily Breakfast/Lunch/Dinner menus, pack extra sides at ₹0 delivery, and track your rider live with OTP.
+                  </p>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
-                  Manage Everything<br />From the App
-                </h2>
-                <p className="text-orange-100 text-lg mb-8 leading-relaxed">
-                  Skip meals with 1 tap, inspect daily rotating menus, order extra sides, track delivery live, and check your wallet balance.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <button className="flex items-center justify-center gap-3 bg-white hover:bg-orange-50 text-orange-600 px-6 py-4 rounded-2xl font-bold transition-all shadow-lg shadow-orange-700/20 cursor-pointer">
-                    <span className="text-2xl">🍎</span>
-                    <div className="text-left">
-                      <p className="text-[10px] font-medium text-orange-400 leading-none">Download on the</p>
-                      <p className="text-base font-extrabold leading-none mt-0.5">App Store</p>
+
+                {/* 6 Colorful Feature Bento Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-left">
+                  {[
+                    { icon: '⏭️', title: 'Skip Meals', sub: '+1 Meal Rollover', style: 'bg-purple-50/90 border-purple-200/80 text-purple-900' },
+                    { icon: '📅', title: 'Weekly Menu', sub: '3 Meals Rotating', style: 'bg-orange-50/90 border-orange-200/80 text-orange-900' },
+                    { icon: '🚴', title: 'Live OTP Track', sub: 'Doorstep Rider', style: 'bg-sky-50/90 border-sky-200/80 text-sky-900' },
+                    { icon: '➕', title: 'Pack Extras', sub: '₹0 Delivery Fee', style: 'bg-emerald-50/90 border-emerald-200/80 text-emerald-900' },
+                    { icon: '💳', title: 'Campus Wallet', sub: '1-Tap Checkout', style: 'bg-amber-50/90 border-amber-200/80 text-amber-900' },
+                    { icon: '🔔', title: 'Smart Alerts', sub: 'Expiry & Dispatch', style: 'bg-rose-50/90 border-rose-200/80 text-rose-900' },
+                  ].map((f, i) => (
+                    <div
+                      key={i}
+                      className={`rounded-2xl p-3.5 border shadow-2xs hover:-translate-y-0.5 transition-all flex items-center gap-2.5 ${f.style}`}
+                    >
+                      <span className="text-xl shrink-0">{f.icon}</span>
+                      <div className="min-w-0">
+                        <p className="font-black text-xs leading-tight truncate">{f.title}</p>
+                        <p className="text-[10px] font-bold opacity-75 truncate mt-0.5">{f.sub}</p>
+                      </div>
                     </div>
+                  ))}
+                </div>
+
+                {/* Interactive Action CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-1">
+                  <button
+                    onClick={() => navigate(user ? '/dashboard' : '/login?redirect=/dashboard')}
+                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white px-7 py-3.5 rounded-2xl font-black text-sm shadow-lg shadow-orange-500/25 transition-all cursor-pointer active:scale-95"
+                  >
+                    <span>Open Student Dashboard</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
-                  <button className="flex items-center justify-center gap-3 bg-white/20 hover:bg-white/30 text-white px-6 py-4 rounded-2xl font-bold transition-all border border-white/30 cursor-pointer backdrop-blur-md">
-                    <span className="text-2xl">▶️</span>
-                    <div className="text-left">
-                      <p className="text-[10px] font-medium text-orange-100 leading-none">Get it on</p>
-                      <p className="text-base font-extrabold leading-none mt-0.5">Google Play</p>
-                    </div>
+                  <button
+                    onClick={() => navigate('/timetable')}
+                    className="inline-flex items-center justify-center gap-2 bg-white hover:bg-orange-50 text-slate-800 border-2 border-slate-200 hover:border-orange-300 px-6 py-3.5 rounded-2xl font-black text-sm transition-all cursor-pointer shadow-2xs"
+                  >
+                    <Calendar className="w-4 h-4 text-orange-600" />
+                    <span>Weekly Mess Timetable</span>
                   </button>
                 </div>
               </div>
 
-              <div className="flex-1 grid grid-cols-2 gap-4 w-full max-w-sm">
-                {[
-                  { icon: '⏭️', label: 'Skip Meals Instantly' },
-                  { icon: '📅', label: 'View Weekly Menu' },
-                  { icon: '💳', label: 'Wallet & Credits' },
-                  { icon: '🚴', label: 'Live Delivery Track' },
-                  { icon: '➕', label: 'Order Extras (-5%)' },
-                  { icon: '🔔', label: 'Meal Reminders' },
-                ].map((f, i) => (
-                  <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-3 border border-white/10">
-                    <span className="text-2xl">{f.icon}</span>
-                    <span className="text-white font-semibold text-sm">{f.label}</span>
+              {/* RIGHT: Sleek Mobile App Live Preview Mockup */}
+              <div className="lg:col-span-5 flex justify-center">
+                <div className="w-full max-w-[300px] bg-slate-900 rounded-[2.5rem] p-3 shadow-2xl shadow-slate-900/25 border-4 border-slate-800 relative">
+                  {/* Top Notch */}
+                  <div className="w-24 h-4 bg-slate-800 rounded-b-2xl mx-auto mb-2" />
+
+                  {/* Phone Screen */}
+                  <div className="bg-[#FAF9F6] rounded-[1.85rem] p-4 space-y-3 text-slate-900">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-orange-600">Bitez Mess Pass</p>
+                        <p className="text-xs font-black text-slate-900">Hi, Student 👋</p>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-black">
+                        ● Active
+                      </span>
+                    </div>
+
+                    {/* Mini Meal Balance Card */}
+                    <div className="bg-white rounded-2xl p-3 border border-slate-200/80 shadow-2xs">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-1">
+                        <span>Meal Balance</span>
+                        <span className="text-orange-600 font-black">98%</span>
+                      </div>
+                      <div className="flex items-baseline gap-1 mb-2">
+                        <span className="text-xl font-black text-slate-900">59</span>
+                        <span className="text-[10px] font-bold text-slate-400">/ 60 Meals Left</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full w-[98%] bg-gradient-to-r from-orange-500 to-amber-500 rounded-full" />
+                      </div>
+                    </div>
+
+                    {/* Mini Live Delivery Card */}
+                    <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-3 text-white shadow-md">
+                      <div className="flex items-center justify-between text-[10px] font-black uppercase opacity-90">
+                        <span>🍱 Today&apos;s Lunch</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full">OTP: 4821</span>
+                      </div>
+                      <p className="text-xs font-black mt-1">Out for Delivery to Room 204</p>
+                      <p className="text-[10px] text-orange-50 mt-0.5">+ Extra Butter Roti packed inside</p>
+                    </div>
+
+                    {/* Quick App Pills */}
+                    <div className="grid grid-cols-3 gap-1.5 pt-1 text-center">
+                      {[
+                        { e: '⏭️', t: 'Skip' },
+                        { e: '➕', t: 'Extras' },
+                        { e: '💳', t: '₹250' }
+                      ].map((b, idx) => (
+                        <div key={idx} className="bg-white border border-slate-200 rounded-xl py-2 text-[10px] font-black text-slate-700 shadow-2xs">
+                          <span className="block text-sm">{b.e}</span>
+                          <span>{b.t}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>

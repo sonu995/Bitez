@@ -10,7 +10,7 @@ const { getOrCreateMealTimings } = require('./mealTimingsHelper');
 
 // @route  GET /api/subscriptions  — all subscriptions for admin
 // @access Admin / Staff
-router.get('/', async (req, res) => {
+router.get('/', protect, adminOnly, async (req, res) => {
   try {
     const subs = await Subscription.find()
       .populate('userId', 'name email phone walletBalance deliveryAddress')
@@ -43,6 +43,16 @@ router.get('/me', protect, async (req, res) => {
 
     if (!sub) {
       sub = await Subscription.findOne({ userId, status: 'paused' }).populate('planId');
+    }
+
+    // Enforce automatic expiry if endDate has elapsed or meal balance reached 0
+    if (sub && sub.status === 'active') {
+      const isDateExpired = sub.endDate && new Date(sub.endDate).getTime() < Date.now();
+      const isQuotaEmpty = typeof sub.remainingMeals === 'number' && sub.remainingMeals <= 0;
+      if (isDateExpired || isQuotaEmpty) {
+        sub.status = 'expired';
+        if (typeof sub.save === 'function') await sub.save();
+      }
     }
 
     res.json({ success: true, subscription: sub || null });
@@ -137,9 +147,9 @@ router.get('/cutoff-status', async (req, res) => {
   }
 });
 
-// @route  GET /api/subscriptions/:id — individual subscription full details for admin
-// @access Admin / Staff
-router.get('/:id', async (req, res) => {
+// @route  GET /api/subscriptions/:id — individual subscription full details
+// @access Private (Owner or Admin)
+router.get('/:id', protect, async (req, res) => {
   try {
     let sub = await Subscription.findById(req.params.id)
       .populate('userId', 'name email phone walletBalance deliveryAddress')
@@ -153,6 +163,12 @@ router.get('/:id', async (req, res) => {
 
     if (!sub) return res.status(404).json({ success: false, message: 'Subscription not found' });
 
+    const ownerId = String(sub.userId?._id || sub.userId?.id || sub.userId || '');
+    const requesterId = String(req.user._id || req.user.id || '');
+    if (ownerId !== requesterId && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized to view this subscription' });
+    }
+
     res.json({ success: true, subscription: sub });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -160,8 +176,8 @@ router.get('/:id', async (req, res) => {
 });
 
 // @route  GET /api/subscriptions/:id/orders — subscriber orders and delivery history
-// @access Admin / Staff
-router.get('/:id/orders', async (req, res) => {
+// @access Private (Owner or Admin)
+router.get('/:id/orders', protect, async (req, res) => {
   try {
     const paramId = req.params.id;
     let sub = await Subscription.findById(paramId).populate('userId').populate('planId');
@@ -234,8 +250,8 @@ router.get('/:id/orders', async (req, res) => {
 });
 
 // @route  POST /api/subscriptions/manual — admin manually subscribes a student
-// @access Admin / Staff
-router.post('/manual', async (req, res) => {
+// @access Admin
+router.post('/manual', protect, adminOnly, async (req, res) => {
   try {
     const {
       studentName,
@@ -478,13 +494,18 @@ router.put('/:id', protect, async (req, res) => {
 });
 
 // @route  PUT /api/subscriptions/:id/pause
-// @access Private / Admin
-router.put('/:id/pause', async (req, res) => {
+// @access Private (Owner or Admin)
+router.put('/:id/pause', protect, async (req, res) => {
   try {
     let sub = await Subscription.findById(req.params.id);
     if (!sub) sub = await Subscription.findOne({ _id: req.params.id });
     if (!sub) sub = await Subscription.findOne({ id: req.params.id });
     if (!sub) return res.status(404).json({ success: false, message: 'Subscription not found' });
+
+    const requesterId = String(req.user._id || req.user.id || '');
+    if (String(sub.userId) !== requesterId && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized to pause this subscription' });
+    }
 
     const newStatus = sub.status === 'paused' ? 'active' : 'paused';
     sub.status = newStatus;
@@ -543,11 +564,16 @@ router.put('/:id/pause', async (req, res) => {
 });
 
 // @route  PUT /api/subscriptions/:id/cancel
-// @access Private / Admin
-router.put('/:id/cancel', async (req, res) => {
+// @access Private (Owner or Admin)
+router.put('/:id/cancel', protect, async (req, res) => {
   try {
     const sub = await Subscription.findById(req.params.id);
     if (!sub) return res.status(404).json({ success: false, message: 'Subscription not found' });
+
+    const requesterId = String(req.user._id || req.user.id || '');
+    if (String(sub.userId) !== requesterId && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized to cancel this subscription' });
+    }
 
     sub.status = 'cancelled';
     await sub.save();
@@ -567,8 +593,8 @@ router.put('/:id/cancel', async (req, res) => {
 });
 
 // @route  PUT /api/subscriptions/:id/extend — extend extra meals or extra days
-// @access Admin / Staff
-router.put('/:id/extend', async (req, res) => {
+// @access Admin
+router.put('/:id/extend', protect, adminOnly, async (req, res) => {
   try {
     const { extraMeals, extraDays } = req.body;
     const sub = await Subscription.findById(req.params.id);
@@ -588,8 +614,8 @@ router.put('/:id/extend', async (req, res) => {
 });
 
 // @route  PUT /api/subscriptions/:id/renew — 1-click renewal
-// @access Admin / Staff
-router.put('/:id/renew', async (req, res) => {
+// @access Admin
+router.put('/:id/renew', protect, adminOnly, async (req, res) => {
   try {
     const sub = await Subscription.findById(req.params.id).populate('planId');
     if (!sub) return res.status(404).json({ success: false, message: 'Subscription not found' });

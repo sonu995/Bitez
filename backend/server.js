@@ -32,6 +32,7 @@ app.use('/api/complaints', require('./routes/complaints'));
 app.use('/api/dishes', require('./routes/dishes'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/rider', require('./routes/rider'));
+app.use('/api/kitchen', require('./routes/kitchen'));
 
 // Health check
 app.get('/api/health', (req, res) => {

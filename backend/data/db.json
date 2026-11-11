@@ -22,8 +22,8 @@
       "_id": "6accf8af0c7ec018613f5206",
       "id": "6accf8af0c7ec018613f5206",
       "createdAt": "2026-10-12T15:11:43.748Z",
-      "updatedAt": "2026-11-07T07:59:27.283Z",
-      "activeSubscription": "6aeb47c2612fb482635cfd36",
+      "updatedAt": "2026-11-11T04:09:15.481Z",
+      "activeSubscription": "6af3ea6b321a35fe870c79c7",
       "walletBalance": 0,
       "walletTransactions": [
         {
@@ -138,7 +138,7 @@
       "_id": "6ace3a4b7da1670d9fec2b6e",
       "id": "6ace3a4b7da1670d9fec2b6e",
       "createdAt": "2026-10-13T14:03:55.002Z",
-      "updatedAt": "2026-11-04T14:57:06.808Z",
+      "updatedAt": "2026-11-11T04:09:15.483Z",
       "activeSubscribers": 2
     }
   ],
@@ -332,7 +332,7 @@
       "kycVerifiedAt": "2026-11-04T13:59:48.796Z",
       "pin": "1234",
       "rating": 5,
-      "status": "available",
+      "status": "busy",
       "onlineStatus": "online",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=compress&cs=tinysrgb&w=150",
       "perDeliveryRate": 35,
@@ -372,7 +372,7 @@
       },
       "_id": "6aeb3a54183eb075673bf035",
       "createdAt": "2026-11-04T13:59:48.796Z",
-      "updatedAt": "2026-11-10T04:11:07.701Z",
+      "updatedAt": "2026-11-11T04:08:16.504Z",
       "activeTiffins": 2
     }
   ],
@@ -387,7 +387,7 @@
       "amountPaid": 149,
       "remainingMeals": 59,
       "totalMeals": 60,
-      "status": "active",
+      "status": "replaced",
       "paymentMethod": "UPI / Online QR",
       "dietPreference": "Homestyle North Indian Veg",
       "hostelAddress": "Tagore Hostel, Room 204 (NC-01)",
@@ -396,10 +396,30 @@
       "_id": "6aeb47c2612fb482635cfd36",
       "id": "6aeb47c2612fb482635cfd36",
       "createdAt": "2026-11-04T14:57:06.806Z",
-      "updatedAt": "2026-11-07T07:59:27.288Z",
+      "updatedAt": "2026-11-11T04:09:15.469Z",
       "skippedMeals": 0,
       "pausedAt": "2026-11-07T07:59:27.286Z",
       "resumedAt": "2026-11-07T07:59:27.288Z"
+    },
+    {
+      "userId": "6accf8af0c7ec018613f5206",
+      "planId": "6ace3a4b7da1670d9fec2b6e",
+      "billingCycle": "monthly",
+      "startDate": "2026-11-11T04:09:15.477Z",
+      "endDate": "2026-12-11T04:09:15.477Z",
+      "amountPaid": 149,
+      "remainingMeals": 60,
+      "totalMeals": 60,
+      "status": "active",
+      "paymentMethod": "Bitez Wallet / UPI",
+      "dietPreference": "Standard Homestyle",
+      "hostelAddress": "Tagore Hostel, Room 204 (NC-01)",
+      "room": "12",
+      "zoneCode": "ZN-01",
+      "_id": "6af3ea6b321a35fe870c79c7",
+      "id": "6af3ea6b321a35fe870c79c7",
+      "createdAt": "2026-11-11T04:09:15.478Z",
+      "updatedAt": "2026-11-11T04:09:15.478Z"
     }
   ],
   "dispatchRoster": [
@@ -553,6 +573,23 @@
       "statusStep": "dispatched",
       "deliveredAt": "01:00 PM",
       "mealDeducted": false
+    },
+    {
+      "id": "TIF-213",
+      "_id": "TIF-213",
+      "student": "raj kumar",
+      "hostel": "Tagore Hostel, Room 204 (NC-01)",
+      "zoneCode": "ZN-01",
+      "zoneName": "North Campus",
+      "route": "North Campus",
+      "rider": "Unassigned",
+      "plan": "Trial thail (2 Meals)",
+      "slot": "Lunch & Dinner",
+      "status": "dispatched",
+      "extras": "Standard Homestyle",
+      "deliveredAt": "Scheduled",
+      "createdAt": "2026-11-11T04:09:15.488Z",
+      "updatedAt": "2026-11-11T04:09:15.488Z"
     }
   ],
   "skipRequests": [],
@@ -981,7 +1018,8 @@
       "_id": "6aeec8a8446fc3c5801abd9d",
       "id": "6aeec8a8446fc3c5801abd9d",
       "createdAt": "2026-11-07T06:43:52.907Z",
-      "updatedAt": "2026-11-07T07:11:50.152Z"
+      "updatedAt": "2026-11-11T04:08:16.498Z",
+      "riderId": "#R001"
     }
   ],
   "dishes": [
@@ -1012,7 +1050,7 @@
         "Gulab Jamun"
       ],
       "isAvailable": true,
-      "updatedAt": "2026-10-17T09:59:27.235Z"
+      "updatedAt": "2026-11-10T05:54:32.233Z"
     },
     {
       "_id": "dish_02",

@@ -64,12 +64,10 @@ export default function Dashboard() {
   const { user, topupWallet, refreshUser, hasActiveSub, isLoading: authLoading, updateProfile } = useAuth();
   const { addToCart } = useCart();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'subscription' | 'timetable' | 'orders' | 'wallet' | 'profile'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'subscription' | 'orders' | 'wallet' | 'profile'>('overview');
   const [orders, setOrders] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [todayMenu, setTodayMenu] = useState<any>(null);
-  const [weeklyTimetable, setWeeklyTimetable] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
-  const [selectedTimetableDay, setSelectedTimetableDay] = useState<string>('Today');
   const [extraItems, setExtraItems] = useState<any[]>(DEFAULT_DASHBOARD_EXTRAS);
   const [loading, setLoading] = useState(true);
 
@@ -167,11 +165,10 @@ export default function Dashboard() {
   const fetchDashboardData = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const [ordersRes, subRes, menuRes, weeklyRes, extrasRes, attachedRes, mealStatusRes] = await Promise.allSettled([
+      const [ordersRes, subRes, menuRes, extrasRes, attachedRes, mealStatusRes] = await Promise.allSettled([
         ordersAPI.getMyOrders(),
         subscriptionsAPI.getMine(),
         menuAPI.getToday(),
-        menuAPI.getAll(),
         extrasAPI.getAll(),
         ordersAPI.getAttachedMealExtras(),
         ordersAPI.getMealDeliveryStatus()
@@ -208,11 +205,6 @@ export default function Dashboard() {
 
       if (menuRes.status === 'fulfilled') {
         if (menuRes.value?.menu) setTodayMenu(menuRes.value.menu);
-        if (menuRes.value?.weekly) setWeeklyTimetable(menuRes.value.weekly);
-      }
-
-      if (weeklyRes.status === 'fulfilled' && weeklyRes.value?.menu) {
-        setWeeklyTimetable(weeklyRes.value.menu);
       }
 
       if (extrasRes.status === 'fulfilled' && extrasRes.value?.items && extrasRes.value.items.length > 0) {
@@ -830,11 +822,11 @@ export default function Dashboard() {
 
               <div className="flex sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
                 <button
-                  onClick={() => setActiveTab('timetable')}
+                  onClick={() => navigate('/timetable')}
                   className="flex-1 sm:flex-initial px-4 py-2 bg-white hover:bg-orange-50 text-orange-700 font-extrabold text-xs rounded-xl border border-orange-200 transition shadow-2xs cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <CalendarDays className="w-3.5 h-3.5 text-orange-600" />
-                  <span>Full 7-Day Timetable</span>
+                  <span>Weekly Mess Timetable</span>
                 </button>
               </div>
             </div>
@@ -1671,96 +1663,6 @@ export default function Dashboard() {
   );
 
   // ══════════════════════════════════════════════════════════════
-  // RENDER: TIMETABLE TAB
-  // ══════════════════════════════════════════════════════════════
-  const renderTimetableTab = () => {
-    const days = ['Today', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const currentSchedule = selectedTimetableDay === 'Today'
-      ? {
-          breakfast: typeof todayMenu?.breakfast === 'string' ? todayMenu.breakfast : todayMenu?.breakfast?.items || 'Aloo Paratha + Fresh Curd + Masala Chai',
-          lunch: typeof todayMenu?.lunch === 'string' ? todayMenu.lunch : todayMenu?.lunch?.items || 'Paneer Butter Masala + Dal Tadka + 4 Butter Phulkas + Jeera Rice + Salad',
-          dinner: typeof todayMenu?.dinner === 'string' ? todayMenu.dinner : todayMenu?.dinner?.items || 'Seasonal Mix Veg + Dal Makhani + 4 Butter Rotis + Steamed Rice + Boondi Raita'
-        }
-      : weeklyTimetable[selectedTimetableDay] || {
-          breakfast: 'Poha + Boiled Eggs / Curd + Chai',
-          lunch: 'Dal Makhani + Jeera Rice + 4 Roti + Salad',
-          dinner: 'Kadhai Paneer + 4 Butter Phulkas + Steamed Rice'
-        };
-
-    return (
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2.5">
-              <CalendarDays className="w-6 h-6 text-orange-500" />
-              <span>Weekly Campus Mess Timetable</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Check what's scheduled for breakfast, lunch and dinner on every day of the week
-            </p>
-          </div>
-
-          <Link
-            to="/timetable"
-            className="px-4 py-2 bg-orange-50 hover:bg-orange-100 text-orange-700 font-extrabold text-xs rounded-xl border border-orange-200 transition"
-          >
-            Open Standalone Timetable 📅
-          </Link>
-        </div>
-
-        {/* Day Switcher */}
-        <div className="flex overflow-x-auto scrollbar-hide bg-slate-50 p-1.5 rounded-2xl border border-slate-200/80 gap-1.5">
-          {days.map((day) => {
-            const isActive = selectedTimetableDay === day;
-            return (
-              <button
-                key={day}
-                onClick={() => setSelectedTimetableDay(day)}
-                className={`flex-1 min-w-[70px] py-2 px-3 rounded-xl text-xs font-black transition-all cursor-pointer text-center ${
-                  isActive
-                    ? 'bg-orange-500 text-white shadow-xs scale-102'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-                }`}
-              >
-                {day === 'Today' ? '⚡ Today' : day}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* 3 Meal Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {[
-            { title: mealTimings?.breakfast?.label || 'Morning Breakfast', emoji: '☀️', time: mealTimings?.breakfast?.deliveryTimeStr || '08:00 AM – 09:30 AM', dishes: currentSchedule.breakfast, tag: 'High Energy' },
-            { title: mealTimings?.lunch?.label || 'Lunch Thali', emoji: '🍱', time: mealTimings?.lunch?.deliveryTimeStr || '12:30 PM – 02:00 PM', dishes: currentSchedule.lunch, tag: 'Wholesome Nutrition' },
-            { title: mealTimings?.dinner?.label || 'Dinner Feast', emoji: '🌙', time: mealTimings?.dinner?.deliveryTimeStr || '07:30 PM – 09:00 PM', dishes: currentSchedule.dinner, tag: 'Warm & Comfort' }
-          ].map((m) => (
-            <div key={m.title} className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-2xl">{m.emoji}</span>
-                  <span className="text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-200/80 px-2 py-0.5 rounded-md">
-                    {m.time}
-                  </span>
-                </div>
-                <h4 className="text-base font-black text-slate-900 mb-2">{m.title}</h4>
-                <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200/60 mb-3">
-                  {m.dishes}
-                </p>
-              </div>
-
-              <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
-                <span>{m.tag}</span>
-                <span className="text-emerald-600 font-bold">100% Pure Veg</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // ══════════════════════════════════════════════════════════════
   // RENDER: ORDERS TAB
   // ══════════════════════════════════════════════════════════════
   const renderOrdersTab = () => (
@@ -2029,7 +1931,6 @@ export default function Dashboard() {
           {[
             { id: 'overview', label: 'Overview', icon: LayoutDashboard },
             { id: 'subscription', label: 'Plan & Skips', icon: Crown },
-            { id: 'timetable', label: 'Timetable', icon: CalendarDays },
             { id: 'orders', label: 'Orders', icon: ShoppingBag },
             { id: 'wallet', label: 'Wallet', icon: Wallet },
             { id: 'profile', label: 'Profile', icon: User }
@@ -2051,12 +1952,18 @@ export default function Dashboard() {
               </button>
             );
           })}
+          <Link
+            to="/timetable"
+            className="snap-start flex-1 min-w-[95px] sm:min-w-0 py-2 sm:py-2.5 px-2.5 sm:px-3.5 rounded-xl font-black text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap select-none text-slate-600 hover:text-orange-600 hover:bg-orange-50/50"
+          >
+            <CalendarDays className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />
+            <span>Timetable</span>
+          </Link>
         </div>
 
         {/* ── ACTIVE TAB CONTENT ── */}
         {activeTab === 'overview' && renderOverview()}
         {activeTab === 'subscription' && renderSubscriptionTab()}
-        {activeTab === 'timetable' && renderTimetableTab()}
         {activeTab === 'orders' && renderOrdersTab()}
         {activeTab === 'wallet' && renderWalletTab()}
         {activeTab === 'profile' && renderProfileTab()}

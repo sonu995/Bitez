@@ -909,3 +909,33 @@ export const riderAPI = {
     }).then(handleResponse)
 };
 
+// ── KITCHEN DISPLAY SYSTEM (KDS) & STOCK CONTROLS ────────────
+export const kitchenAPI = {
+  getQueue: () =>
+    fetch(`${BASE_URL}/kitchen/queue`, { headers: adminHeaders() }).then(handleResponse),
+  updateKotStatus: (orderId: string, data: { status?: string; kitchenReady?: boolean }) =>
+    fetch(`${BASE_URL}/kitchen/kot/${encodeURIComponent(orderId)}/status`, {
+      method: 'PUT',
+      headers: adminHeaders(),
+      body: JSON.stringify(data)
+    }).then(handleResponse),
+  updateMessBoxStatus: (dispatchId: string, status: string) =>
+    fetch(`${BASE_URL}/kitchen/mess/${encodeURIComponent(dispatchId)}/status`, {
+      method: 'PUT',
+      headers: adminHeaders(),
+      body: JSON.stringify({ status })
+    }).then(handleResponse),
+  batchPackMessSlot: (slot: 'Breakfast' | 'Lunch' | 'Dinner') =>
+    fetch(`${BASE_URL}/kitchen/mess/batch-pack`, {
+      method: 'PUT',
+      headers: adminHeaders(),
+      body: JSON.stringify({ slot })
+    }).then(handleResponse),
+  updateStock: (type: 'dish' | 'extra', id: string, data: { isAvailable?: boolean; stockQty?: number | null }) =>
+    fetch(`${BASE_URL}/kitchen/stock/${type}/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: adminHeaders(),
+      body: JSON.stringify(data)
+    }).then(handleResponse)
+};
+

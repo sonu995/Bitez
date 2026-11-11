@@ -49,18 +49,46 @@ const NotificationSystem: React.FC = () => {
         icon: <Wallet className="w-5 h-5 text-emerald-600" />
       });
 
-      // Live subscription notification
+      // Live subscription & Expiry Reminder notifications
       try {
         const subRes = await subscriptionsAPI.getMine();
         if (subRes?.subscription) {
           const sub = subRes.subscription;
+          const daysLeft = sub.endDate
+            ? Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+            : 30;
+          const mealsLeft = sub.remainingMeals ?? 0;
+
+          if (sub.status === 'expired' || daysLeft <= 0 || mealsLeft <= 0) {
+            list.push({
+              id: 'sub-expired',
+              type: 'subscription',
+              title: '⚠️ Mess Subscription Expired',
+              message: 'Your active meal quota or validity has ended. Renew your plan to resume mess tiffins & Extra Food With Meal.',
+              time: 'Action Required',
+              read: false,
+              icon: <Clock className="w-5 h-5 text-rose-600" />
+            });
+          } else if (daysLeft <= 7 || mealsLeft <= 5) {
+            const reminderLabel = daysLeft <= 1 ? 'Expires Tomorrow!' : daysLeft <= 3 ? `Expires in ${daysLeft} Days` : `Expires in ${daysLeft} Days`;
+            list.push({
+              id: 'sub-expiry-reminder',
+              type: 'subscription',
+              title: `🔔 Renewal Reminder: ${reminderLabel}`,
+              message: `Only ${mealsLeft} meals remaining until ${new Date(sub.endDate).toLocaleDateString('en-IN')}. Renew early to avoid mess interruption.`,
+              time: `${daysLeft}d left`,
+              read: false,
+              icon: <Clock className="w-5 h-5 text-rose-600" />
+            });
+          }
+
           list.push({
             id: 'sub',
             type: 'subscription',
             title: `${sub.planId?.name || 'Mess'} Plan (${sub.status.toUpperCase()})`,
-            message: `${sub.remainingMeals ?? 0} meals remaining. Valid until ${new Date(sub.endDate).toLocaleDateString('en-IN')}.`,
+            message: `${mealsLeft} meals remaining. Valid until ${new Date(sub.endDate).toLocaleDateString('en-IN')}.`,
             time: 'Current Plan',
-            read: false,
+            read: daysLeft > 7 && mealsLeft > 5,
             icon: <Clock className="w-5 h-5 text-amber-600" />
           });
         }

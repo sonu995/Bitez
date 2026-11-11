@@ -5143,6 +5143,20 @@ export default function AdminPanel() {
             </span>
             <ExternalLink size={11} className="text-slate-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
+
+          {/* Quick Launch Kitchen Display System (KDS) */}
+          <Link
+            to="/kitchen"
+            target="_blank"
+            className="mt-1.5 w-full py-1.5 px-2 bg-orange-950 hover:bg-orange-900 text-amber-300 hover:text-amber-200 border border-orange-800/60 rounded-xl text-[11px] font-black flex items-center justify-between transition shadow-2xs group"
+            title="Launch Dedicated Kitchen Display System (KDS)"
+          >
+            <span className="flex items-center gap-1.5">
+              <ChefHat size={13} className="text-amber-400 group-hover:scale-110 transition-transform" />
+              <span>Kitchen Display (KDS)</span>
+            </span>
+            <ExternalLink size={11} className="text-orange-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
         </div>
 
         {/* Navigation Tabs - Categorized Groups */}
@@ -6375,8 +6389,38 @@ export default function AdminPanel() {
               );
             });
 
+            const unassignedCombinedBoxes = normalizedList.filter(
+              item => item.hasAttachedExtras && (!item.rider || item.rider === 'Unassigned') && !item.isSkipped && item.status !== 'delivered'
+            );
+
             return (
               <div className="space-y-5">
+                {/* ── COMBINED DELIVERY UNASSIGNED RIDER WARNING ── */}
+                {unassignedCombinedBoxes.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 via-rose-50 to-amber-50 border-2 border-amber-300 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <AlertTriangle size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-amber-950">
+                          ⚠️ Combined Dispatch Warning: {unassignedCombinedBoxes.length} Tiffin Box(es) with Extra Add-ons have NO Rider Assigned!
+                        </p>
+                        <p className="text-xs text-amber-800 font-medium mt-0.5">
+                          Students ({unassignedCombinedBoxes.map(b => b.student).slice(0, 3).join(', ')}{unassignedCombinedBoxes.length > 3 ? '...' : ''}) added extra food items. Assign a rider before dispatch so bundled items aren&apos;t missed!
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setDispatchExtrasOnly(true)}
+                      className="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 transition cursor-pointer shadow-2xs"
+                    >
+                      View Combined Boxes ➔
+                    </button>
+                  </div>
+                )}
+
                 {/* ── TOP VIEW SWITCHER: LIVE CHECKLIST vs COMPLETE HISTORY ── */}
                 <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-2xs">
                   <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">

@@ -21,15 +21,17 @@ import Support from './pages/Support';
 import ComplaintTracking from './pages/ComplaintTracking';
 import WeeklyTimetable from './pages/WeeklyTimetable';
 import RiderApp from './pages/RiderApp';
+import KitchenPanel from './pages/KitchenPanel';
 
 function AppLayout() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
   const isRider = location.pathname.startsWith('/rider');
-  const isDedicatedApp = isAdmin || isRider;
+  const isKitchen = location.pathname.startsWith('/kitchen');
+  const isDedicatedApp = isAdmin || isRider || isKitchen;
 
   return (
-    <div className={`min-h-screen flex flex-col relative ${isAdmin ? 'bg-slate-50' : isRider ? 'bg-slate-950' : 'bg-gradient-to-b from-orange-50/40 via-amber-50/20 to-white'}`}>
+    <div className={`min-h-screen flex flex-col relative ${isAdmin ? 'bg-slate-50' : (isRider || isKitchen) ? 'bg-slate-950' : 'bg-gradient-to-b from-orange-50/40 via-amber-50/20 to-white'}`}>
       {!isDedicatedApp && <Header />}
       <main className={`flex-1 ${!isDedicatedApp ? 'pb-20 sm:pb-0' : ''}`}>
         <Routes>
@@ -37,7 +39,7 @@ function AppLayout() {
           <Route path="/menu/:restaurantId" element={<Menu />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/timetable" element={<WeeklyTimetable />} />
-          <Route path="/weekly-menu" element={<WeeklyTimetable />} />
+          <Route path="/weekly-menu" element={<Navigate to="/timetable" replace />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
@@ -51,6 +53,8 @@ function AppLayout() {
           <Route path="/admin/instant" element={<InstantAdminPanel />} />
           <Route path="/admin/instant-orders" element={<InstantAdminPanel />} />
           <Route path="/admin/tiffin-plans" element={<AdminTiffinPlans />} />
+          <Route path="/admin/kitchen" element={<KitchenPanel />} />
+          <Route path="/kitchen" element={<KitchenPanel />} />
           <Route path="/mess" element={<Subscriptions />} />
           <Route path="/plans" element={<Subscriptions />} />
           <Route path="/subscriptions" element={<Subscriptions />} />

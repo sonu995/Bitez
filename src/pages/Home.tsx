@@ -84,8 +84,7 @@ const Home: React.FC = () => {
   });
   const [foodItems, setFoodItems] = useState<any[]>([]);
   const [loadingDishes, setLoadingDishes] = useState(true);
-  const [weeklyTimetable, setWeeklyTimetable] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
-  const [selectedTimetableDay, setSelectedTimetableDay] = useState<string>('Today');
+  const [mealTimings, setMealTimings] = useState<any>(null);
 
   // Mess Plans Carousel / Slider State
   const messPlansRef = useRef<HTMLDivElement>(null);
@@ -196,9 +195,9 @@ const Home: React.FC = () => {
         setMessPlans(formatted);
       }
     }).catch((e: any) => console.error('Error fetching plans:', e))
-    .finally(() => setLoadingPlans(false));
+      .finally(() => setLoadingPlans(false));
 
-    // 2. Fetch live today's rotating menu & weekly timetable
+    // 2. Fetch live today's rotating menu & meal timings
     menuAPI.getToday().then((data: any) => {
       if (data?.breakfast && data?.lunch && data?.dinner) {
         setTodaysMenu({
@@ -209,10 +208,8 @@ const Home: React.FC = () => {
       }
     }).catch((e: any) => console.error('Error fetching today menu:', e));
 
-    menuAPI.getAll().then((data: any) => {
-      if (data?.menu) {
-        setWeeklyTimetable(data.menu);
-      }
+    menuAPI.getMealTimings?.().then((res: any) => {
+      if (res?.timings) setMealTimings(res.timings);
     }).catch(() => {});
 
     // 3. Fetch live dishes
@@ -221,10 +218,10 @@ const Home: React.FC = () => {
         setFoodItems(data.dishes);
       }
     }).catch((e: any) => console.error('Error fetching food items:', e))
-    .finally(() => setLoadingDishes(false));
+      .finally(() => setLoadingDishes(false));
   }, []);
 
-    const reviews = [
+  const reviews = [
     { name: 'Rahul S.', rating: 5, text: 'Food quality is consistently great and delivery is always on time. The mess plan saves me so much money and hassle! 🔥', avatar: '👨‍🎓' },
     { name: 'Priya M.', rating: 5, text: 'Best tiffin service in the city! I love the daily menu variety and the app makes it super easy to skip and pause meals. ⭐', avatar: '👩‍💼' },
     { name: 'Amit K.', rating: 4, text: 'Affordable and delicious food. The skip-meal feature is very convenient during exam weeks. Highly recommended! 🍕', avatar: '👨‍💻' },
@@ -322,14 +319,14 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* HERO SECTION - WARM CULINARY PALETTE */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-orange-50/50 via-amber-50/20 to-transparent pt-8 pb-4 lg:pt-10 lg:pb-6 border-b border-orange-100/60">
+      <section className="relative overflow-hidden bg-gradient-to-b from-orange-50/50 via-amber-50/20 to-transparent pt-6 pb-8 lg:pt-8 lg:pb-10 border-b border-orange-100/70">
         {/* Soft background ambient blurs */}
         <div className="absolute top-0 right-10 w-[500px] h-[500px] bg-gradient-to-br from-orange-500/15 to-amber-500/10 rounded-full blur-3xl pointer-events-none -z-0"></div>
         <div className="absolute top-20 right-48 w-80 h-80 bg-orange-500/8 rounded-full blur-3xl pointer-events-none -z-0"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-6 items-center">
-            
+
             {/* LEFT CONTENT COLUMN */}
             <div className="md:col-span-6 text-center md:text-left order-2 md:order-1">
               {/* Handwritten script badge */}
@@ -409,7 +406,7 @@ const Home: React.FC = () => {
                 </div>
 
                 {/* 3. Promo Strip Pill */}
-                <div 
+                <div
                   onClick={() => navigate('/menu')}
                   className="flex items-center justify-between bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border border-orange-200/80 rounded-xl px-3 py-2 text-xs shadow-2xs cursor-pointer active:scale-98 transition-all"
                 >
@@ -483,13 +480,13 @@ const Home: React.FC = () => {
 
             {/* RIGHT COMPOSITE VISUAL COLUMN (Header Image - visible on mobile and desktop) */}
             <div className="md:col-span-6 relative flex items-center justify-center pt-2 md:pt-0 order-1 md:order-2 mb-4 sm:mb-6 md:mb-0">
-              
+
               <div className="relative w-full max-w-[620px] group">
-                
+
                 {/* 1. Ambient Background Glowing Light Orbs */}
                 <div className="absolute -top-10 -right-10 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
                 <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
-                
+
                 {/* 2. Rotating Decorative Dashed Orbital Shape */}
                 <div className="absolute inset-0 sm:-inset-4 border-2 border-dashed border-orange-200/60 rounded-[2.25rem] sm:rounded-[3.75rem] pointer-events-none animate-spin-slow opacity-80" />
 
@@ -500,10 +497,10 @@ const Home: React.FC = () => {
 
                 {/* 4. Main Organic Shaped Container with Glassmorphism Border */}
                 <div className="relative p-2 sm:p-3.5 bg-white/90 backdrop-blur-xl rounded-[2rem] sm:rounded-[3.25rem] lg:rounded-[3.5rem] shadow-[0_20px_50px_-15px_rgba(234,88,12,0.15)] border border-slate-200/80 transition-all duration-700 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_25px_60px_-12px_rgba(234,88,12,0.25)]">
-                  
+
                   {/* Inner Shaped Frame */}
                   <div className="relative overflow-hidden rounded-[1.75rem] sm:rounded-[2.75rem] lg:rounded-[3rem] bg-slate-100 aspect-[16/10] sm:aspect-[16/9.5] flex items-center justify-center">
-                    
+
                     {/* Top glass shine effect */}
                     <div className="absolute inset-x-0 top-0 h-20 sm:h-28 bg-gradient-to-b from-white/40 to-transparent pointer-events-none z-10" />
 
@@ -586,14 +583,14 @@ const Home: React.FC = () => {
       </section>
 
       {/* MESS PLANS - CAROUSEL / SCROLL SECTION */}
-      <section id="mess-plans" className="py-16 sm:py-24 bg-gradient-to-b from-[#FDFBF7] via-white to-[#FDFBF7] border-y border-orange-100/60 relative overflow-hidden">
+      <section id="mess-plans" className="py-10 sm:py-12 lg:py-14 bg-gradient-to-b from-[#FDFBF7] via-white to-[#FDFBF7] relative overflow-hidden">
         {/* Decorative background glows */}
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-orange-400/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           {/* Section Header with Left/Right Arrows */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-5">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 gap-4">
             <div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 border border-orange-200 text-orange-700 text-xs font-black uppercase tracking-wider mb-3 shadow-xs">
                 <Sparkles className="w-3.5 h-3.5 text-orange-600" />
@@ -616,11 +613,10 @@ const Home: React.FC = () => {
                 onClick={() => scrollMessPlans('left')}
                 disabled={!canScrollPlansLeft}
                 aria-label="Scroll plans left"
-                className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
-                  canScrollPlansLeft
+                className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${canScrollPlansLeft
                     ? 'bg-white border-slate-300 text-slate-800 shadow-sm hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:scale-105 active:scale-95'
                     : 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed'
-                }`}
+                  }`}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -628,11 +624,10 @@ const Home: React.FC = () => {
                 onClick={() => scrollMessPlans('right')}
                 disabled={!canScrollPlansRight}
                 aria-label="Scroll plans right"
-                className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
-                  canScrollPlansRight
+                className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${canScrollPlansRight
                     ? 'bg-white border-slate-300 text-slate-800 shadow-sm hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:scale-105 active:scale-95'
                     : 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed'
-                }`}
+                  }`}
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -708,7 +703,7 @@ const Home: React.FC = () => {
                         </span>
                         <span className="text-xs font-bold text-slate-400">/month</span>
                       </div>
-                      
+
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
                         <span className="text-[11px] font-semibold text-slate-500">Effective Cost:</span>
                         <span className="text-xs font-black text-orange-600 bg-orange-100/70 px-2 py-0.5 rounded-md">
@@ -766,18 +761,17 @@ const Home: React.FC = () => {
                     }
                   }}
                   aria-label={`Go to plan ${dotIdx + 1}`}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    activePlanIndex === dotIdx
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${activePlanIndex === dotIdx
                       ? 'w-7 bg-orange-500'
                       : 'w-2 bg-slate-300 hover:bg-slate-400'
-                  }`}
+                    }`}
                 />
               ))}
             </div>
           )}
 
           {/* Guarantee / Trust Badge Footer */}
-          <div className="mt-12 p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
+          <div className="mt-7 sm:mt-8 p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
                 <ShieldCheck className="w-5 h-5" />
@@ -800,81 +794,52 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* WEEKLY TIMETABLE & LIVE KITCHEN MENU */}
-      <section id="todays-menu" className="py-14 sm:py-20 bg-[#FBF9F5] border-y border-orange-100/60 relative">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center mb-8 sm:mb-10 max-w-2xl mx-auto">
+      {/* TODAY'S LIVE KITCHEN MENU HIGHLIGHT */}
+      <section id="todays-menu" className="py-10 sm:py-12 lg:py-14 bg-[#FBF9F5] border-t border-orange-100/70 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <div className="text-center mb-6 sm:mb-8 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 border border-orange-200 text-orange-700 text-xs font-black uppercase tracking-wider mb-3 shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-orange-600" />
-              <span>FRESH ROTATING HOMESTYLE TIMETABLE</span>
+              <span>COOKING FRESH IN CAMPUS KITCHEN TODAY</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mb-2 sm:mb-3">
-              Weekly Mess <span className="text-orange-600">Timetable 🍱</span>
+              Today&apos;s Live <span className="text-orange-600">Mess Menu 🍳</span>
             </h2>
             <p className="text-slate-500 text-xs sm:text-base">
-              Check what's cooking fresh today or browse what's planned for any day of the week
+              Freshly prepared homestyle meals today — check the full 7-day rotating schedule in the Weekly Timetable.
             </p>
           </div>
 
-          {/* Interactive Day Switcher Tabs */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex bg-white p-1.5 rounded-2xl border border-slate-200/90 shadow-sm overflow-x-auto max-w-full scrollbar-hide gap-1">
-              {['Today', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => {
-                const isActive = selectedTimetableDay === day;
-                return (
-                  <button
-                    key={day}
-                    onClick={() => setSelectedTimetableDay(day)}
-                    className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 ${
-                      isActive
-                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 scale-105'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span>{day === 'Today' ? '⚡ Today' : day}</span>
-                    {day === 'Sun' && <span>🎉</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 3 Meal Cards */}
+          {/* 3 Today Meal Cards with Food Images */}
           {(() => {
-            const currentSchedule = selectedTimetableDay === 'Today'
-              ? {
-                  breakfast: typeof todaysMenu.breakfast === 'string' ? todaysMenu.breakfast : todaysMenu.breakfast?.items || 'Aloo Paratha + Curd + Chai',
-                  lunch: typeof todaysMenu.lunch === 'string' ? todaysMenu.lunch : todaysMenu.lunch?.items || 'Dal Makhani + Jeera Rice + 3 Roti + Salad',
-                  dinner: typeof todaysMenu.dinner === 'string' ? todaysMenu.dinner : todaysMenu.dinner?.items || 'Paneer Butter Masala + Rice + 3 Roti'
-                }
-              : weeklyTimetable[selectedTimetableDay] || {
-                  breakfast: 'Poha + Boiled Eggs + Chai',
-                  lunch: 'Dal Tadka + Jeera Rice + 3 Roti + Salad',
-                  dinner: 'Kadhai Paneer + 3 Phulka Roti + Rice'
-                };
-
             const mealsData = [
               {
-                title: 'Breakfast',
+                title: mealTimings?.breakfast?.label || 'Breakfast',
                 emoji: '☀️',
-                time: '8:00 AM – 10:00 AM',
-                items: currentSchedule.breakfast,
-                tag: 'Morning Energy'
+                time: mealTimings?.breakfast?.deliveryTimeStr || '08:00 AM – 09:30 AM',
+                items: typeof todaysMenu.breakfast === 'string' ? todaysMenu.breakfast : todaysMenu.breakfast?.items || 'Aloo Paratha + Curd + Chai',
+                tag: 'Morning Energy',
+                img: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=600',
+                fallback: '/categories/south-indian.png'
               },
               {
-                title: 'Lunch Thali',
+                title: mealTimings?.lunch?.label || 'Lunch Thali',
                 emoji: '🌤️',
-                time: '12:30 PM – 2:30 PM',
-                items: currentSchedule.lunch,
-                tag: 'Balanced Homestyle'
+                time: mealTimings?.lunch?.deliveryTimeStr || '12:30 PM – 02:00 PM',
+                items: typeof todaysMenu.lunch === 'string' ? todaysMenu.lunch : todaysMenu.lunch?.items || 'Dal Makhani + Jeera Rice + 3 Roti + Salad',
+                tag: 'Balanced Homestyle',
+                img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=600',
+                fallback: '/categories/thali.png'
               },
               {
-                title: 'Dinner',
+                title: mealTimings?.dinner?.label || 'Dinner',
                 emoji: '🌙',
-                time: '7:30 PM – 9:30 PM',
-                items: currentSchedule.dinner,
-                tag: 'Warm Comfort'
+                time: mealTimings?.dinner?.deliveryTimeStr || '07:30 PM – 09:00 PM',
+                items: typeof todaysMenu.dinner === 'string' ? todaysMenu.dinner : todaysMenu.dinner?.items || 'Paneer Butter Masala + Rice + 3 Roti',
+                tag: 'Warm Comfort',
+                img: 'https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=600',
+                fallback: '/categories/curries.png'
               }
             ];
 
@@ -883,23 +848,49 @@ const Home: React.FC = () => {
                 {mealsData.map(m => (
                   <div
                     key={m.title}
-                    className="bg-white rounded-3xl p-6 sm:p-7 text-center hover:-translate-y-1 transition-all duration-300 border border-slate-200 shadow-xs hover:shadow-lg hover:border-orange-200 flex flex-col justify-between"
+                    className="bg-white rounded-3xl overflow-hidden hover:-translate-y-1 transition-all duration-300 border border-slate-200 shadow-xs hover:shadow-xl hover:border-orange-200 flex flex-col justify-between group"
                   >
                     <div>
-                      <div className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-0.5 rounded-full mb-3 border border-orange-100">
-                        <Clock className="w-3 h-3" />
-                        <span>{m.time}</span>
+                      {/* Visual Food Image Banner */}
+                      <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
+                        <img
+                          src={m.img}
+                          alt={m.title}
+                          onError={(e) => {
+                            if (!e.currentTarget.dataset.fallbackApplied) {
+                              e.currentTarget.dataset.fallbackApplied = '1';
+                              e.currentTarget.src = m.fallback;
+                            }
+                          }}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
+                        <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-slate-800 text-[11px] font-black px-3 py-1 rounded-full shadow-xs flex items-center gap-1">
+                          <span>{m.emoji}</span>
+                          <span>{m.tag}</span>
+                        </span>
+                        <span className="absolute top-3 right-3 bg-emerald-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-xs">
+                          ✓ Pure Veg
+                        </span>
+                        <span className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full border border-white/15 flex items-center gap-1.5">
+                          <Clock className="w-3 h-3 text-orange-400" />
+                          <span>{m.time}</span>
+                        </span>
                       </div>
-                      <div className="text-4xl sm:text-5xl mb-2">{m.emoji}</div>
-                      <h3 className="text-base sm:text-lg font-black text-slate-900 mb-2">{m.title}</h3>
-                      <div className="bg-slate-50 rounded-2xl p-3.5 border border-slate-100/80 mb-3">
-                        <p className="text-slate-800 text-xs sm:text-sm font-bold leading-relaxed">{m.items}</p>
+
+                      <div className="p-5 sm:p-6 text-left">
+                        <h3 className="text-base sm:text-lg font-black text-slate-900 mb-2 flex items-center gap-1.5">
+                          <span>{m.title}</span>
+                        </h3>
+                        <div className="bg-orange-50/60 rounded-2xl p-3.5 border border-orange-100/80">
+                          <p className="text-slate-800 text-xs sm:text-sm font-bold leading-relaxed">{m.items}</p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-100 text-xs text-slate-400 font-semibold flex items-center justify-between">
-                      <span>{m.tag}</span>
-                      <span className="text-emerald-600 font-bold">✓ Pure Veg</span>
+                    <div className="px-5 sm:px-6 pb-4 pt-2 border-t border-slate-100 text-xs text-slate-400 font-semibold flex items-center justify-between">
+                      <span>Hot Insulated Tiffin</span>
+                      <span className="text-orange-600 font-bold">100% Homestyle</span>
                     </div>
                   </div>
                 ))}
@@ -907,13 +898,13 @@ const Home: React.FC = () => {
             );
           })()}
 
-          {/* Action Links */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-8 pt-4">
+          {/* Single Canonical Action Link to Weekly Mess Timetable */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-6 pt-2">
             <Link
               to="/timetable"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl transition-all shadow-md shadow-orange-500/20 text-xs sm:text-sm cursor-pointer"
             >
-              <span>View Full 7-Day Timetable 📅</span>
+              <span>Open Weekly Mess Timetable 🍱</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
@@ -929,11 +920,11 @@ const Home: React.FC = () => {
       </section>
 
       {/* INSTANT ORDER - 3-COLOR THEME */}
-      <section id="food-delivery" className="relative py-14 sm:py-20 bg-white overflow-hidden border-t border-slate-200/80">
+      <section id="food-delivery" className="relative py-10 sm:py-12 lg:py-14 bg-white overflow-hidden border-t border-slate-200/80">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           {/* 1. SECTION HEADER */}
-          <div className="text-center max-w-2xl mx-auto mb-8">
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-7">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-800 text-xs font-bold uppercase tracking-wider mb-2.5 shadow-2xs">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
@@ -998,11 +989,10 @@ const Home: React.FC = () => {
                     >
                       {/* Floating Circular Card */}
                       <div
-                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white flex items-center justify-center transition-all duration-300 transform group-hover:-translate-y-1.5 ${
-                          isActive
+                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white flex items-center justify-center transition-all duration-300 transform group-hover:-translate-y-1.5 ${isActive
                             ? 'ring-2 ring-orange-500 shadow-md bg-white scale-105'
                             : 'shadow-xs group-hover:shadow-md border border-slate-200'
-                        }`}
+                          }`}
                       >
                         <img
                           src={c.image}
@@ -1023,11 +1013,10 @@ const Home: React.FC = () => {
                       {/* Category Label Underneath */}
                       <div className="mt-2.5 sm:mt-3 text-center w-full">
                         <span
-                          className={`block text-xs sm:text-sm tracking-tight transition-colors duration-200 leading-tight ${
-                            isActive
+                          className={`block text-xs sm:text-sm tracking-tight transition-colors duration-200 leading-tight ${isActive
                               ? 'font-bold text-orange-600'
                               : 'font-semibold text-slate-700 group-hover:text-slate-900'
-                          }`}
+                            }`}
                         >
                           {c.name}
                         </span>
@@ -1054,11 +1043,10 @@ const Home: React.FC = () => {
                 {/* Veg Only Toggle */}
                 <button
                   onClick={() => setVegOnly(!vegOnly)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold border transition-all cursor-pointer ${
-                    vegOnly
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold border transition-all cursor-pointer ${vegOnly
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
                   <div className={`w-3 h-3 rounded border flex items-center justify-center ${vegOnly ? 'border-white bg-emerald-600' : 'border-emerald-600 bg-white'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${vegOnly ? 'bg-white' : 'bg-emerald-600'}`} />
@@ -1115,9 +1103,8 @@ const Home: React.FC = () => {
                         {/* Top Badges */}
                         <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between pointer-events-none">
                           {/* Veg / Non-Veg Icon */}
-                          <div className={`w-5 h-5 rounded-md border-2 bg-white/95 backdrop-blur-md flex items-center justify-center shadow-xs ${
-                            item.isVeg ? 'border-emerald-600' : 'border-rose-600'
-                          }`}>
+                          <div className={`w-5 h-5 rounded-md border-2 bg-white/95 backdrop-blur-md flex items-center justify-center shadow-xs ${item.isVeg ? 'border-emerald-600' : 'border-rose-600'
+                            }`}>
                             <div className={`w-2 h-2 rounded-full ${item.isVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
                           </div>
 
@@ -1230,56 +1217,244 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* OFFERS - 3-COLOR THEME */}
-      <section id="offers" className="py-12 sm:py-16 bg-slate-50 border-t border-slate-200/80">
+      {/* OFFERS - PREMIUM SHOWCASE PROMO CARDS */}
+      <section id="offers" className="py-10 sm:py-12 lg:py-14 bg-gradient-to-b from-slate-50 to-white border-t border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="bg-orange-500 rounded-3xl p-6 sm:p-8 md:p-10 text-white relative overflow-hidden shadow-lg shadow-orange-500/15 flex flex-col justify-between">
-              <div className="absolute top-4 right-6 text-5xl sm:text-6xl opacity-20 pointer-events-none">🍔</div>
-              <div>
-                <p className="text-xs sm:text-sm font-bold text-white/90 mb-1.5 sm:mb-2">🔥 Today's Fast-Food Special</p>
-                <h3 className="text-2xl sm:text-3xl font-extrabold mb-2 sm:mb-3">Special Combo @ ₹99</h3>
-                <p className="text-white/90 text-xs sm:text-sm mb-6 leading-relaxed">Crispy Burger + Salted Peri Peri Fries + Cold Beverage</p>
-              </div>
-              <div>
-                <Link to="/menu" className="inline-block bg-white text-orange-600 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl hover:bg-slate-100 transition-all shadow-md active:scale-95">Order Combo Now →</Link>
-              </div>
+
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-100/80 border border-orange-200 text-orange-700 text-xs font-black uppercase tracking-wider mb-3 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-orange-600" />
+              <span>EXCLUSIVE CAMPUS DEALS &amp; COMBOS</span>
             </div>
-            <div className="bg-gradient-to-br from-amber-500 via-orange-600 to-orange-700 rounded-3xl p-6 sm:p-8 md:p-10 text-white relative overflow-hidden shadow-xl shadow-orange-500/20 flex flex-col justify-between">
-              <div className="absolute top-4 right-6 text-5xl sm:text-6xl opacity-20 pointer-events-none">🍱</div>
-              <div>
-                <p className="text-xs sm:text-sm font-bold text-amber-200 mb-1.5 sm:mb-2">🎉 New Student Subscription Offer</p>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 sm:mb-3">First Month @ ₹999</h3>
-                <p className="text-orange-100 text-xs sm:text-sm mb-6 leading-relaxed">Subscribe this month and get free express delivery + weekend dessert specials included.</p>
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Hot Campus <span className="text-orange-600">Special Offers 🎁</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+
+            {/* Card 1: Express Fast-Food Combo (Warm Peach & Cream Palette) */}
+            <div className="group relative rounded-[2rem] p-6 sm:p-8 bg-gradient-to-br from-orange-50 via-white to-amber-50/90 text-slate-900 overflow-hidden shadow-lg shadow-orange-500/5 border-2 border-orange-200/80 hover:border-orange-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+              {/* Soft Ambient Accent */}
+              <div className="absolute -top-16 -right-16 w-56 h-56 bg-orange-200/35 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-orange-100 text-orange-700 border border-orange-200 text-[10px] font-black uppercase tracking-wider">
+                      🔥 Today&apos;s Fast-Food Special
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase">
+                      Save 45%
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline gap-2.5 mb-2">
+                    <h3 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-900">
+                      Special Combo <span className="text-orange-600">@ ₹99</span>
+                    </h3>
+                    <span className="text-sm sm:text-base text-slate-400 line-through font-bold">₹179</span>
+                  </div>
+
+                  <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed mb-4">
+                    Crispy Veg Burger + Salted Peri Peri Fries + Chilled Beverage delivered hot in 25 mins.
+                  </p>
+
+                  {/* Feature Pills */}
+                  <div className="flex flex-wrap gap-1.5 mb-6">
+                    {['🍔 Crispy Burger', '🍟 Peri Peri Fries', '🥤 Cold Drink'].map(chip => (
+                      <span key={chip} className="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-white border border-orange-200/70 text-slate-700 shadow-2xs">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Appetizing Visual Frame */}
+                <div className="relative shrink-0 self-center sm:self-auto">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-white p-1.5 border border-orange-200 shadow-xl rotate-2 group-hover:rotate-0 transition-transform duration-500">
+                    <img
+                      src="https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      alt="Special Combo Burger and Fries"
+                      onError={(e) => {
+                        if (!e.currentTarget.dataset.fallbackApplied) {
+                          e.currentTarget.dataset.fallbackApplied = '1';
+                          e.currentTarget.src = '/categories/burgers.png';
+                        }
+                      }}
+                      className="w-full h-full object-cover rounded-2xl"
+                    />
+                  </div>
+                  <span className="absolute -bottom-2 -right-2 bg-slate-900 text-amber-300 font-black text-[10px] px-2.5 py-1 rounded-full shadow-md border-2 border-white">
+                    ⚡ 25m Express
+                  </span>
+                </div>
               </div>
-              <div>
-                <Link to="/mess" className="inline-block bg-white text-orange-600 hover:bg-slate-50 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-md active:scale-95">
-                  Explore Mess Plans →
+
+              <div className="relative z-10 pt-4 border-t border-orange-200/60 flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] font-mono font-extrabold text-orange-700 bg-white border border-orange-200 px-3 py-1.5 rounded-xl shadow-2xs">
+                  CODE: COMBO99
+                </span>
+                <Link
+                  to="/menu"
+                  className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-md shadow-orange-500/20 active:scale-95"
+                >
+                  <span>Order Combo Now</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
+
+            {/* Card 2: New Student Mess Subscription Offer (Fresh Mint & Saffron Palette) */}
+            <div className="group relative rounded-[2rem] p-6 sm:p-8 bg-gradient-to-br from-emerald-50/70 via-white to-amber-50 text-slate-900 overflow-hidden shadow-lg shadow-emerald-500/5 border-2 border-emerald-200/80 hover:border-emerald-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+              {/* Soft Ambient Accent */}
+              <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-emerald-200/35 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase tracking-wider">
+                      🎉 New Student Offer
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 border border-amber-200 text-amber-800 text-[10px] font-black uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
+                      Limited Seats
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline gap-2.5 mb-2">
+                    <h3 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-900">
+                      First Month <span className="text-emerald-600">@ ₹999</span>
+                    </h3>
+                    <span className="text-sm sm:text-base text-slate-400 line-through font-bold">₹1,999</span>
+                  </div>
+
+                  <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed mb-4">
+                    Subscribe this month and unlock ₹0 hostel doorstep delivery + Sunday Royal Desserts included.
+                  </p>
+
+                  {/* Benefit Pills */}
+                  <div className="flex flex-wrap gap-1.5 mb-6">
+                    {['🚀 ₹0 Delivery Fee', '🍨 Weekend Desserts', '⏭️ Easy Skips'].map(chip => (
+                      <span key={chip} className="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-white border border-emerald-200/70 text-slate-700 shadow-2xs">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Appetizing Thali Visual Frame */}
+                <div className="relative shrink-0 self-center sm:self-auto">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-white p-1.5 border border-emerald-200 shadow-xl -rotate-2 group-hover:rotate-0 transition-transform duration-500">
+                    <img
+                      src="https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      alt="Homestyle Mess Thali Tiffin"
+                      onError={(e) => {
+                        if (!e.currentTarget.dataset.fallbackApplied) {
+                          e.currentTarget.dataset.fallbackApplied = '1';
+                          e.currentTarget.src = '/categories/thali.png';
+                        }
+                      }}
+                      className="w-full h-full object-cover rounded-2xl"
+                    />
+                  </div>
+                  <span className="absolute -bottom-2 -right-2 bg-emerald-600 text-white font-black text-[10px] px-2.5 py-1 rounded-full shadow-md border-2 border-white">
+                    🍱 50% OFF 1st Mo
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative z-10 pt-4 border-t border-emerald-200/60 flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] font-extrabold text-emerald-700 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Verified Campus Mess Pass
+                </span>
+                <Link
+                  to="/mess"
+                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-md shadow-emerald-600/20 active:scale-95"
+                >
+                  <span>Explore Mess Plans</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* WHY CHOOSE US - DISTINCT VALUE PROPOSITIONS */}
-      <section className="py-14 sm:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2 sm:mb-3">Why Students &amp; Pros Choose Us ✨</h2>
-            <p className="text-slate-500 text-xs sm:text-base">Designed specifically for daily convenience, pocket-friendly nutrition, and complete flexibility.</p>
+      {/* WHY CHOOSE US - COLORFUL VALUE PROPOSITIONS */}
+      <section className="relative py-10 sm:py-12 lg:py-14 bg-gradient-to-b from-white via-orange-50/20 to-white border-t border-slate-200/60 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-100 via-amber-100 to-rose-100 border border-orange-200/80 text-orange-800 text-xs font-black uppercase tracking-wider mb-3 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-orange-600" />
+              <span>THE BITEZ ADVANTAGE</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mb-2 sm:mb-3 tracking-tight">
+              Why Students &amp; Pros{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-rose-500 to-purple-600">
+                Choose Us ✨
+              </span>
+            </h2>
+            <p className="text-slate-600 text-xs sm:text-base">
+              Designed specifically for daily convenience, pocket-friendly nutrition, and complete flexibility.
+            </p>
           </div>
           <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: '🍱', title: 'Authentic Homestyle Taste', desc: 'Freshly prepared, non-oily nutritious food made daily with whole wheat rotis and fresh ingredients.' },
-              { icon: '🚴', title: 'Punctual Delivery', desc: 'Guaranteed delivery slots (12–1 PM lunch, 7:30–8:30 PM dinner) right to your hostel or desk.' },
-              { icon: '💰', title: 'Affordable Pricing', desc: 'Pocket-friendly subscriptions starting @ just ₹40/meal with zero hidden or delivery fees.' },
-              { icon: '📅', title: 'Instant Skips & Pauses', desc: 'Skip any meal before cutoff with 100% wallet refund, or pause validity during vacations.' }
+              {
+                icon: '🍱',
+                title: 'Authentic Homestyle Taste',
+                desc: 'Freshly prepared, non-oily nutritious food made daily with whole wheat rotis and fresh ingredients.',
+                badge: 'Pure Veg & Fresh',
+                cardStyle: 'bg-gradient-to-br from-orange-50 via-amber-50/60 to-white border-orange-200 hover:border-orange-400 shadow-orange-500/10',
+                iconPod: 'bg-gradient-to-br from-orange-500 to-amber-500 shadow-orange-500/30',
+                badgeStyle: 'bg-orange-100 text-orange-700 border-orange-200'
+              },
+              {
+                icon: '🚴',
+                title: 'Punctual Delivery',
+                desc: 'On-time Breakfast, Lunch & Dinner delivery slots right to your hostel room or campus gate.',
+                badge: '3 Daily Meal Slots',
+                cardStyle: 'bg-gradient-to-br from-sky-50 via-blue-50/60 to-white border-sky-200 hover:border-sky-400 shadow-sky-500/10',
+                iconPod: 'bg-gradient-to-br from-sky-500 to-indigo-600 shadow-sky-500/30',
+                badgeStyle: 'bg-sky-100 text-sky-700 border-sky-200'
+              },
+              {
+                icon: '💰',
+                title: 'Affordable Pricing',
+                desc: 'Pocket-friendly subscriptions starting @ just ₹40/meal with zero hidden charges or extra delivery fees.',
+                badge: '₹0 Delivery Fee',
+                cardStyle: 'bg-gradient-to-br from-emerald-50 via-teal-50/60 to-white border-emerald-200 hover:border-emerald-400 shadow-emerald-500/10',
+                iconPod: 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/30',
+                badgeStyle: 'bg-emerald-100 text-emerald-700 border-emerald-200'
+              },
+              {
+                icon: '📅',
+                title: 'Instant Skips & Pauses',
+                desc: 'Skip any meal before cutoff for +1 rollover meal balance, or pause your plan during vacations.',
+                badge: '+1 Meal Rollover',
+                cardStyle: 'bg-gradient-to-br from-purple-50 via-fuchsia-50/60 to-white border-purple-200 hover:border-purple-400 shadow-purple-500/10',
+                iconPod: 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-purple-500/30',
+                badgeStyle: 'bg-purple-100 text-purple-700 border-purple-200'
+              }
             ].map((item, i) => (
-              <div key={i} className="bg-white rounded-3xl p-6 text-center shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border border-orange-100/70 flex flex-col justify-start">
-                <div className="text-4xl mb-3.5">{item.icon}</div>
-                <h3 className="font-extrabold text-slate-900 text-base sm:text-lg mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+              <div
+                key={i}
+                className={`rounded-3xl p-6 text-center shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 border-2 flex flex-col justify-between group ${item.cardStyle}`}
+              >
+                <div>
+                  <div className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl text-white shadow-lg group-hover:scale-110 transition-transform duration-300 ${item.iconPod}`}>
+                    {item.icon}
+                  </div>
+                  <h3 className="font-black text-slate-900 text-base sm:text-lg mb-2">{item.title}</h3>
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4">{item.desc}</p>
+                </div>
+                <div className="pt-2">
+                  <span className={`inline-block text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${item.badgeStyle}`}>
+                    {item.badge}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
@@ -1287,12 +1462,12 @@ const Home: React.FC = () => {
       </section>
 
       {/* DELIVERY AREA CHECKER */}
-      <section className="py-12 sm:py-16 bg-orange-50/25 border-y border-orange-100/60">
+      <section className="py-10 sm:py-12 lg:py-14 bg-orange-50/25 border-t border-orange-100/70">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2 sm:mb-3">We Deliver Near You 📍</h2>
-          <p className="text-slate-500 mb-8 sm:mb-10 text-xs sm:text-base">Check if service is active in your college campus, hostel, coaching, or workplace</p>
-          <div className="bg-white rounded-3xl p-6 sm:p-10 mb-4 border border-orange-200/80 shadow-md">
-            <div className="text-6xl sm:text-7xl mb-4 sm:mb-6">🗺️</div>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2 sm:mb-2.5">We Deliver Near You 📍</h2>
+          <p className="text-slate-500 mb-6 sm:mb-7 text-xs sm:text-base">Check if service is active in your college campus, hostel, coaching, or workplace</p>
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-orange-200/80 shadow-md">
+            <div className="text-5xl sm:text-6xl mb-4">🗺️</div>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3 max-w-md mx-auto">
               <input type="text" placeholder="Enter your campus, PG, or area" className="flex-1 w-full px-5 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs sm:text-sm outline-none" />
               <button className="w-full sm:w-auto px-6 py-3 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-2xl hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 whitespace-nowrap cursor-pointer">Check Availability</button>
@@ -1302,9 +1477,9 @@ const Home: React.FC = () => {
       </section>
 
       {/* CUSTOMER REVIEWS - 3-COLOR THEME */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-10 sm:py-12 lg:py-14 bg-white border-t border-slate-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2 sm:mb-3">Loved by 10,000+ Foodies ⭐</h2>
             <p className="text-slate-500 text-xs sm:text-base">Real reviews from students, hostellers, and office professionals across the city</p>
           </div>
@@ -1326,13 +1501,13 @@ const Home: React.FC = () => {
       </section>
 
       {/* FREQUENTLY ASKED QUESTIONS - 3-COLOR THEME */}
-      <section id="faqs" className="relative py-20 lg:py-24 bg-slate-50 overflow-hidden border-t border-slate-200/80">
+      <section id="faqs" className="relative py-10 sm:py-12 lg:py-14 bg-slate-50 overflow-hidden border-t border-slate-200/80">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-            
+
             {/* LEFT COLUMN: Sticky Header & Live Support Card */}
             <div className="lg:col-span-4 lg:sticky lg:top-24">
-              
+
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200 text-orange-800 text-xs font-bold uppercase tracking-wider mb-4 shadow-2xs">
                 <HelpCircle className="w-3.5 h-3.5 text-orange-600" />
@@ -1401,7 +1576,7 @@ const Home: React.FC = () => {
 
             {/* RIGHT COLUMN: Search + Category Filters + Interactive Accordions */}
             <div className="lg:col-span-8">
-              
+
               {/* Search Bar */}
               <div className="relative mb-5">
                 <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -1430,11 +1605,10 @@ const Home: React.FC = () => {
                     <button
                       key={cat.id}
                       onClick={() => setFaqCategory(cat.id)}
-                      className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${
-                        isActive
+                      className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${isActive
                           ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 scale-102'
                           : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 shadow-2xs'
-                      }`}
+                        }`}
                     >
                       {cat.icon && <span>{cat.icon}</span>}
                       <span>{cat.label}</span>
@@ -1466,39 +1640,35 @@ const Home: React.FC = () => {
                     return (
                       <div
                         key={faq.id}
-                        className={`rounded-2xl sm:rounded-3xl transition-all duration-300 overflow-hidden ${
-                          isOpen
+                        className={`rounded-2xl sm:rounded-3xl transition-all duration-300 overflow-hidden ${isOpen
                             ? 'bg-white border-2 border-orange-500 shadow-md ring-4 ring-orange-100'
                             : 'bg-white hover:bg-white border border-slate-200 hover:border-orange-200 shadow-2xs hover:shadow-md'
-                        }`}
+                          }`}
                       >
                         <button
                           onClick={() => setOpenFaq(isOpen ? null : faq.id)}
                           className="w-full px-5 sm:px-6 py-4.5 sm:py-5 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
                         >
                           <div className="flex items-center gap-3.5 sm:gap-4 flex-1">
-                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 transition-transform duration-300 group-hover:scale-105 shadow-2xs ${
-                              isOpen ? 'bg-orange-50 border border-orange-200 text-orange-700' : 'bg-slate-50 border border-slate-200 text-slate-700'
-                            }`}>
+                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 transition-transform duration-300 group-hover:scale-105 shadow-2xs ${isOpen ? 'bg-orange-50 border border-orange-200 text-orange-700' : 'bg-slate-50 border border-slate-200 text-slate-700'
+                              }`}>
                               {faq.icon}
                             </div>
                             <div>
                               <div className="inline-block px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                                 {faq.tag}
                               </div>
-                              <h3 className={`text-sm sm:text-base font-bold transition-colors leading-snug ${
-                                isOpen ? 'text-orange-600 font-extrabold' : 'text-slate-800 group-hover:text-orange-600'
-                              }`}>
+                              <h3 className={`text-sm sm:text-base font-bold transition-colors leading-snug ${isOpen ? 'text-orange-600 font-extrabold' : 'text-slate-800 group-hover:text-orange-600'
+                                }`}>
                                 {faq.q}
                               </h3>
                             </div>
                           </div>
 
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
-                            isOpen
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 flex-shrink-0 ${isOpen
                               ? 'bg-orange-500 text-white rotate-180 shadow-sm'
                               : 'bg-slate-100 text-slate-400 group-hover:bg-orange-50 group-hover:text-orange-600'
-                          }`}>
+                            }`}>
                             <ChevronDown className="w-4 h-4" />
                           </div>
                         </button>

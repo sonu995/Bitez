@@ -4,6 +4,7 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
 const ExtraItem = require('../models/ExtraItem');
+const Dish = require('../models/Dish');
 const { getModel } = require('../config/adapter');
 const DispatchRoster = getModel('dispatchRoster');
 const DeliveryRateSetting = getModel('deliveryRateSettings');
@@ -159,10 +160,22 @@ router.get('/meal-delivery-status', protect, async (req, res) => {
       return userMatches && isToday;
     });
 
-    const activeSub = await Subscription.findOne({
+    let activeSub = await Subscription.findOne({
       userId: user?._id || user?.id,
       status: { $in: ['active', 'trial'] }
     }).populate('planId');
+
+    // Enforce subscription expiry / zero-meal exhaustion check
+    if (activeSub) {
+      const isDateExpired = activeSub.endDate && new Date(activeSub.endDate).getTime() < Date.now();
+      const isQuotaEmpty = typeof activeSub.remainingMeals === 'number' && activeSub.remainingMeals <= 0;
+      if (isDateExpired || isQuotaEmpty) {
+        activeSub.status = 'expired';
+        if (typeof activeSub.save === 'function') await activeSub.save();
+        activeSub = null;
+      }
+    }
+
     const isSubscriber = Boolean(activeSub || user?.isSubscriber || user?.hasSubscription || (userMeals && userMeals.length > 0));
 
     const istTime = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
@@ -361,11 +374,50 @@ router.post('/', protect, async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
+    // 0. Check Stock & Availability on all ordered items (Dishes & Extra Items)
+    let allDishes = [];
+    try {
+      allDishes = await Dish.find();
+    } catch (e) {}
+
     // 1. Detect if order is an Extra Food / Add-on order
     let allExtraCatalog = [];
     try {
       allExtraCatalog = await ExtraItem.find();
     } catch (e) {}
+
+    for (const orderedItem of items) {
+      const cleanId = String(orderedItem.id || orderedItem._id || '').replace(/^extra-/, '');
+      const cleanName = (orderedItem.name || '').toLowerCase().replace(/ \(extra side\)$/i, '').trim();
+      const matchedDish = (allDishes || []).find(d => String(d._id || d.id) === cleanId || (d.name || '').toLowerCase().trim() === cleanName);
+      const matchedExtra = (allExtraCatalog || []).find(ex => String(ex._id || ex.id) === cleanId || (ex.name || '').toLowerCase().trim() === cleanName);
+
+      if (matchedDish) {
+        if (matchedDish.isAvailable === false || (typeof matchedDish.stockQty === 'number' && matchedDish.stockQty <= 0)) {
+          return res.status(400).json({
+            success: false,
+            code: 'ITEM_OUT_OF_STOCK',
+            message: `Sorry, "${matchedDish.name}" is currently out of stock.`
+          });
+        }
+        if (typeof matchedDish.stockQty === 'number' && matchedDish.stockQty < (Number(orderedItem.quantity) || 1)) {
+          return res.status(400).json({
+            success: false,
+            code: 'INSUFFICIENT_STOCK',
+            message: `Only ${matchedDish.stockQty} portion(s) of "${matchedDish.name}" left in stock.`
+          });
+        }
+      }
+      if (matchedExtra) {
+        if (matchedExtra.isActive === false || matchedExtra.isAvailable === false || (typeof matchedExtra.stockQty === 'number' && matchedExtra.stockQty <= 0)) {
+          return res.status(400).json({
+            success: false,
+            code: 'ITEM_OUT_OF_STOCK',
+            message: `Sorry, "${matchedExtra.name}" is currently out of stock today.`
+          });
+        }
+      }
+    }
     const extraItemNames = new Set((allExtraCatalog || []).map(e => (e.name || '').toLowerCase().trim()));
     const extraItemIds = new Set((allExtraCatalog || []).map(e => String(e._id || e.id)));
 
@@ -437,10 +489,27 @@ router.post('/', protect, async (req, res) => {
       );
 
       if (!targetMeal) {
-        const activeSub = await Subscription.findOne({
+        let activeSub = await Subscription.findOne({
           userId: user._id || user.id,
           status: { $in: ['active', 'trial'] }
         }).populate('planId');
+
+        // Block if subscription is expired or exhausted
+        if (activeSub) {
+          const isDateExpired = activeSub.endDate && new Date(activeSub.endDate).getTime() < Date.now();
+          const isQuotaEmpty = typeof activeSub.remainingMeals === 'number' && activeSub.remainingMeals <= 0;
+          if (isDateExpired || isQuotaEmpty) {
+            activeSub.status = 'expired';
+            if (typeof activeSub.save === 'function') await activeSub.save();
+            return res.status(403).json({
+              success: false,
+              code: 'SUBSCRIPTION_EXPIRED',
+              policy: 'Extra Food With Meal Only Policy',
+              message: 'Your mess subscription has expired or has 0 meals remaining. Please renew your plan to order extra food with meal.'
+            });
+          }
+        }
+
         const isSubscriber = Boolean(activeSub || user.isSubscriber || user.hasSubscription);
 
         if (isSubscriber) {
@@ -577,6 +646,8 @@ router.post('/', protect, async (req, res) => {
       }
     } catch (e) {}
 
+    const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+
     // Determine payment method and status
     const rawMethod = (paymentMethod || 'Cash on Delivery').toLowerCase();
     let normalizedMethod = 'Cash on Delivery';
@@ -594,17 +665,17 @@ router.post('/', protect, async (req, res) => {
         });
       }
 
-      // Deduct from wallet & record transaction
+      // Deduct from wallet & record immutable transaction ledger entry with real orderId
       const deductAmt = Math.round(totalAmount);
       user.walletBalance = (Number(user.walletBalance) || 0) - deductAmt;
       if (!Array.isArray(user.walletTransactions)) user.walletTransactions = [];
       const ordTxnId = `TXN-ORD-${Math.floor(100000 + Math.random() * 900000)}`;
       user.walletTransactions.unshift({
         id: ordTxnId,
-        referenceId: `ORD-PENDING`,
+        referenceId: orderId,
         type: 'debit',
         amount: deductAmt,
-        description: `Food Order Checkout`,
+        description: `Food Order #${orderId}`,
         method: 'Campus Wallet',
         status: 'Completed',
         date: new Date().toISOString(),
@@ -627,7 +698,6 @@ router.post('/', protect, async (req, res) => {
       : (req.body.attachedMealSlot || (mealSlot && mealSlot !== 'Instant' ? mealSlot : 'Lunch'));
     const targetMealDate = targetMeal?.date || req.body.attachedMealDate || new Date().toISOString().split('T')[0];
 
-    const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
     const finalCustomerName = customerName || user.name || 'Student Customer';
     const finalCustomerPhone = customerPhone || user.phone || '';
     const finalDeliveryAddress = deliveryAddress || user.deliveryAddress || '';
@@ -787,6 +857,11 @@ router.post('/:id/cancel', protect, async (req, res) => {
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    const requesterId = String(req.user._id || req.user.id || '');
+    if (String(order.userId || '') !== requesterId && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized to cancel this order' });
     }
 
     if (order.status === 'delivered') {
